@@ -1,9 +1,9 @@
-;; init-c.el --- Initialize c configurations.	-*- lexical-binding: t -*-
+;; init-elixir.el --- Initialize elixir configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019 Vincent Zhang
+;; Copyright (C) 2019 N.Ahmet BASTUG
 
-;; Author: Vincent Zhang <seagle0128@gmail.com>
-;; URL: https://github.com/seagle0128/.emacs.d
+;; Author: N.Ahmet BASTUG <bastugn@itu.edu.tr>
+;; URL: https://github.com/kosantosbik/.emacs.d
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -25,29 +25,29 @@
 
 ;;; Commentary:
 ;;
-;; C/C++ configuration.
+;; Elixir configurations.
 ;;
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
-
-;; C/C++ Mode
-(use-package cc-mode
-  :ensure nil
-  :bind (:map c-mode-base-map
-         ("C-c c" . compile))
-  :hook (c-mode-common . (lambda ()
-                           (c-set-style "bsd")
-                           (setq tab-width 4)
-                           (setq c-basic-offset 4)))
+(use-package elixir-mode
   :config
-  (use-package modern-cpp-font-lock
-    :diminish
-    :init (modern-c++-font-lock-global-mode t)))
+  (use-package alchemist
+    :hook ((elixir-mode . alchemist-mode)
+           (elixir-mode . alchemist-phoenix-mode))
+    :config
+    (add-hook 'elixir-mode-hook 'alchemist-mode)
+    (add-hook 'elixir-mode-hook 'alchemist-phoenix-mode))
 
-(provide 'init-c)
+  (use-package flycheck-mix
+    :after flycheck
+    :init (flycheck-mix-setup))
+
+  (use-package flycheck-credo
+    :after flycheck
+    :init (flycheck-credo-setup)))
+
+(provide 'init-elixir)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-c.el ends here
+;;; init-elixir.el ends here

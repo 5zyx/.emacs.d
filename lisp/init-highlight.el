@@ -33,19 +33,38 @@
 (eval-when-compile
   (require 'init-const))
 
+;; Visualize TAB, (HARD) SPACE, NEWLINE
+(setq-default show-trailing-whitespace nil)
+(dolist (hook '(prog-mode-hook outline-mode-hook conf-mode-hook))
+  (add-hook hook (lambda ()
+                   (setq show-trailing-whitespace t)
+                   (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))))
+
 ;; Highlight the current line
 (use-package hl-line
   :ensure nil
   :hook (after-init . global-hl-line-mode))
 
+;; Highlight matching parens
+(use-package paren
+  :ensure nil
+  :hook (after-init . show-paren-mode)
+  :config (setq show-paren-when-point-inside-paren t
+                show-paren-when-point-in-periphery t))
+
 ;; Highlight symbols
 (use-package symbol-overlay
   :diminish
-  :defines iedit-mode
-  :commands (symbol-overlay-get-symbol
-             symbol-overlay-assoc
-             symbol-overlay-get-list
-             symbol-overlay-jump-call)
+  :custom-face
+  (symbol-overlay-default-face ((t (:inherit 'region))))
+  (symbol-overlay-face-1 ((t (:inherit 'highlight))))
+  (symbol-overlay-face-2 ((t (:inherit 'font-lock-builtin-face :inverse-video t))))
+  (symbol-overlay-face-3 ((t (:inherit 'warning :inverse-video t))))
+  (symbol-overlay-face-4 ((t (:inherit 'font-lock-constant-face :inverse-video t))))
+  (symbol-overlay-face-5 ((t (:inherit 'error :inverse-video t))))
+  (symbol-overlay-face-6 ((t (:inherit 'dired-mark :inverse-video t :bold nil))))
+  (symbol-overlay-face-7 ((t (:inherit 'success :inverse-video t))))
+  (symbol-overlay-face-8 ((t (:inherit 'dired-symlink :inverse-video t :bold nil))))
   :bind (("M-i" . symbol-overlay-put)
          ("M-n" . symbol-overlay-jump-next)
          ("M-p" . symbol-overlay-jump-prev)
@@ -54,31 +73,49 @@
          ("M-C" . symbol-overlay-remove-all)
          ([M-f3] . symbol-overlay-remove-all))
   :hook ((prog-mode . symbol-overlay-mode)
+         ;; Disable symbol highlighting in `iedit-mode'
          (iedit-mode . (lambda () (symbol-overlay-mode -1)))
-         (iedit-mode-end . symbol-overlay-mode)))
-
-;; Highlight matching parens
-(use-package paren
-  :ensure nil
-  :hook (after-init . show-paren-mode)
+         (iedit-mode-end . symbol-overlay-mode))
+  :init (setq symbol-overlay-idle-time 0.1)
   :config
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t))
+  ;; Disable symbol highlighting while selecting
+  (defadvice set-mark (after disable-symbol-overlay activate)
+    (symbol-overlay-mode -1))
+  (defadvice deactivate-mark (after enable-symbol-overlay activate)
+    (symbol-overlay-mode 1)))
 
 ;; Highlight indentions
 (when (display-graphic-p)
   (use-package highlight-indent-guides
     :diminish
-    :hook (prog-mode . (lambda ()
-                         ;; WORKAROUND:Fix the issue of not displaying plots
-                         ;; @see https://github.com/DarthFennec/highlight-indent-guides/issues/55
-                         (unless (eq major-mode 'ein:notebook-multilang-mode)
-                           (highlight-indent-guides-mode 1))))
+    :commands highlight-indent-guides--highlighter-default
+    :functions my-indent-guides-for-all-but-first-column
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :init (setq highlight-indent-guides-method 'character
+                highlight-indent-guides-responsive 'top)
     :config
-    (setq highlight-indent-guides-method 'character)
-    (setq highlight-indent-guides-responsive t)
+    ;; Don't display indentations while editing with `company'
+    (with-eval-after-load 'company
+      (add-hook 'company-completion-started-hook
+                (lambda (&rest _)
+                  "Trun off indentation highlighting."
+                  (when highlight-indent-guides-mode
+                    (highlight-indent-guides-mode -1))))
+      (add-hook 'company-after-completion-hook
+                (lambda (&rest _)
+                  "Trun on indentation highlighting."
+                  (when (and (derived-mode-p 'prog-mode)
+                             (not highlight-indent-guides-mode))
+                    (highlight-indent-guides-mode 1)))))
 
-    ;; Disable `highlight-indent-guides-mode' in `swiper'
+    ;; Don't display first level of indentation
+    (defun my-indent-guides-for-all-but-first-column (level responsive display)
+      (unless (< level 1)
+        (highlight-indent-guides--highlighter-default level responsive display)))
+    (setq highlight-indent-guides-highlighter-function
+          #'my-indent-guides-for-all-but-first-column)
+
+    ;; Don't display indentations in `swiper'
     ;; https://github.com/DarthFennec/highlight-indent-guides/issues/40
     (with-eval-after-load 'ivy
       (defadvice ivy-cleanup-string (after my-ivy-cleanup-hig activate)
@@ -93,36 +130,26 @@
 ;; Colorize color names in buffers
 (use-package rainbow-mode
   :diminish
-  :hook (prog-mode . rainbow-mode)
+  :defines helpful-mode-map
+  :functions my-rainbow-colorize-match
+  :commands (rainbow-x-color-luminance rainbow-colorize-match)
+  :bind (:map help-mode-map
+         ("w" . rainbow-mode))
+  :hook ((css-mode scss-mode less-css-mode) . rainbow-mode)
   :config
-  ;; Override `hl-line' faces
-  ;; HACK: Use overlay instead of text properties.
-  ;; https://emacs.stackexchange.com/questions/23958/combine-highlight-symbol-mode-and-hl-line-mode
-  (defun rainbow-colorize-match (color &optional match)
-    "Return a matched string propertized with a face whose
-background is COLOR. The foreground is computed using
-`rainbow-color-luminance', and is either white or black."
+  ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
+  ;; @see https://emacs.stackexchange.com/questions/36420
+  (defun my-rainbow-colorize-match (color &optional match)
     (let* ((match (or match 0))
            (ov (make-overlay (match-beginning match) (match-end match))))
-      (overlay-put ov
-                   'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
-                                             "white" "black"))
-                           (:background ,color)))
-      (ignore-errors
-        (overlay-put ov 'symbol 'ovrainbow))))
+      (overlay-put ov 'ovrainbow t)
+      (overlay-put ov 'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
+                                                "white" "black"))
+                              (:background ,color)))))
+  (advice-add #'rainbow-colorize-match :override #'my-rainbow-colorize-match)
 
-  (defun rainbow-turn-off ()
-    "Turn off rainbow-mode."
-    (font-lock-remove-keywords
-     nil
-     `(,@rainbow-hexadecimal-colors-font-lock-keywords
-       ,@rainbow-x-colors-font-lock-keywords
-       ,@rainbow-latex-rgb-colors-font-lock-keywords
-       ,@rainbow-r-colors-font-lock-keywords
-       ,@rainbow-html-colors-font-lock-keywords
-       ,@rainbow-html-rgb-colors-font-lock-keywords))
-    (ignore-errors
-      (remove-overlays (point-min) (point-max) 'symbol 'ovrainbow))))
+  (defadvice rainbow-turn-off (after clear-overlays activate)
+    (remove-overlays (point-min) (point-max) 'ovrainbow t)))
 
 ;; Highlight brackets according to their depth
 (use-package rainbow-delimiters
@@ -130,12 +157,11 @@ background is COLOR. The foreground is computed using
 
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
-  :custom-face (hl-todo ((t (:box t :inherit))))
   :bind (:map hl-todo-mode-map
-              ([C-f3] . hl-todo-occur)
-              ("C-c t p" . hl-todo-previous)
-              ("C-c t n" . hl-todo-next)
-              ("C-c t o" . hl-todo-occur))
+         ([C-f3] . hl-todo-occur)
+         ("C-c t p" . hl-todo-previous)
+         ("C-c t n" . hl-todo-next)
+         ("C-c t o" . hl-todo-occur))
   :hook (after-init . global-hl-todo-mode)
   :config
   (dolist (keyword '("BUG" "DEFECT" "ISSUE"))
@@ -147,12 +173,10 @@ background is COLOR. The foreground is computed using
 (use-package diff-hl
   :defines (diff-hl-margin-symbols-alist desktop-minor-mode-table)
   :commands diff-hl-magit-post-refresh
-  :custom-face
-  (diff-hl-change ((t (:background "#46D9FF"))))
-  (diff-hl-delete ((t (:background "#ff6c6b"))))
-  (diff-hl-insert ((t (:background "#98be65"))))
+  :functions  my-diff-hl-fringe-bmp-function
+  :custom-face (diff-hl-change ((t (:foreground ,(face-background 'highlight)))))
   :bind (:map diff-hl-command-map
-              ("SPC" . diff-hl-mark-hunk))
+         ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
          (dired-mode . diff-hl-dired-mode))
   :config
@@ -161,8 +185,14 @@ background is COLOR. The foreground is computed using
 
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
-  (setq diff-hl-draw-borders nil)
-  (if sys/mac-x-p (set-fringe-mode '(4 . 8)))
+
+  (defun my-diff-hl-fringe-bmp-function (_type _pos)
+    "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
+    (define-fringe-bitmap 'my-diff-hl-bmp
+      (vector (if sys/macp #b11100000 #b11111100))
+      1 8
+      '(center t)))
+  (setq diff-hl-fringe-bmp-function #'my-diff-hl-fringe-bmp-function)
 
   (unless (display-graphic-p)
     (setq diff-hl-margin-symbols-alist
@@ -185,37 +215,6 @@ background is COLOR. The foreground is computed using
   :hook (after-init . volatile-highlights-mode))
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
-(use-package whitespace
-  :ensure nil
-  :diminish
-  :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
-  :config
-  (setq whitespace-line-column fill-column) ;; limit line length
-  ;; automatically clean up bad whitespace
-  (setq whitespace-action '(auto-cleanup))
-  ;; only show bad whitespace
-  (setq whitespace-style '(face
-                           trailing space-before-tab
-                           indentation empty space-after-tab))
-
-  (with-eval-after-load 'popup
-    ;; advice for whitespace-mode conflict with popup
-    (defvar my-prev-whitespace-mode nil)
-    (make-local-variable 'my-prev-whitespace-mode)
-
-    (defadvice popup-draw (before my-turn-off-whitespace activate compile)
-      "Turn off whitespace mode before showing autocomplete box."
-      (if whitespace-mode
-          (progn
-            (setq my-prev-whitespace-mode t)
-            (whitespace-mode -1))
-        (setq my-prev-whitespace-mode nil)))
-
-    (defadvice popup-delete (after my-restore-whitespace activate compile)
-      "Restore previous whitespace mode when deleting autocomplete box."
-      (if my-prev-whitespace-mode
-          (whitespace-mode 1)))))
-
 ;; Pulse current line
 (use-package pulse
   :ensure nil

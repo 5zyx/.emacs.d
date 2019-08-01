@@ -67,6 +67,9 @@
             ('netease
              `(,(cons "gnu"   (concat proto "://mirrors.163.com/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/"))))
+            ('tencent
+             `(,(cons "gnu"   (concat proto "://mirrors.cloud.tencent.com/elpa//gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
             ('tuna
              `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))
@@ -101,6 +104,9 @@
 (use-package diminish)
 (use-package bind-key)
 
+;; Update GPG keyring for GNU ELPA
+(use-package gnu-elpa-keyring-update)
+
 ;; Initialization benchmark
 (when centaur-benchmark
   (use-package benchmark-init
@@ -112,18 +118,27 @@
     (with-eval-after-load 'swiper
       (add-to-list 'swiper-font-lock-exclude 'benchmark-init/tree-mode))))
 
-;; Extensions
+;; A modern Packages Menu
 (use-package paradox
   :init
   (setq paradox-execute-asynchronously t)
   (setq paradox-github-token t)
   (setq paradox-display-star-count nil)
 
-  (defalias #'upgrade-packages #'paradox-upgrade-packages)
+  (defalias 'upgrade-packages #'paradox-upgrade-packages)
 
   ;; Replace default `list-packages'
   (defadvice list-packages (before my-list-packages activate)
-    (paradox-enable)))
+    (paradox-enable))
+  :config
+  (when (fboundp 'page-break-lines-mode)
+    (add-hook 'paradox-after-execute-functions
+              (lambda (&rest _)
+                (let ((buf (get-buffer-create "*Paradox Report*"))
+                      (inhibit-read-only t))
+                  (with-current-buffer buf
+                    (page-break-lines-mode 1))))
+              t)))
 
 (provide 'init-package)
 

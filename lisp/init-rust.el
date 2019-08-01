@@ -1,4 +1,4 @@
-;; init-dap.el --- Initialize dap configurations.	-*- lexical-binding: t -*-
+;; init-rust.el --- Initialize Rust configurations.	-*- lexical-binding: t -*-
 
 ;; Copyright (C) 2019 Vincent Zhang
 
@@ -25,24 +25,26 @@
 
 ;;; Commentary:
 ;;
-;; Debug Adapter Protocol configurations.
+;; Rust configurations.
 ;;
 
 ;;; Code:
 
-(use-package dap-mode
-  :diminish
-  :hook ((after-init . dap-mode)
-         (dap-mode . dap-ui-mode)
+;; Rust
+(use-package rust-mode
+  :init (setq rust-format-on-save t)
+  :config
+  (use-package cargo
+    :diminish cargo-minor-mode
+    :hook (rust-mode . cargo-minor-mode)
+    :config
+    ;; To render buttons correctly, keep it at the last
+    (setq compilation-filter-hook
+          (append compilation-filter-hook '(cargo-process--add-errno-buttons)))))
 
-         (python-mode . (lambda () (require 'dap-python)))
-         (go-mode . (lambda () (require 'dap-go)))
-         (java-mode . (lambda () (require 'dap-java)))
-         (rust-mode . (lambda () (require 'dap-rust)))
-         ((c-mode c++-mode objc-mode swift) . (lambda () (require 'dap-lldb)))
-         (php-mode . (lambda () (require 'dap-php)))))
+(use-package rust-playground)
 
-(provide 'init-dap)
+(provide 'init-rust)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-dap.el ends here
+;;; init-rust.el ends here

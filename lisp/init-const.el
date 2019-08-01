@@ -32,7 +32,7 @@
 
 (defconst centaur-homepage
   "https://github.com/seagle0128/.emacs.d"
-  "The Github page of Centuar Emacs.")
+  "The Github page of Centaur Emacs.")
 
 (defconst sys/win32p
   (eq system-type 'windows-nt)
@@ -73,6 +73,11 @@
 (defconst emacs/>=27p
   (>= emacs-major-version 27)
   "Emacs is 27 or above.")
+
+(defconst emacs/>=25.3p
+  (or emacs/>=26p
+      (and (= emacs-major-version 25) (>= emacs-minor-version 3)))
+  "Emacs is 25.3 or above.")
 
 (defconst emacs/>=25.2p
   (or emacs/>=26p

@@ -42,11 +42,23 @@
 
 ;; Youdao Dictionary
 (use-package youdao-dictionary
-  :functions (posframe-show posframe-hide)
-  :preface
+  :functions (posframe-show
+              posframe-hide)
+  :commands (youdao-dictionary-mode
+             youdao-dictionary--region-or-word
+             youdao-dictionary--format-result)
+  :bind (("C-c y" . my-youdao-search-at-point)
+         ("C-c Y" . youdao-dictionary-search-at-point))
+  :config
+  ;; Cache documents
+  (setq url-automatic-caching t)
+
+  ;; Enable Chinese word segmentation support (支持中文分词)
+  (setq youdao-dictionary-use-chinese-word-segmentation t)
+
   (with-eval-after-load 'posframe
     (defun youdao-dictionary-search-at-point-posframe ()
-      "Search word at point and display result with `posframe'."
+      "Search word at point and display result with posframe."
       (interactive)
       (let ((word (youdao-dictionary--region-or-word)))
         (if word
@@ -58,8 +70,7 @@
                   (insert (youdao-dictionary--format-result word))
                   (goto-char (point-min))
                   (set (make-local-variable 'youdao-dictionary-current-buffer-word) word)))
-              (posframe-show youdao-dictionary-buffer-name
-                             :position (point))
+              (posframe-show youdao-dictionary-buffer-name :position (point))
               (unwind-protect
                   (push (read-event) unread-command-events)
                 (posframe-hide youdao-dictionary-buffer-name)))
@@ -70,15 +81,8 @@
     (if (display-graphic-p)
         (if (fboundp 'youdao-dictionary-search-at-point-posframe)
             (youdao-dictionary-search-at-point-posframe)
-          (youdao-dictionary-search-at-point-tooltip))))
-  :bind (("C-c y" . youdao-dictionary-search-at-point)
-         ("C-c Y" . my-youdao-search-at-point))
-  :config
-  ;; Cache documents
-  (setq url-automatic-caching t)
-
-  ;; Enable Chinese word segmentation support (支持中文分词)
-  (setq youdao-dictionary-use-chinese-word-segmentation t))
+          (youdao-dictionary-search-at-point-tooltip))
+      (youdao-dictionary-search-at-point))))
 
 ;;
 ;; Search tools
@@ -87,8 +91,8 @@
 ;; Writable `grep' buffer
 (use-package wgrep
   :init
-  (setq wgrep-auto-save-buffer t)
-  (setq wgrep-change-readonly-file t))
+  (setq wgrep-auto-save-buffer t
+        wgrep-change-readonly-file t))
 
 ;; `find-dired' alternative using `fd'
 (when (executable-find "fd")
@@ -100,8 +104,8 @@
     :defines projectile-command-map
     :hook (after-init . rg-enable-default-bindings)
     :config
-    (setq rg-group-result t)
-    (setq rg-show-columns t)
+    (setq rg-group-result t
+          rg-show-columns t)
 
     (cl-pushnew '("tmpl" . "*.tmpl") rg-custom-type-aliases)
 
@@ -110,30 +114,18 @@
       (bind-key "s R" #'rg-project projectile-command-map))
 
     (with-eval-after-load 'counsel
-      (bind-keys :map rg-global-map
-                 ("c r" . counsel-rg)
-                 ("c s" . counsel-ag)
-                 ("c p" . counsel-pt)
-                 ("c f" . counsel-fzf)))))
-
-;; Edit text for browsers with GhostText or AtomicChrome extension
-(use-package atomic-chrome
-  :hook ((emacs-startup . atomic-chrome-start-server)
-         (atomic-chrome-edit-mode . delete-other-windows))
-  :init (setq atomic-chrome-buffer-open-style 'frame)
-  :config
-  (if (fboundp 'gfm-mode)
-      (setq atomic-chrome-url-major-mode-alist
-            '(("github\\.com" . gfm-mode)))))
-
-;; Open files as another user
-(unless sys/win32p
-  (use-package sudo-edit))
+      (bind-keys
+       :map rg-global-map
+       ("c r" . counsel-rg)
+       ("c s" . counsel-ag)
+       ("c p" . counsel-pt)
+       ("c f" . counsel-fzf)))))
 
 ;; Docker
 (use-package docker
   :bind ("C-c d" . docker)
-  :init (setq docker-image-run-arguments '("-i" "-t" "--rm")))
+  :init (setq docker-image-run-arguments '("-i" "-t" "--rm")
+              docker-container-shell-file-name "/bin/bash"))
 
 ;; Tramp
 (use-package docker-tramp)
@@ -146,15 +138,23 @@
 ;; A Simmple and cool pomodoro timer
 (use-package pomidor
   :bind ("<f12>" . pomidor)
-  :init (setq alert-default-style (if sys/macp 'osx-notifier 'libnotify))
-  :config
+  :init
+  (setq alert-default-style 'mode-line)
   (when sys/macp
     (setq pomidor-play-sound-file
           (lambda (file)
-            (start-process "my-pomidor-play-sound"
+            (start-process "pomidor-play-sound"
                            nil
                            "afplay"
-                           file)))))
+                           file))))
+  :config
+  (setq alert-severity-colors
+        `((urgent   . ,(face-foreground 'error))
+          (high     . ,(face-foreground 'all-the-icons-orange))
+          (moderate . ,(face-foreground 'warning))
+          (normal   . ,(face-foreground 'success))
+          (low      . ,(face-foreground 'all-the-icons-blue))
+          (trivial  . ,(face-foreground 'all-the-icons-purple)))))
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
@@ -171,52 +171,34 @@
         (save-buffer))))
   :hook (after-init . persistent-scratch-setup-default)
   :bind (:map lisp-interaction-mode-map
-              ("C-x C-s" . my-save-buffer)))
+         ("C-x C-s" . my-save-buffer)))
 
 ;; PDF reader
 (when (display-graphic-p)
-  (use-package pdf-view
-    :ensure pdf-tools
+  (use-package pdf-tools
     :diminish (pdf-view-midnight-minor-mode pdf-view-printer-minor-mode)
+    :defines pdf-annot-activate-created-annotations
     :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
     :magic ("%PDF" . pdf-view-mode)
-    :preface
-    (defun my-pdf-set-midnight-colors ()
-      (setq pdf-view-midnight-colors
-            `(,(face-foreground 'default) . ,(face-background 'default))))
-
-    ;; Workaround for pdf-tools not reopening to last-viewed page
-    ;; https://github.com/politza/pdf-tools/issues/18
-    (defun my-pdf-set-last-viewed-bookmark ()
-      (interactive)
-      (when (eq major-mode 'pdf-view-mode)
-        (bookmark-set (my-pdf-generate-bookmark-name))))
-
-    (defun my-pdf-jump-last-viewed-bookmark ()
-      (when (my-pdf-has-last-viewed-bookmark)
-        (bookmark-jump (my-pdf-generate-bookmark-name))))
-
-    (defun my-pdf-has-last-viewed-bookmark ()
-      (assoc
-       (my-pdf-generate-bookmark-name) bookmark-alist))
-
-    (defun my-pdf-generate-bookmark-name ()
-      (concat "LAST-VIEWED: " (buffer-name)))
-
-    (defun my-pdf-set-all-last-viewed-bookmarks ()
-      (dolist (buf (buffer-list))
-        (with-current-buffer buf
-          (my-pdf-set-last-viewed-bookmark))))
     :bind (:map pdf-view-mode-map
-                ("C-s" . isearch-forward))
-    :hook ((after-load-theme . my-pdf-set-midnight-colors)
-           (kill-buffer . my-pdf-set-last-viewed-bookmark)
-           (pdf-view-mode . my-pdf-jump-last-viewed-bookmark)
-           (kill-emacs . (lambda ()
-                           (unless noninteractive  ; as `save-place-mode' does
-                             (my-pdf-set-all-last-viewed-bookmarks)))))
-    :init (my-pdf-set-midnight-colors)
-    :config (pdf-tools-install t nil t t)))
+           ("C-s" . isearch-forward))
+    :init
+    (setq pdf-view-midnight-colors '("#ededed" . "#21242b")
+          pdf-annot-activate-created-annotations t)
+    :config
+    ;; WORKAROUND: Fix compilation errors on macOS.
+    ;; @see https://github.com/politza/pdf-tools/issues/480
+    (when sys/macp
+      (setenv "PKG_CONFIG_PATH"
+              "/usr/local/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig"))
+    (pdf-tools-install t nil t t)
+
+    ;; Recover last viewed position
+    (when emacs/>=26p
+      (use-package pdf-view-restore
+        :hook (pdf-view-mode . pdf-view-restore-mode)
+        :init (setq pdf-view-restore-filename
+                    (locate-user-emacs-file ".pdf-view-restore"))))))
 
 ;; Epub reader
 (use-package nov
@@ -234,6 +216,32 @@
   :bind ("<f7>" . olivetti-mode)
   :init (setq olivetti-body-width 0.618))
 
+;; Music player
+(use-package bongo
+  :functions (bongo-add-dired-files
+              dired-get-filename
+              dired-marker-regexp
+              dired-move-to-filename)
+  :commands (bongo-buffer
+             bongo-library-buffer-p
+             bongo-library-buffer)
+  :bind ("C-<f9>" . bongo)
+  :init
+  (with-eval-after-load 'dired
+    (defun bongo-add-dired-files ()
+      "Add marked files to Bongo library"
+      (interactive)
+      (bongo-buffer)
+      (let (file (files nil))
+        (dired-map-over-marks
+         (setq file (dired-get-filename)
+               files (append files (list file)))
+         nil t)
+        (with-bongo-library-buffer
+          (mapc 'bongo-insert-file files)))
+      (bongo-switch-buffers))
+    (bind-key "b" #'bongo-add-dired-files dired-mode-map)))
+
 ;; Misc
 (use-package copyit)                    ; copy path, url, etc.
 (use-package daemons)                   ; system services/daemons
@@ -244,7 +252,7 @@
 (use-package list-environment)
 (use-package memory-usage)
 (use-package tldr)
-(use-package ztree)                     ; text mode directory tree. Similar with beyond compare
+(use-package ztree)                     ; text mode directory tree
 
 (provide 'init-utils)
 
