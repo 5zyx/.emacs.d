@@ -31,7 +31,7 @@
 /amx-items
 /bookmarks
 /company-statistics-cache.el
-/custom-post.el
+#/custom-post.el
 /custom.el
 /history
 /nov-places
