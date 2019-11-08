@@ -4,7 +4,7 @@
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
-;; Version: 5.5.0
+;; Version: 5.7.0
 ;; Keywords: .emacs.d centaur
 
 ;;
@@ -60,6 +60,9 @@ decrease this. If you experience stuttering, increase this.")
 
 (defvar centaur-gc-cons-upper-limit (if (display-graphic-p) 400000000 100000000)
   "The temporary value for `gc-cons-threshold' to defer it.")
+
+(defvar centaur-gc-timer (run-with-idle-timer 10 t #'garbage-collect)
+  "Run garbarge collection when idle 10s.")
 
 (defvar default-file-name-handler-alist file-name-handler-alist)
 
@@ -145,8 +148,8 @@ decrease this. If you experience stuttering, increase this.")
 
 (require 'init-markdown)
 (require 'init-org)
-(require 'init-elfeed)
 
+(require 'init-elfeed)
 (require 'init-utils)
 
 ;; Programming

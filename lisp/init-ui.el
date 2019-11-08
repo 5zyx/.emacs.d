@@ -65,114 +65,57 @@
 (if (centaur-compatible-theme-p centaur-theme)
     (progn
       (use-package doom-themes
+        :defines doom-themes-treemacs-theme
+        :functions doom-themes-hide-modeline
+        :hook (after-load-theme . (lambda ()
+                                    (set-face-foreground
+                                     'mode-line
+                                     (face-foreground 'default))))
         :init (centaur-load-theme centaur-theme)
         :config
+        ;; FIXME: @see https://github.com/hlissner/emacs-doom-themes/issues/317.
+        (set-face-foreground 'mode-line (face-foreground 'default))
+
+        ;; Make swiper match clearer
+	    (with-eval-after-load 'swiper
+	      (set-face-background 'swiper-background-match-face-1 "SlateGray1"))
+
         ;; Enable flashing mode-line on errors
         (doom-themes-visual-bell-config)
+        ;; WORKAROUND: use legacy codes
         (set-face-attribute 'doom-visual-bell nil
+                            :inherit 'mode-line
                             :background (face-foreground 'error)
-                            :foreground (face-background 'default)
                             :inverse-video nil)
+        (defvar doom-themes--bell-p nil)
+        (defun doom-themes-visual-bell-fn ()
+          "Blink the mode-line red briefly. Set `ring-bell-function' to this to use it."
+          (unless doom-themes--bell-p
+            (let ((old-remap (copy-alist face-remapping-alist)))
+              (setq doom-themes--bell-p t)
+              (setq face-remapping-alist
+                    (append (delete (assq 'mode-line face-remapping-alist)
+                                    face-remapping-alist)
+                            '((mode-line doom-visual-bell))))
+              (force-mode-line-update)
+              (run-with-timer 0.15 nil
+                              (lambda (remap buf)
+                                (with-current-buffer buf
+                                  (when (assq 'mode-line face-remapping-alist)
+                                    (setq face-remapping-alist remap
+                                          doom-themes--bell-p nil))
+                                  (force-mode-line-update)))
+                              old-remap
+                              (current-buffer)))))
+
         ;; Corrects (and improves) org-mode's native fontification.
         (doom-themes-org-config)
-        ;; Enable custom treemacs theme (all-the-icons must be installed!)
+
+        ;; Enable customized theme (`all-the-icons' must be installed!)
+        (setq doom-themes-treemacs-theme "doom-colors")
         (doom-themes-treemacs-config)
-
-        ;; Colorful icon theme
-	    (with-eval-after-load 'treemacs
-          (with-no-warnings
-            (when (require 'all-the-icons nil t)
-              (treemacs-create-theme
-               "centaur"
-               :config
-               (let ((face-spec '(:inherit font-lock-doc-face :slant normal)))
-                 (treemacs-create-icon
-                  :icon (format " %s\t" (all-the-icons-octicon "repo" :v-adjust -0.1 :face face-spec))
-                  :extensions (root))
-                 (treemacs-create-icon
-                  :icon (format "%s\t%s\t"
-                                (all-the-icons-octicon "chevron-down" :height 0.75 :v-adjust 0.1)
-                                (all-the-icons-octicon "file-directory" :v-adjust 0))
-                  :extensions (dir-open))
-                 (treemacs-create-icon
-                  :icon (format "%s\t%s\t"
-                                (all-the-icons-octicon "chevron-right" :height 0.75 :v-adjust 0.1 :face face-spec)
-                                (all-the-icons-octicon "file-directory" :v-adjust 0 :face face-spec))
-                  :extensions (dir-closed))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t%s\t"
-                                (all-the-icons-octicon "chevron-down" :height 0.75 :v-adjust 0.1)
-                                (all-the-icons-octicon "package" :v-adjust 0)) :extensions (tag-open))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t%s\t"
-                                (all-the-icons-octicon "chevron-right" :height 0.75 :v-adjust 0.1 :face face-spec)
-                                (all-the-icons-octicon "package" :v-adjust 0 :face face-spec))
-                  :extensions (tag-closed))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "tag" :height 0.9 :v-adjust 0 :face face-spec))
-                  :extensions (tag-leaf))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "flame" :v-adjust 0 :face face-spec))
-                  :extensions (error))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "stop" :v-adjust 0 :face face-spec))
-                  :extensions (warning))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "info" :height 0.75 :v-adjust 0.1 :face face-spec))
-                  :extensions (info))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "file-binary" :v-adjust 0 :face face-spec))
-                  :extensions ("exe" "obj" "so" "o" "out"))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-octicon "file-zip" :v-adjust 0 :face 'all-the-icons-lmaroon))
-                  :extensions ("tar" "rar" "tgz"))
-                 (treemacs-create-icon
-                  :icon (format "  %s\t" (all-the-icons-faicon "file-o" :height 0.8 :v-adjust 0 :face 'all-the-icons-dsilver))
-                  :extensions (fallback))
-
-                 (defun get-extenstions (ext)
-                   "Transfer EXT regexps to extension list."
-                   (let* ((e (s-replace-all
-                              '((".\\?" . "") ("\\?" . "") ("\\." . "")
-                                ("\\" . "") ("^" . "") ("$" . "")
-                                ("'" . "") ("*." . "") ("*" . ""))
-                              ext))
-                          (exts (list e)))
-                     ;; Handle "[]"
-                     (when-let* ((s (s-split "\\[\\|\\]" e))
-                                 (f (car s))
-                                 (m (cadr s))
-                                 (l (caddr s))
-                                 (mcs (delete "" (s-split "" m))))
-                       (setq exts nil)
-                       (dolist (c mcs)
-                         (push (s-concat f c l) exts)))
-                     ;; Handle '?
-                     (dolist (ext exts)
-                       (when (s-match "?" ext)
-                         (when-let ((s (s-split "?" ext)))
-                           (setq exts nil)
-                           (push (s-join "" s) exts)
-                           (push (s-concat (if (> (length (car s)) 1)
-                                               (substring (car s) 0 -1))
-                                           (cadr s)) exts))))
-                     exts))
-
-                 (dolist (item all-the-icons-icon-alist)
-                   (let* ((extensions (get-extenstions (car item)))
-                          (func (cadr item))
-                          (args (append (list (caddr item)) '(:v-adjust -0.05) (cdddr item)))
-                          (icon (apply func args)))
-                     (let* ((icon-pair (cons (format "  %s\t" icon) " "))
-                            (gui-icons (treemacs-theme->gui-icons treemacs--current-theme))
-                            (tui-icons (treemacs-theme->tui-icons treemacs--current-theme))
-                            (gui-icon  (car icon-pair))
-                            (tui-icon  (cdr icon-pair)))
-                       (--each extensions
-                         (ht-set! gui-icons it gui-icon)
-                         (ht-set! tui-icons it tui-icon)))))))
-
-              (treemacs-load-theme "centaur")))))
+        (with-eval-after-load 'treemacs
+          (remove-hook 'treemacs-mode-hook #'doom-themes-hide-modeline)))
 
       ;; Make certain buffers grossly incandescent
       (use-package solaire-mode
@@ -192,12 +135,7 @@
 
 ;; Mode-line
 (use-package doom-modeline
-  :custom-face (mode-line ((t (:foreground ,(face-foreground 'default)))))
-  :hook ((after-init . doom-modeline-mode)
-         (after-load-theme . (lambda ()
-                               (set-face-foreground
-                                'mode-line
-                                (face-foreground 'default)))))
+  :hook (after-init . doom-modeline-mode)
   :init
   ;; prevent flash of unstyled modeline at startup
   (unless after-init-time
@@ -207,13 +145,16 @@
   (setq doom-modeline-major-mode-color-icon t
         doom-modeline-minor-modes nil
         doom-modeline-mu4e nil)
-  :bind ("C-<f6>" . doom-modeline-hydra/body)
+  :bind (:map doom-modeline-mode-map
+         ("M-<f6>" . doom-modeline-hydra/body))
   :pretty-hydra
   ((:title (pretty-hydra-title "Mode Line" 'fileicon "emacs")
     :color amaranth :quit-key "q")
    ("Icon"
     (("i" (setq doom-modeline-icon (not doom-modeline-icon))
       "display icons" :toggle doom-modeline-icon)
+     ("u" (setq doom-modeline-unicode-fallback (not doom-modeline-unicode-fallback))
+      "unicode fallback" :toggle doom-modeline-unicode-fallback)
      ("m" (setq doom-modeline-major-mode-icon (not doom-modeline-major-mode-icon))
       "major mode" :toggle doom-modeline-major-mode-icon)
      ("c" (setq doom-modeline-major-mode-color-icon (not doom-modeline-major-mode-color-icon))
@@ -221,9 +162,7 @@
      ("s" (setq doom-modeline-buffer-state-icon (not doom-modeline-buffer-state-icon))
       "buffer state" :toggle doom-modeline-buffer-state-icon)
      ("d" (setq doom-modeline-buffer-modification-icon (not doom-modeline-buffer-modification-icon))
-      "modification" :toggle doom-modeline-buffer-modification-icon)
-     ("p" (setq doom-modeline-persp-name-icon (not doom-modeline-persp-name-icon))
-      "perspective" :toggle doom-modeline-persp-name-icon))
+      "modification" :toggle doom-modeline-buffer-modification-icon))
     "Segment"
     (("M" (setq doom-modeline-minor-modes (not doom-modeline-minor-modes))
       "minor modes" :toggle doom-modeline-minor-modes)
@@ -277,7 +216,21 @@
       :toggle (eq doom-modeline-buffer-file-name-style 'file-name))
      ("b" (setq doom-modeline-buffer-file-name-style 'buffer-name)
       "buffer name"
-      :toggle (eq doom-modeline-buffer-file-name-style 'buffer-name))))))
+      :toggle (eq doom-modeline-buffer-file-name-style 'buffer-name)))
+    "Misc"
+    (("g" (progn
+            (message "Fetching GitHub notifications...")
+            (run-with-timer 300 nil #'doom-modeline--github-fetch-notifications)
+            (browse-url "https://github.com/notifications"))
+      "github notifications" :color blue)
+     ("e" (if (bound-and-true-p flycheck-mode)
+              (flycheck-list-errors)
+            (flymake-show-diagnostics-buffer))
+      "list errors" :color blue)
+     ("B" (if (bound-and-true-p grip-mode)
+              (grip-browse-preview)
+            (message "Not in preiew"))
+      "browse preivew" :color blue)))))
 
 (use-package hide-mode-line
   :hook (((completion-list-mode completion-in-region-mode) . hide-mode-line-mode)))
@@ -298,16 +251,10 @@
                '("\\.toml$" all-the-icons-octicon "settings" :v-adjust 0.0 :face all-the-icons-dyellow))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(conf-toml-mode all-the-icons-octicon "settings" :v-adjust 0.0 :face all-the-icons-dyellow))
-  (add-to-list 'all-the-icons-icon-alist
-               '("\\.lua$" all-the-icons-fileicon "lua" :face all-the-icons-dblue))
-  (add-to-list 'all-the-icons-mode-icon-alist
-               '(lua-mode all-the-icons-fileicon "lua" :face all-the-icons-dblue))
-  (add-to-list 'all-the-icons-icon-alist
-               '("\\.go$" all-the-icons-fileicon "go" :face all-the-icons-blue))
-  (add-to-list 'all-the-icons-mode-icon-alist
-               '(go-mode all-the-icons-fileicon "go" :face all-the-icons-blue))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(help-mode all-the-icons-faicon "info-circle" :height 1.1 :v-adjust -0.1 :face all-the-icons-purple))
+  (add-to-list 'all-the-icons-mode-icon-alist
+               '(helpful-mode all-the-icons-faicon "info-circle" :height 1.1 :v-adjust -0.1 :face all-the-icons-purple))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(Info-mode all-the-icons-faicon "info-circle" :height 1.1 :v-adjust -0.1))
   (add-to-list 'all-the-icons-icon-alist
@@ -329,7 +276,7 @@
   (add-to-list 'all-the-icons-mode-icon-alist
                '(nov-mode all-the-icons-faicon "book" :height 1.0 :v-adjust -0.1 :face all-the-icons-green))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(gfm-mode all-the-icons-octicon "markdown" :face all-the-icons-blue)))
+               '(gfm-mode all-the-icons-octicon "markdown" :face all-the-icons-lblue)))
 
 ;; Show native line numbers if possible, otherwise use linum
 (if (fboundp 'display-line-numbers-mode)
@@ -340,15 +287,13 @@
     :demand
     :defines linum-format
     :hook (after-init . global-linum-mode)
+    :init (setq linum-format "%4d ")
     :config
-    (setq linum-format "%4d ")
-
     ;; Highlight current line number
     (use-package hlinum
       :defines linum-highlight-in-all-buffersp
+      :custom-face (linum-highlight-face ((t (:inherit default :background nil :foreground nil))))
       :hook (global-linum-mode . hlinum-activate)
-      :custom-face
-      (linum-highlight-face ((t `(:inherit default :background nil :foreground nil))))
       :init (setq linum-highlight-in-all-buffersp t))))
 
 ;; Suppress GUI features

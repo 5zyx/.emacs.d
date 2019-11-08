@@ -6,6 +6,27 @@
 
 ![Centaur Emacs](logo.png)
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Centaur Emacs](#centaur-emacs)
+    - [Features](#features)
+    - [Prerequisite](#prerequisite)
+        - [OS](#os)
+        - [GNU Emacs](#gnu-emacs)
+        - [Dotfiles](#dotfiles)
+    - [Quick Start](#quick-start)
+        - [Install](#install)
+        - [Update](#update)
+        - [Docker](#docker)
+    - [Customization](#customization)
+        - [Customize-group](#customize-group)
+        - [Manual](#manual)
+    - [Screenshots](#screenshots)
+    - [FAQ](#faq)
+
+<!-- markdown-toc end -->
+
 This is an Emacs distribution that aims to enhance the default
 Emacs experience. It alters a lot of the default settings,
 bundles a plethora of additional packages and adds its own core
@@ -15,7 +36,7 @@ Emacs power users.
 
 It's able to run on Windows, GNU Linux and macOS. It is compatible **ONLY with
 GNU Emacs 25.1 and above**. In general you're advised to always run with the
-latest stable release - currently **26.2**.
+latest stable release - currently **26.3**.
 
 ## Features
 
@@ -24,12 +45,12 @@ latest stable release - currently **26.2**.
 - Quick fuzzy search.
 - Better Org/Markdown support.
 - Support multiple programming languages
-  - C/C++/Object-C/C#/Java
-  - Python/Ruby/Perl/PHP/Shell/Powershell/Bat
-  - Javascript/Typescript/JSON/YAML
-  - HTML/CSS/XML
-  - Golang/Swift/Rust/Dart/Elixir
-  - ...
+    - C/C++/Object-C/C#/Java
+    - Python/Ruby/Perl/PHP/Shell/Powershell/Bat
+    - Javascript/Typescript/JSON/YAML
+    - HTML/CSS/XML
+    - Golang/Swift/Rust/Dart/Elixir
+    - ...
 - Auto completion.
 - Fly syntax check.
 - Fly spell check.
@@ -38,9 +59,9 @@ latest stable release - currently **26.2**.
 - Pomodor integration.
 - Support docker.
 - Better Chinese support:
-  - Chinese calendar
-  - Youdao dictionary
-  - Pinyin search
+    - Chinese calendar
+    - Youdao dictionary
+    - Pinyin search
 
 ## Prerequisite
 
@@ -48,7 +69,7 @@ latest stable release - currently **26.2**.
 
 - GNU Linux
 - macOS
-- Windows (Cygwin/msys)
+- Windows (Cygwin/MSYS)
 
 ### GNU Emacs
 
@@ -67,12 +88,9 @@ mv ~/.emacs.d ~/.emacs.d.bak
 git clone --depth 1 https://github.com/seagle0128/.emacs.d.git ~/.emacs.d
 ```
 
-or download the [zip
-package](https://github.com/seagle0128/.emacs.d/archive/master.zip) directly and
-extract to `~/.emacs.d`.
+or download the [zip package](https://github.com/seagle0128/.emacs.d/archive/master.zip) directly and extract to `~/.emacs.d`.
 
-Then start Emacs. Wait for a while to install packages at the first startup.
-Enjoy!
+Then start Emacs. Wait for a while to install packages at the first startup. Enjoy! :smile:
 
 ### Update
 
@@ -105,15 +123,13 @@ docker run -it centaur/emacs bash
 
 ## Customization
 
-### Customize-group
+### Customize Group
 
-`M-x customize-group` and select `centaur`. Set and save the configurations,
-then restart Emacs.
+`M-x customize-group` and select `centaur`. Set and save the configurations, then restart Emacs.
 
 ### Manual
 
-Copy `custom-template.el` to `custom.el` and change the configurations, then
-restart Emacs.
+Copy `custom-template.el` to `custom.el` and change the configurations, then restart Emacs.
 
 For Example:
 
@@ -123,15 +139,14 @@ For Example:
 (setq centaur-mail-address "user@email.com")   ; Email address
 (setq centaur-proxy "127.0.0.1:1080")          ; Network proxy
 (setq centaur-package-archives 'emacs-china)   ; Package repo: melpa, melpa-mirror, emacs-china, netease or tuna
-(setq centaur-theme classic)                   ; Color theme: default, classic, dark, light or daylight
+(setq centaur-theme 'dark)                     ; Color theme: default, classic, colorful, dark, light, day or night
 (setq centaur-dashboard nil)                   ; Use dashboard at startup or not: t or nil
 (setq centaur-lsp 'eglot)                      ; Set LSP client: lsp-mode, eglot or nil
 (setq centaur-chinese-calendar nil)            ; Use Chinese calendar or not: t or nil
 (setq centaur-benchmark t)                     ; Enable initialization benchmark or not: t or nil
 ```
 
-The default package archives is `melpa`. You can change it in `custom.el`, or
-switch manually via `M-x switch-package-archives` anytime.
+The default package archives is `melpa`. You can change it in `custom.el`, or switch manually via `M-x switch-package-archives` anytime.
 
 For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
 
@@ -161,6 +176,20 @@ For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
     `all-the-icons` only support GUI. If you don't like color icons,
     `(setq all-the-icons-color-icons nil)` to disable. Please refer to
     [all-the-icons.el](https://github.com/domtronn/all-the-icons.el) for details.
+
+    If some icons are not displayed correctly although `all-the-icons` fonts are
+    installed correctly, please install [symbola](http://users.teilar.gr/~g1951d/).
+    Refer to [#121](https://github.com/seagle0128/.emacs.d/issues/121) for more
+    details.
+
+1. The packages cannot be installed, what should I do?
+
+   Generally it's due to connection issue. Please refer to
+   [#98](https://github.com/seagle0128/.emacs.d/issues/98).
+   - `M-x package-refresh-contents` and try again.
+   - `(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")`.
+   - Use other mirror of elpa.
+   - Change another network to retry.
 
 1. How to search Chinese via pinyin?
 
@@ -197,3 +226,15 @@ For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
     Please refer to #33. You should instead set environment variables in startup
     files like .profile, .bash_profile or .zshenv, then `Centaur Emacs` is able
     to recognize and import the environment variables.
+
+## Donate
+
+If you think it's helpful for you, please consider pay a cup of coffee for me. Thank you! :smile:
+
+<img
+src="https://user-images.githubusercontent.com/140797/65818854-44204900-e248-11e9-9cc5-3e6339587cd8.png"
+alt="Alipay" width="120"/>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<img
+src="https://user-images.githubusercontent.com/140797/65818844-366ac380-e248-11e9-931c-4bd872d0566b.png"
+alt="Wechat" width="120"/>

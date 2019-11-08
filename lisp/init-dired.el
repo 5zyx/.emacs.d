@@ -64,6 +64,11 @@
       :bind (:map dired-mode-map
              ("S" . hydra-dired-quick-sort/body))))
 
+  ;; Show git info in dired
+  (use-package dired-git-info
+    :bind (:map dired-mode-map
+           (")" . dired-git-info-mode)))
+
   ;; Allow rsync from dired buffers
   (use-package dired-rsync
     :bind (:map dired-mode-map
@@ -76,9 +81,16 @@
   ;; Shows icons
   (use-package all-the-icons-dired
     :diminish
+    :functions (dired-move-to-filename
+                dired-get-filename
+                my-all-the-icons-dired--display)
+    :commands all-the-icons-dired--display
     :custom-face (all-the-icons-dired-dir-face ((t (:foreground nil))))
     :hook (dired-mode . all-the-icons-dired-mode)
     :config
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (declare-function all-the-icons-match-to-alist 'all-the-icons)
+    (declare-function all-the-icons-dir-is-submodule 'all-the-icons)
     (defun my-all-the-icons-dired--display ()
       "Display the icons of files without colors in a dired buffer."
       (when dired-subdir-alist
@@ -153,6 +165,10 @@
     (setq dired-omit-files
           (concat dired-omit-files
                   "\\|^.DS_Store$\\|^.projectile$\\|^.git*\\|^.svn$\\|^.vscode$\\|\\.js\\.meta$\\|\\.meta$\\|\\.elc$\\|^.emacs.*"))))
+
+;; `find-dired' alternative using `fd'
+(when (executable-find "fd")
+  (use-package fd-dired))
 
 (provide 'init-dired)
 

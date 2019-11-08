@@ -45,19 +45,37 @@
   (interactive)
   (set-buffer-file-coding-system 'undecided-dos nil))
 
+(defun delete-carrage-returns ()
+  "Delete `^M' characters in the buffer.
+Same as `replace-string C-q C-m RET RET'."
+  (interactive)
+  (save-excursion
+    (goto-char 0)
+    (while (search-forward "\r" nil :noerror)
+      (replace-match ""))))
+
 ;; Revert buffer
+(declare-function flycheck-buffer 'flycheck)
+(declare-function flymake-start 'flymake)
 (defun revert-this-buffer ()
   "Revert the current buffer."
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
-    (text-scale-increase 0)
-    (widen)
-    (if (and (fboundp 'fancy-narrow-active-p)
-             (fancy-narrow-active-p))
-        (fancy-widen))
     (revert-buffer t t)
     (message "Reverted this buffer.")))
 (bind-key "s-r" #'revert-this-buffer)
+
+;; Copy file name
+(defun copy-file-name ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (if-let ((filename (if (equal major-mode 'dired-mode)
+                         default-directory
+                       (buffer-file-name))))
+      (progn
+        (kill-new filename)
+        (message "Copied '%s'" filename))
+    (message "WARNING: Current buffer is not attached to a file!")))
 
 ;; Mode line
 (defun mode-line-height ()
@@ -70,6 +88,7 @@
   "Reload Emacs configurations."
   (interactive)
   (load-file user-init-file))
+(defalias 'centaur-reload-init-file 'reload-init-file)
 (bind-key "C-c C-l" #'reload-init-file)
 
 ;; Browse the homepage
@@ -86,7 +105,7 @@
          (expand-file-name "custom-example.el" user-emacs-directory)))
     (unless (file-exists-p custom-file)
       (if (file-exists-p custom-example)
-          (copy-file custom-file)
+          (copy-file custom-example custom-file)
         (error "Unable to find \"%s\"" custom-example)))
     (find-file custom-file)))
 
@@ -97,21 +116,62 @@
   (let ((dir (expand-file-name user-emacs-directory)))
     (if (file-exists-p dir)
         (progn
-          (message "Updating Emacs configurations...")
+          (message "Updating configurations...")
           (cd dir)
           (shell-command "git pull")
-          (message "Update finished. Restart Emacs to complete the process."))
+          (message "Updating configurations...done"))
       (message "\"%s\" doesn't exist." dir))))
 (defalias 'centaur-update-config 'update-config)
 
 (declare-function upgrade-packages 'init-package)
-(defalias 'centaur-update-packages 'upgrade-packages)
+(declare-function async-inject-variables 'async)
+(defun update-packages (&optional sync)
+  "Refresh package contents and update all packages.
 
-(defun update-config-and-packages()
-  "Update confgiurations and packages."
+If SYNC is non-nil, the updating process is synchronous."
   (interactive)
-  (update-config)
-  (upgrade-packages nil))
+  (message "Updating packages...")
+  (if (and (not sync)
+           (require 'async nil t))
+      (async-start
+       `(lambda ()
+          ,(async-inject-variables "\\`\\(load-path\\)\\'")
+          (require 'init-package)
+          (upgrade-packages)
+          (with-current-buffer auto-package-update-buffer-name
+            (buffer-string)))
+       (lambda (result)
+         (message "%s" result)
+         (message "Updating packages...done")))
+    (progn
+      (upgrade-packages)
+      (message "Updating packages...done"))))
+(defalias 'centaur-update-packages 'update-packages)
+
+(defun update-config-and-packages(&optional sync)
+  "Update confgiurations and packages.
+
+If SYNC is non-nil, the updating process is synchronous."
+  (interactive)
+  (message "This will update Centaur Emacs to the latest")
+  (if (and (not sync)
+           (require 'async nil t))
+      (async-start
+       `(lambda ()
+          ,(async-inject-variables "\\`\\(load-path\\)\\'")
+          (require 'init-package)
+          (require 'init-funcs)
+          (update-config)
+          (update-packages t)
+          (with-current-buffer auto-package-update-buffer-name
+            (buffer-string)))
+       (lambda (result)
+         (message "%s" result)
+         (message "Done. Restart to complete process")))
+    (progn
+      (update-config)
+      (update-packages t)
+      (message "Done. Restart to complete process"))))
 (defalias 'centaur-update 'update-config-and-packages)
 
 (defun update-all()
@@ -132,7 +192,7 @@
           (message "Updating dotfiles...")
           (cd dir)
           (shell-command "git pull")
-          (message "Update finished."))
+          (message "Updating dotfiles...done"))
       (message "\"%s\" doesn't exist." dir))))
 (defalias 'centaur-update-dotfiles 'update-dotfiles)
 
@@ -145,7 +205,7 @@
           (message "Updating org files...")
           (cd dir)
           (shell-command "git pull")
-          (message "Update finished."))
+          (message "Updating org files...done"))
       (message "\"%s\" doesn't exist." dir))))
 (defalias 'centaur-update-org 'update-org)
 
@@ -198,9 +258,11 @@
   (pcase theme
     ('default 'doom-one)
     ('classic 'doom-molokai)
-    ('dark 'doom-Iosvkem)
+    ('colorful 'doom-snazzy)
+    ('dark 'doom-palenight)
     ('light 'doom-one-light)
-    ('daylight 'doom-tomorrow-day)
+    ('day 'doom-opera-light)
+    ('night 'doom-city-lights)
     (_ (or theme 'doom-one))))
 
 (defun centaur-compatible-theme-p (theme)
@@ -272,22 +334,23 @@
 (defun proxy-socks-enable ()
   "Enable SOCKS proxy."
   (interactive)
-  (setq url-gateway-method 'socks)
-  (setq socks-noproxy '("localhost"))
-  (setq socks-server '("Default server" "127.0.0.1" 1086 5))
+  (require 'socks)
+  (setq url-gateway-method 'socks
+        socks-noproxy '("localhost")
+        socks-server '("Default server" "127.0.0.1" 1086 5))
   (proxy-socks-show))
 
 (defun proxy-socks-disable ()
   "Disable SOCKS proxy."
   (interactive)
-  (setq url-gateway-method 'native)
-  (setq socks-noproxy nil)
+  (setq url-gateway-method 'native
+        socks-noproxy nil)
   (proxy-socks-show))
 
 (defun proxy-socks-toggle ()
   "Toggle SOCKS proxy."
   (interactive)
-  (if socks-noproxy
+  (if (bound-and-true-p socks-noproxy)
       (proxy-socks-disable)
     (proxy-socks-enable)))
 
