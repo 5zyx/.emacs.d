@@ -53,7 +53,10 @@
      ;; Configure LSP clients
      (use-package lsp-clients
        :ensure nil
-       :init (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))))
+       :init
+       (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
+       (unless (executable-find "rls")
+         (setq lsp-rust-rls-server-command '("rustup" "run" "stable" "rls")))))
 
    (use-package lsp-ui
      :functions my-lsp-ui-imenu-hide-mode-line
@@ -143,7 +146,9 @@
    ;; `lsp-mode' and `treemacs' integration.
    (when emacs/>=25.2p
      (use-package lsp-treemacs
-       :bind (("C-<f8>" . lsp-treemacs-errors-list)
+       :after lsp-mode
+       :bind (:map lsp-mode-map
+              ("C-<f8>" . lsp-treemacs-errors-list)
               ("M-<f8>" . lsp-treemacs-symbols)
               ("s-<f8>" . lsp-treemacs-java-deps-list))
        :config
