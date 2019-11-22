@@ -242,11 +242,27 @@
   :init (unless (or sys/win32p (member "all-the-icons" (font-family-list)))
           (all-the-icons-install-fonts t))
   :config
+  (with-no-warnings
+    (defun all-the-icons-reset ()
+      "Reset (unmemoize/memoize) the icons."
+      (interactive)
+      (dolist (f '(all-the-icons-icon-for-file
+                   all-the-icons-icon-for-mode
+                   all-the-icons-icon-for-url
+                   all-the-icons-icon-family-for-file
+                   all-the-icons-icon-family-for-mode
+                   all-the-icons-icon-family))
+        (ignore-errors
+          (memoize-restore f)
+          (memoize f)))
+      (message "Reset all-the-icons")))
+
+  (add-to-list 'all-the-icons-mode-icon-alist
+               '(forge-topic-mode all-the-icons-alltheicon "git" :face all-the-icons-blue))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(vterm-mode all-the-icons-octicon "terminal" :v-adjust 0.2))
   (add-to-list 'all-the-icons-icon-alist
                '("\\.xpm$" all-the-icons-octicon "file-media" :v-adjust 0.0 :face all-the-icons-dgreen))
-
   (add-to-list 'all-the-icons-icon-alist
                '("\\.toml$" all-the-icons-octicon "settings" :v-adjust 0.0 :face all-the-icons-dyellow))
   (add-to-list 'all-the-icons-mode-icon-alist
@@ -266,11 +282,11 @@
   (add-to-list 'all-the-icons-icon-alist
                '(".*\\.ipynb\\'" all-the-icons-fileicon "jupyter" :height 1.2 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(ein:notebooklist-mode all-the-icons-faicon "book" :face all-the-icons-orange))
+               '(ein:notebooklist-mode all-the-icons-faicon "book" :face all-the-icons-lorange))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(ein:notebook-mode all-the-icons-fileicon "jupyter" :height 1.2 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(ein:notebook-multilang-mode all-the-icons-fileicon "jupyter" :height 1.2 :face all-the-icons-orange))
+               '(ein:notebook-multilang-mode all-the-icons-fileicon "jupyter" :height 1.2 :face all-the-icons-dorange))
   (add-to-list 'all-the-icons-icon-alist
                '("\\.epub\\'" all-the-icons-faicon "book" :height 1.0 :v-adjust -0.1 :face all-the-icons-green))
   (add-to-list 'all-the-icons-mode-icon-alist
