@@ -88,7 +88,9 @@ mv ~/.emacs.d ~/.emacs.d.bak
 git clone --depth 1 https://github.com/seagle0128/.emacs.d.git ~/.emacs.d
 ```
 
-or download the [zip package](https://github.com/seagle0128/.emacs.d/archive/master.zip) directly and extract to `~/.emacs.d`.
+or download the [zip
+package](https://github.com/seagle0128/.emacs.d/archive/master.zip) directly and
+extract to `~/.emacs.d`.
 
 Then start Emacs. Wait for a while to install packages at the first startup. Enjoy! :smile:
 
@@ -146,7 +148,8 @@ For Example:
 (setq centaur-benchmark t)                     ; Enable initialization benchmark or not: t or nil
 ```
 
-The default package archives is `melpa`. You can change it in `custom.el`, or switch manually via `M-x switch-package-archives` anytime.
+The default package archives is `melpa`. You can change it in `custom.el`, or
+switch manually via `M-x switch-package-archives` anytime.
 
 For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
 
@@ -210,11 +213,11 @@ For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
     `lsp-mode` is the default client, and `eglot` is another choice. Use `(setq
     centaur-lsp nil)` to disable LSP if you don't like it.
 
-    Before use it you should install language servers. Refer to [lsp-mode:
+    To use LSP you should install the language servers. Refer to [lsp-mode:
     supported-languages](https://github.com/emacs-lsp/lsp-mode#supported-languages)
     or [eglot: Connecting to a
     server](https://github.com/joaotavora/eglot#connecting-to-a-server) for
-    details.
+    the details.
 
 1. How to enable `plantuml` in `org-mode`?
 
@@ -229,7 +232,8 @@ For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
 
 ## Donate
 
-If you think it's helpful for you, please consider pay a cup of coffee for me. Thank you! :smile:
+If you think the it's helpful for you, please consider paying a cup of coffee
+for me. Thank you! :smile:
 
 <img
 src="https://user-images.githubusercontent.com/140797/65818854-44204900-e248-11e9-9cc5-3e6339587cd8.png"
@@ -237,4 +241,10 @@ alt="Alipay" width="120"/>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <img
 src="https://user-images.githubusercontent.com/140797/65818844-366ac380-e248-11e9-931c-4bd872d0566b.png"
-alt="Wechat" width="120"/>
+alt="Wechat Pay" width="120"/>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://paypal.me/seagle0128" target="_blank">
+<img
+src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/optimize/Online_Primary_Acceptance_Mark_RGB_V2_medium.jpg"
+alt="PayPal"/>
+</a>
