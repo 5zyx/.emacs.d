@@ -135,9 +135,13 @@
   (setq counsel-find-file-at-point t
         counsel-yank-pop-separator "\n────────\n")
 
-  ;; Use faster search tool: ripgrep (rg)
+  ;; Use the faster search tool: ripgrep (`rg')
   (when (executable-find "rg")
-    (setq counsel-grep-base-command "rg -S --no-heading --line-number --color never '%s' %s"))
+    (setq counsel-grep-base-command "rg -S --no-heading --line-number --color never '%s' %s")
+    (when (and sys/macp (executable-find "gls"))
+      (setq counsel-find-file-occur-use-find nil
+            counsel-find-file-occur-cmd
+            "gls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 gls -d --group-directories-first")))
   :config
   (with-no-warnings
     ;; Pre-fill search keywords
@@ -259,6 +263,7 @@
                                   (counsel-rg . ivy-prescient-non-fuzzy)
                                   (counsel-pt . ivy-prescient-non-fuzzy)
                                   (counsel-grep . ivy-prescient-non-fuzzy)
+                                  (counsel-imenu . ivy-prescient-non-fuzzy)
                                   (counsel-yank-pop . ivy-prescient-non-fuzzy)
                                   (swiper . ivy-prescient-non-fuzzy)
                                   (swiper-isearch . ivy-prescient-non-fuzzy)
@@ -350,13 +355,9 @@
             (t nil)))
     :init
     (dolist (fn '(swiper
-                  swiper-isearch
-                  swiper-all
-                  counsel-ag
-                  counsel-rg
-                  counsel-pt
-                  counsel-grep
-                  counsel-yank-pop))
+                  swiper-isearch swiper-all
+                  counsel-ag counsel-rg counsel-pt counsel-grep
+                  counsel-imenu counsel-yank-pop))
       (setf (alist-get fn ivy-re-builders-alist) #'ivy--regex-pinyin))))
 
 ;; More friendly display transformer for Ivy
@@ -397,6 +398,11 @@
       "Display project icons in `ivy-rich'."
       (when (display-graphic-p)
         (all-the-icons-octicon "file-directory" :height 1.0 :v-adjust 0.01)))
+
+    (defun ivy-rich-mode-icon (_candidate)
+      "Display mode icons in `ivy-rich'."
+      (when (display-graphic-p)
+        (all-the-icons-faicon "cube" :height 0.95 :v-adjust -0.05 :face 'all-the-icons-blue)))
 
     (defun ivy-rich-function-icon (_candidate)
       "Display function icons in `ivy-rich'."
@@ -702,6 +708,11 @@
           (:columns
            ((ivy-rich-project-icon)
             (counsel-projectile-find-dir-transformer))
+           :delimiter "\t")
+          counsel-minor
+          (:columns
+           ((ivy-rich-mode-icon)
+            (ivy-rich-candidate))
            :delimiter "\t")
           treemacs-projectile
           (:columns
