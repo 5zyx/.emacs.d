@@ -86,7 +86,7 @@
         (set-face-attribute 'doom-visual-bell nil
                             :inherit 'mode-line
                             :background (face-foreground 'error)
-                            :inverse-video nil)
+                            :inverse-video 'unspecified)
         (defvar doom-themes--bell-p nil)
         (defun doom-themes-visual-bell-fn ()
           "Blink the mode-line red briefly. Set `ring-bell-function' to this to use it."
@@ -262,15 +262,15 @@
   (add-to-list 'all-the-icons-mode-icon-alist
                '(elfeed-search-mode all-the-icons-faicon "rss-square" :v-adjust -0.1 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(elfeed-show-mode all-the-icons-octicon "rss" :v-adjust 0.0 :face all-the-icons-lorange))
+               '(elfeed-show-mode all-the-icons-octicon "rss" :height 1.1 :v-adjust 0.0 :face all-the-icons-lorange))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(newsticker-mode all-the-icons-faicon "rss-square" :v-adjust -0.1 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(newsticker-treeview-mode all-the-icons-faicon "rss-square" :v-adjust -0.1 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(newsticker-treeview-list-mode all-the-icons-octicon "rss" :v-adjust 0.0 :face all-the-icons-orange))
+               '(newsticker-treeview-list-mode all-the-icons-octicon "rss" :height 1.1 :v-adjust 0.0 :face all-the-icons-orange))
   (add-to-list 'all-the-icons-mode-icon-alist
-               '(newsticker-treeview-item-mode all-the-icons-octicon "rss" :v-adjust 0.0 :face all-the-icons-lorange))
+               '(newsticker-treeview-item-mode all-the-icons-octicon "rss" :height 1.1 :v-adjust 0.0 :face all-the-icons-lorange))
   (add-to-list 'all-the-icons-icon-alist
                '("\\.[bB][iI][nN]$" all-the-icons-octicon "file-binary" :v-adjust 0.0 :face all-the-icons-yellow))
   (add-to-list 'all-the-icons-icon-alist
