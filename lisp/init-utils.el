@@ -105,7 +105,7 @@
   (cl-pushnew '("tmpl" . "*.tmpl") rg-custom-type-aliases)
 
   (with-eval-after-load 'projectile
-    (defalias 'projectile-ripgrep 'rg-project)
+    (defalias 'projectile-ripgrep #'rg-project)
     (bind-key "s R" #'rg-project projectile-command-map))
 
   (with-eval-after-load 'counsel
@@ -116,6 +116,7 @@
 
 ;; Docker
 (use-package docker
+  :defines docker-image-run-arguments
   :bind ("C-c d" . docker)
   :init (setq docker-image-run-arguments '("-i" "-t" "--rm")
               docker-container-shell-file-name "/bin/bash"))

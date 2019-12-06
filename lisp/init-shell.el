@@ -113,24 +113,21 @@
 
 ;; Better term
 ;; @see https://github.com/akermu/emacs-libvterm#installation
-(when (and (executable-find "cmake")
+(when (and module-file-suffix           ; dynamic module
+           (executable-find "cmake")
            (executable-find "libtool")
            (executable-find "make"))
-  (use-package vterm
-    :init (defalias #'term #'vterm)))
+  (use-package vterm))
 
 ;; Shell Pop
 (use-package shell-pop
   :bind ([f9] . shell-pop)
-  :init (setq shell-pop-shell-type
-              (cond
-               (sys/win32p
-                '("eshell" "*eshell*" (lambda () (eshell))))
-               ((fboundp 'vterm)
-                '("vterm" "*vterm*" (lambda () (vterm))))
-               (t
-                '("ansi-term" "*ansi-term*"
-                  (lambda () (ansi-term shell-pop-term-shell)))))))
+  :init
+  (setq shell-pop-window-size 40
+        shell-pop-shell-type
+        (cond (sys/win32p '("eshell" "*eshell*" (lambda () (eshell))))
+              ((fboundp 'vterm) '("vterm" "*vterm*" (lambda () (vterm))))
+              (t '("terminal" "*terminal*" (lambda () (term shell-pop-term-shell)))))))
 
 (provide 'init-shell)
 

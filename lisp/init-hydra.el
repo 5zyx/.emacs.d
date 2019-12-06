@@ -42,7 +42,10 @@
 
 (use-package pretty-hydra
   :defines (display-line-numbers-mode linum-mode)
-  :functions set-package-archives centaur-load-theme
+  :functions (set-package-archives
+              centaur-load-theme
+              origami-mode
+              counsel-load-theme-action)
   :bind ("<f6>" . toggles-hydra/body)
   :init
   (cl-defun pretty-hydra-title (title &optional icon-type icon-name
@@ -66,29 +69,29 @@
     ("Basic"
      (("n" (if (fboundp 'display-line-numbers-mode)
                (display-line-numbers-mode (if display-line-numbers-mode -1 1))
-             (linum-mode (if linum-mode -1 1)))
+             (global-linum-mode (if global-linum-mode -1 1)))
        "line number" :toggle (if (fboundp 'display-line-numbers-mode)
                                  display-line-numbers-mode
-                               linum-mode))
-      ("a" aggressive-indent-mode "aggressive indent" :toggle t)
-      ("h" hungry-delete-mode "hungry delete" :toggle t)
+                               global-linum-mode))
+      ("a" global-aggressive-indent-mode "aggressive indent" :toggle t)
+      ("h" global-hungry-delete-mode "hungry delete" :toggle t)
       ("e" electric-pair-mode "electric pair" :toggle t)
       ("c" flyspell-mode "spell check" :toggle t)
       ("S" prettify-symbols-mode "pretty symbol" :toggle t)
-      ("L" page-break-lines-mode "page break lines" :toggle t)
+      ("L" global-page-break-lines-mode "page break lines" :toggle t)
       ("M" doom-modeline-mode "modern mode-line" :toggle t))
      "Highlight"
      (("l" global-hl-line-mode "line" :toggle t)
       ("P" show-paren-mode "paren" :toggle t)
       ("s" symbol-overlay-mode "symbol" :toggle t)
       ("r" rainbow-mode "rainbow" :toggle t)
-      ("w" (setq show-trailing-whitespace (not show-trailing-whitespace))
+      ("w" (setq-default show-trailing-whitespace (not show-trailing-whitespace))
        "whitespace" :toggle show-trailing-whitespace)
       ("d" rainbow-delimiters-mode "delimiter" :toggle t)
       ("i" highlight-indent-guides-mode "indent" :toggle t)
-      ("T" hl-todo-mode "todo" :toggle t))
+      ("T" global-hl-todo-mode "todo" :toggle t))
      "Coding"
-     (("f" flycheck-mode "flycheck" :toggle t)
+     (("f" global-flycheck-mode "flycheck" :toggle t)
       ("F" flymake-mode "flymake" :toggle t)
       ("o" origami-mode "folding" :toggle t)
       ("O" hs-minor-mode "hideshow" :toggle t)
@@ -97,7 +100,7 @@
       ("E" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
       ("Q" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))
      "Version Control"
-     (("v" diff-hl-mode "gutter" :toggle t)
+     (("v" global-diff-hl-mode "gutter" :toggle t)
       ("V" diff-hl-flydiff-mode "live gutter" :toggle t)
       ("m" diff-hl-margin-mode "margin gutter" :toggle t)
       ("D" diff-hl-dired-mode "dired gutter" :toggle t))
@@ -117,7 +120,7 @@
       ("t n" (centaur-load-theme 'night) "night"
        :toggle (eq (centuar-current-theme) (centaur--standardize-theme 'night)))
       ("t o" (ivy-read "Load custom theme: "
-                       (mapcar 'symbol-name
+                       (mapcar #'symbol-name
                                (custom-available-themes))
                        :predicate (lambda (candidate)
                                     (string-prefix-p "doom-" candidate))
