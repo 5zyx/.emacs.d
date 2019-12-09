@@ -257,7 +257,13 @@
                                     (regexp-quote name)))
                   (id (car (esxml-node-children (esxml-query selector content)))))
         (intern id)))
-    (advice-add #'nov-content-unique-identifier :override #'my-nov-content-unique-identifier)))
+    (advice-add #'nov-content-unique-identifier :override #'my-nov-content-unique-identifier))
+
+  ;; Fix encoding issue on Windows
+  (when sys/win32p
+    (setq process-coding-system-alist
+          (cons `(,nov-unzip-program . (gbk . gbk))
+                process-coding-system-alist))))
 
 ;; Nice writing
 (use-package olivetti
@@ -305,10 +311,11 @@
               erc-autojoin-channels-alist '(("freenode.net" "#emacs"))))
 
 ;; A stackoverflow and its sisters' sites reader
-(use-package howdoyou
-  :bind (:map howdoyou-mode-map
-         ("q" . kill-buffer-and-window))
-  :hook (howdoyou-mode . read-only-mode))
+(when emacs/>=26p
+  (use-package howdoyou
+    :bind (:map howdoyou-mode-map
+           ("q" . kill-buffer-and-window))
+    :hook (howdoyou-mode . read-only-mode)))
 
 ;; text mode directory tree
 (use-package ztree

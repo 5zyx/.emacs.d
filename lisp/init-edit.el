@@ -31,7 +31,7 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'init-custom))
+  (require 'init-const))
 
 ;; Miscs
 ;; (setq initial-scratch-message nil)
@@ -194,8 +194,9 @@
   :hook (after-init . global-anzu-mode))
 
 ;; Redefine M-< and M-> for some modes
-(use-package beginend
-  :hook (after-init . beginend-global-mode))
+(when emacs/>=25.3p
+  (use-package beginend
+    :hook (after-init . beginend-global-mode)))
 
 ;; An all-in-one comment command to rule them all
 (use-package comment-dwim-2
@@ -361,15 +362,7 @@
          ("C-`" . origami-hydra/body))
   :hook (prog-mode . origami-mode)
   :init (setq origami-show-fold-header t)
-  :config
-  (face-spec-reset-face 'origami-fold-header-face)
-
-  ;; Support LSP
-  (when centaur-lsp
-    (use-package lsp-origami
-      :hook (origami-mode . (lambda ()
-                              (if (bound-and-true-p lsp-mode)
-                                  (lsp-origami-mode)))))))
+  :config (face-spec-reset-face 'origami-fold-header-face))
 
 ;; Open files as another user
 (unless sys/win32p
