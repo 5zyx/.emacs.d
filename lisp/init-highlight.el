@@ -187,7 +187,7 @@ FACE defaults to inheriting from default and highlight."
   :diminish
   :bind (:map help-mode-map
          ("w" . rainbow-mode))
-  :hook ((emacs-lisp-mode html-mode php-mode) . rainbow-mode)
+  :hook ((html-mode php-mode) . rainbow-mode)
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
@@ -276,10 +276,12 @@ FACE defaults to inheriting from default and highlight."
         (pulse-momentary-highlight-region beg end face))
       (advice-add #'vhl/.make-hl :override #'my-vhl-pulse))))
 
-;; Visualize TAB, (HARD) SPACE, NEWLINE
 ;; Pulse current line
 (use-package pulse
   :ensure nil
+  :custom-face
+  (pulse-highlight-start-face ((t (:inherit region))))
+  (pulse-highlight-face ((t (:inherit region))))
   :hook (((dumb-jump-after-jump
            imenu-after-jump) . my-recenter-and-pulse)
          ((bookmark-after-jump
@@ -289,16 +291,16 @@ FACE defaults to inheriting from default and highlight."
   (with-no-warnings
     (defun my-pulse-momentary-line (&rest _)
       "Pulse the current line."
-      (pulse-momentary-highlight-one-line (point) 'region))
+      (pulse-momentary-highlight-one-line (point)))
 
     (defun my-pulse-momentary (&rest _)
-      "Pulse the current line."
+      "Pulse the region or the current line."
       (if (fboundp 'xref-pulse-momentarily)
           (xref-pulse-momentarily)
         (my-pulse-momentary-line)))
 
     (defun my-recenter-and-pulse(&rest _)
-      "Recenter and pulse the current line."
+      "Recenter and pulse the region or the current line."
       (recenter)
       (my-pulse-momentary))
 
