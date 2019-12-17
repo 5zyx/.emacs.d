@@ -87,14 +87,19 @@
 
     (defun my-git-messenger:format-detail (vcs commit-id author message)
       (if (eq vcs 'git)
-          (let ((date (git-messenger:commit-date commit-id)))
+          (let ((date (git-messenger:commit-date commit-id))
+                (colon (propertize ":" 'face 'font-lock-comment-face)))
             (concat
-             (propertize (format "Commit : %s \nAuthor : %s\nDate   : %s \n"
-                                 (substring commit-id 0 8) author date)
-                         'face 'font-lock-string-face)
-             (propertize "─────────────────────────────────" 'face 'font-lock-comment-face)
+             (format "%s%s %s \n%s%s %s\n%s  %s %s \n"
+                     (propertize "Commit" 'face 'font-lock-keyword-face) colon
+                     (propertize (substring commit-id 0 8) 'face 'font-lock-comment-face)
+                     (propertize "Author" 'face 'font-lock-keyword-face) colon
+                     (propertize author 'face 'font-lock-string-face)
+                     (propertize "Date" 'face 'font-lock-keyword-face) colon
+                     (propertize date 'face 'font-lock-string-face))
+             (propertize (make-string 38 ?─) 'face 'font-lock-comment-face)
              message
-             (propertize "\nPress q to quit" 'face '(:inherit (font-lock-doc-face italic)))))
+             (propertize "\nPress q to quit" 'face '(:inherit (font-lock-comment-face italic)))))
         (git-messenger:format-detail vcs commit-id author message)))
 
     (defun my-git-messenger:popup-message ()
@@ -120,15 +125,19 @@
               git-messenger:last-commit-id commit-id)
         (run-hook-with-args 'git-messenger:before-popup-hook popuped-message)
         (git-messenger-hydra/body)
-        (cond ((posframe-workable-p)
+        (cond ((and (fboundp 'posframe-workable-p) (posframe-workable-p))
                (let ((buffer-name "*git-messenger*"))
                  (posframe-show buffer-name
                                 :string popuped-message
-                                :internal-border-width 8)
+                                :left-fringe 8
+                                :right-fringe 8
+                                :internal-border-color (face-foreground 'default)
+                                :internal-border-width 1)
                  (unwind-protect
                      (push (read-event) unread-command-events)
                    (posframe-delete buffer-name))))
-              ((fboundp 'pos-tip-show) (pos-tip-show popuped-message))
+              ((and (fboundp 'pos-tip-show) (display-graphic-p))
+               (pos-tip-show popuped-message))
               ((fboundp 'lv-message)
                (lv-message popuped-message)
                (unwind-protect

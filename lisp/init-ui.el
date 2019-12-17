@@ -241,7 +241,7 @@
 ;; NOTE: Must run `M-x all-the-icons-install-fonts', and install fonts manually on Windows
 (use-package all-the-icons
   :if (display-graphic-p)
-  :init (unless (or sys/win32p (member "all-the-icons" (font-family-list)))
+  :init (unless (or sys/win32p (font-installed-p "all-the-icons"))
           (all-the-icons-install-fonts t))
   :config
   (with-no-warnings
@@ -277,6 +277,8 @@
           (memoize f)))
       (message "Reset all-the-icons")))
 
+  (add-to-list 'all-the-icons-mode-icon-alist
+               '(diff-mode all-the-icons-octicon "git-compare" :v-adjust 0.0 :face all-the-icons-lred))
   (add-to-list 'all-the-icons-mode-icon-alist
                '(flycheck-error-list-mode all-the-icons-octicon "checklist" :height 1.1 :v-adjust 0.0 :face all-the-icons-lred))
   (add-to-list 'all-the-icons-mode-icon-alist
