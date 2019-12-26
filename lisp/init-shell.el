@@ -1,6 +1,6 @@
 ;; init-shell.el --- Initialize shell configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019 Vincent Zhang
+;; Copyright (C) 2006-2020 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -123,7 +123,7 @@
 (use-package shell-pop
   :bind ([f9] . shell-pop)
   :init
-  (setq shell-pop-window-size 40
+  (setq shell-pop-window-size 35
         shell-pop-shell-type
         (cond (sys/win32p '("eshell" "*eshell*" (lambda () (eshell))))
               ((fboundp 'vterm) '("vterm" "*vterm*" (lambda () (vterm))))

@@ -1,6 +1,6 @@
 ;;; init.el --- A Fancy and Fast Emacs Configuration.	-*- lexical-binding: t no-byte-compile: t; -*-
 
-;; Copyright (C) 2006-2019 Vincent Zhang
+;; Copyright (C) 2006-2020 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -170,7 +170,6 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-dart)
 (require 'init-elixir)
 (require 'init-web)
-(require 'init-scala)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here

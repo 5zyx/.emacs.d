@@ -97,9 +97,8 @@ Then start Emacs. Wait for a while to install packages at the first startup. Enj
 ### Update
 
 ``` emacs-lisp
-# Update Centaur Emacs (then restart), including configurations and packages
+# Update Centaur Emacs, including configurations and packages
 M-x centaur-update
-M-x centaur-update-and-restart
 
 # Update Emacs configurations only
 M-x centaur-update-config
@@ -107,9 +106,8 @@ M-x centaur-update-config
 # Update ~/.dotfiles if it exists
 M-x centaur-update-dotfiles
 
-# Update packages only (then restart)
+# Update packages only
 M-x centaur-update-packages
-M-x centaur-update-packages-and-restart
 
 # Update all including configurations, packages and dotfiles
 M-x centaur-update-all
@@ -184,7 +182,7 @@ For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
     If the icons are not displayed correctly although `all-the-icons` fonts are
     installed correctly, please install the
     [non-free](http://users.teilar.gr/~g1951d/License.pdf) font
-    [Symbola](http://users.teilar.gr/~g1951d/). This issue usually occurs on
+    [Symbola](http://users.teilar.gr/~g1951d/Symbola.zip). This issue usually occurs on
     Windows. Refer to [#121](https://github.com/seagle0128/.emacs.d/issues/121)
     for more details.
 
