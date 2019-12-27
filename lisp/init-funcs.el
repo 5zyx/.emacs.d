@@ -1,6 +1,6 @@
 ;; init-funcs.el --- Define functions.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2020 Vincent Zhang
+;; Copyright (C) 2018-2020 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -194,6 +194,8 @@ Same as `replace-string C-q C-m RET RET'."
   "Read articles with better views."
   (when (fboundp 'olivetti-mode)
     (olivetti-mode t))
+  (when (fboundp 'mixed-pitch-mode)
+    (mixed-pitch-mode t))
   (text-scale-set +2))
 
 ;; Pakcage archives

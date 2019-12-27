@@ -69,7 +69,7 @@
         dumb-jump-selector 'ivy))
 
 (use-package editorconfig
-  :diminish editorconfig-mode
+  :diminish
   :hook (after-init . editorconfig-mode))
 
 ;; Run commands quickly
@@ -85,9 +85,9 @@
 (use-package plantuml-mode)
 (use-package powershell)
 (use-package rmsbolt)                   ; A compiler output viewer
+(use-package scala-mode)
 (use-package swift-mode)
 (use-package vimrc-mode)
-(use-package scala-mode)
 
 (use-package nxml-mode
   :ensure nil
@@ -100,7 +100,7 @@
 ;; Batch Mode eXtras
 (use-package bmx-mode
   :after company
-  :diminish bmx-mode
+  :diminish
   :hook (after-init . bmx-mode-setup-defaults))
 
 ;; Fish shell
