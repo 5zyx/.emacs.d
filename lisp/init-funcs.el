@@ -90,6 +90,7 @@ Same as `replace-string C-q C-m RET RET'."
                              (file-name-nondirectory buffer-file-name)))
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
+(global-set-key (kbd "C-x K") #'delete-this-file)
 
 (defun rename-this-file (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
@@ -193,10 +194,9 @@ Same as `replace-string C-q C-m RET RET'."
 (defun centaur-read-mode ()
   "Read articles with better views."
   (when (fboundp 'olivetti-mode)
-    (olivetti-mode t))
+    (olivetti-mode 1))
   (when (fboundp 'mixed-pitch-mode)
-    (mixed-pitch-mode t))
-  (text-scale-set +2))
+    (mixed-pitch-mode 1)))
 
 ;; Pakcage archives
 (defun set-package-archives (archives)
