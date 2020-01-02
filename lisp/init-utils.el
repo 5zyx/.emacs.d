@@ -128,20 +128,9 @@
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
-  :preface
-  (defun my-save-buffer ()
-    "Save scratch and other buffer."
-    (interactive)
-    (let ((scratch-name "*scratch*"))
-      (if (string-equal (buffer-name) scratch-name)
-          (progn
-            (message "Saving %s..." scratch-name)
-            (persistent-scratch-save)
-            (message "Wrote %s" scratch-name))
-        (save-buffer))))
-  :hook (after-init . persistent-scratch-setup-default)
-  :bind (:map lisp-interaction-mode-map
-         ("C-x C-s" . my-save-buffer)))
+  :diminish
+  :hook ((after-init . persistent-scratch-autosave-mode)
+         (lisp-interaction-mode . persistent-scratch-mode)))
 
 ;; PDF reader
 (when (display-graphic-p)
@@ -189,9 +178,8 @@
     (with-no-warnings
       (defun pdf-view-use-scaling-p ()
         "Return t if scaling should be used."
-        (and (or (and (eq system-type 'darwin) (string-equal emacs-version "27.0.50"))
-                 (memq (pdf-view-image-type)
-                       '(imagemagick image-io)))
+        (and (or (and (eq system-type 'darwin) (>= emacs-major-version 27))
+                 (memq (pdf-view-image-type) '(imagemagick image-io)))
              pdf-view-use-scaling))
       (defun pdf-view-create-page (page &optional window)
         "Create an image of PAGE for display on WINDOW."

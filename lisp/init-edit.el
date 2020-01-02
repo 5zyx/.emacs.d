@@ -64,7 +64,7 @@
   :bind (("<C-return>" . rect-hydra/body))
   :pretty-hydra
   ((:title (pretty-hydra-title "Rectangle" 'material "border_all" :height 1.1 :v-adjust -0.225)
-    :color amaranth :body-pre (rectangle-mark-mode) :post (deactivate-mark) :quit-key "q")
+    :color amaranth :body-pre (rectangle-mark-mode) :post (deactivate-mark) :quit-key ("q" "C-g"))
    ("Move"
     (("h" backward-char "←")
      ("j" next-line "↓")
@@ -197,7 +197,12 @@
 ;; Redefine M-< and M-> for some modes
 (when emacs/>=25.3p
   (use-package beginend
-    :hook (after-init . beginend-global-mode)))
+    :diminish (beginend-mode beginend-global-mode)
+    :hook (after-init . beginend-global-mode)
+    :config
+    (mapc (lambda (pair)
+            (add-hook (car pair) (lambda () (diminish (cdr pair)))))
+          beginend-modes)))
 
 ;; An all-in-one comment command to rule them all
 (use-package comment-dwim-2
