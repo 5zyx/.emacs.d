@@ -35,9 +35,9 @@
 
 (use-package counsel
   :diminish ivy-mode counsel-mode
-  :bind (("C-s" . swiper-isearch)
-         ("C-r" . swiper-isearch-backward)
-         ("s-f" . swiper)
+  :bind (("C-s"   . swiper-isearch)
+         ("C-r"   . swiper-isearch-backward)
+         ("s-f"   . swiper)
          ("C-S-s" . swiper-all)
 
          ("C-c C-r" . ivy-resume)
@@ -53,10 +53,12 @@
          ([remap insert-char] . counsel-unicode-char)
 
          ("C-x C-r" . counsel-buffer-or-recentf)
-         ("C-x j" . counsel-mark-ring)
-         ("C-h F" . counsel-describe-face)
+         ("C-x j"   . counsel-mark-ring)
+         ("C-h F"   . counsel-faces)
 
+         ("C-c B" . counsel-bookmarked-directory)
          ("C-c L" . counsel-load-library)
+         ("C-c O" . counsel-find-file-extern)
          ("C-c P" . counsel-package)
          ("C-c f" . counsel-find-library)
          ("C-c g" . counsel-grep)
@@ -67,8 +69,10 @@
          ("C-c r" . counsel-rg)
          ("C-c z" . counsel-fzf)
 
+         ("C-c c B" . counsel-bookmarked-directory)
          ("C-c c F" . counsel-faces)
          ("C-c c L" . counsel-load-library)
+         ("C-c c O" . counsel-find-file-extern)
          ("C-c c P" . counsel-package)
          ("C-c c a" . counsel-apropos)
          ("C-c c e" . counsel-colors-emacs)
@@ -86,6 +90,7 @@
          ("C-c c t" . counsel-load-theme)
          ("C-c c u" . counsel-unicode-char)
          ("C-c c w" . counsel-colors-web)
+         ("C-c c v" . counsel-set-variable)
          ("C-c c z" . counsel-fzf)
 
          :map ivy-minibuffer-map
@@ -113,7 +118,21 @@
         ivy-on-del-error-function nil
         ivy-initial-inputs-alist nil)
 
+  (setq swiper-action-recenter t)
+
+  (setq counsel-find-file-at-point t
+        counsel-yank-pop-separator "\n────────\n")
+
+  ;; Use the faster search tool: ripgrep (`rg')
+  (when (executable-find "rg")
+    (setq counsel-grep-base-command "rg -S --no-heading --line-number --color never %s %s")
+    (when (and sys/macp (executable-find "gls"))
+      (setq counsel-find-file-occur-use-find nil
+            counsel-find-file-occur-cmd
+            "gls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 gls -d --group-directories-first")))
+  :config
   (with-no-warnings
+    ;; Display an arrow with the selected item
     (defun my-ivy-format-function-arrow (cands)
       "Transform CANDS into a string for minibuffer."
       (ivy--format-function-generic
@@ -127,23 +146,8 @@
          (concat (propertize " " 'display `(space :align-to 2)) str))
        cands
        "\n"))
-    (setq ivy-format-functions-alist '((counsel-describe-face . counsel--faces-format-function)
-                                       (t . my-ivy-format-function-arrow))))
+    ;; (setf (alist-get 't ivy-format-functions-alist) #'my-ivy-format-function-arrow)
 
-  (setq swiper-action-recenter t)
-
-  (setq counsel-find-file-at-point t
-        counsel-yank-pop-separator "\n────────\n")
-
-  ;; Use the faster search tool: ripgrep (`rg')
-  (when (executable-find "rg")
-    (setq counsel-grep-base-command "rg -S --no-heading --line-number --color never '%s' %s")
-    (when (and sys/macp (executable-find "gls"))
-      (setq counsel-find-file-occur-use-find nil
-            counsel-find-file-occur-cmd
-            "gls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 gls -d --group-directories-first")))
-  :config
-  (with-no-warnings
     ;; Pre-fill search keywords
     ;; @see https://www.reddit.com/r/emacs/comments/b7g1px/withemacs_execute_commands_like_marty_mcfly/
     (defvar my-ivy-fly-commands
@@ -328,7 +332,8 @@ This is for use in `ivy-re-builders-alist'."
     (ivy-prescient-mode 1))
 
   ;; Additional key bindings for Ivy
-  (use-package ivy-hydra)
+  (use-package ivy-hydra
+    :init (setq ivy-read-action-function #'ivy-hydra-read-action))
 
   ;; Ivy integration for Projectile
   (use-package counsel-projectile
@@ -372,7 +377,7 @@ This is for use in `ivy-re-builders-alist'."
   ;; Tramp ivy interface
   (use-package counsel-tramp
     :bind (:map counsel-mode-map
-           ("C-c c v" . counsel-tramp)))
+           ("C-c c T" . counsel-tramp)))
 
   ;; Support pinyin in Ivy
   ;; Input prefix ':' to match pinyin

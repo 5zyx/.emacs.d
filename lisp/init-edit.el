@@ -33,26 +33,6 @@
 (eval-when-compile
   (require 'init-const))
 
-;; Miscs
-;; (setq initial-scratch-message nil)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if names are same
-(setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
-(setq adaptive-fill-first-line-regexp "^* *$")
-(setq delete-by-moving-to-trash t)         ; Deleting files go to OS's trash folder
-(setq make-backup-files nil)               ; Forbide to make backup files
-(setq auto-save-default nil)               ; Disable auto save
-
-(setq-default major-mode 'text-mode)
-
-(setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
-(setq sentence-end-double-space nil)
-
-;; Tab and Space
-;; Permanently indent with spaces, never with TABs
-(setq-default c-basic-offset   4
-              tab-width        4
-              indent-tabs-mode nil)
-
 ;; Delete selection if you insert
 (use-package delsel
   :ensure nil
@@ -304,35 +284,23 @@
 ;; Windows-scroll commands
 (use-package pager
   :bind (([remap scroll-up-command] . pager-page-down)
-         ([next]   . pager-page-down)
          ([remap scroll-down-command] . pager-page-up)
+         ([next]   . pager-page-down)
          ([prior]  . pager-page-up)
          ([M-up]   . pager-row-up)
          ([M-kp-8] . pager-row-up)
          ([M-down] . pager-row-down)
          ([M-kp-2] . pager-row-down)))
 
-;; Treat undo history as a tree
-(use-package undo-tree
-  :diminish
-  :defines recentf-exclude
-  :hook (after-init . global-undo-tree-mode)
-  :init
-  (setq undo-tree-visualizer-timestamps t
-        undo-tree-enable-undo-in-region nil
-        undo-tree-auto-save-history nil
-        undo-tree-history-directory-alist
-        `(("." . ,(locate-user-emacs-file "undo-tree-hist/"))))
-
-  ;; WORKAROUND:  keep the diff window
-  (with-no-warnings
-    (make-variable-buffer-local 'undo-tree-visualizer-diff)
-    (setq-default undo-tree-visualizer-diff t))
-  :config (dolist (dir undo-tree-history-directory-alist)
-            (push (expand-file-name (cdr dir)) recentf-exclude)))
+;; Undo/Redo
+(use-package undo-fu
+  :bind (([remap undo] . undo-fu-only-undo)
+         ([remap undo-only] . undo-fu-only-undo)
+         ("C-?" . undo-fu-only-redo)
+         ("M-_" . undo-fu-only-redo)))
 
 ;; Goto last change
-(use-package goto-chg
+(use-package goto-last-change
   :bind ("C-," . goto-last-change))
 
 ;; Record and jump to the last point in the buffer
@@ -391,16 +359,6 @@
 (use-package fancy-narrow
   :diminish
   :hook (after-init . fancy-narrow-mode))
-
-;; Edit text for browsers with GhostText or AtomicChrome extension
-(use-package atomic-chrome
-  :hook ((emacs-startup . atomic-chrome-start-server)
-         (atomic-chrome-edit-mode . delete-other-windows))
-  :init (setq atomic-chrome-buffer-open-style 'frame)
-  :config
-  (if (fboundp 'gfm-mode)
-      (setq atomic-chrome-url-major-mode-alist
-            '(("github\\.com" . gfm-mode)))))
 
 (provide 'init-edit)
 
