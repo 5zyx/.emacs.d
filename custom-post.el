@@ -28,7 +28,10 @@
                           (local-set-key (kbd "C-c C-j") 'lsp-find-definition)))
 
 (add-hook 'php-mode-hook (lambda()
-                          (local-set-key (kbd "C-c C-j") 'lsp-find-definition)))
+                           (local-set-key (kbd "C-c C-j") 'lsp-find-definition)))
+
+
+;; (define-key global-map "\C-j" 'eval-print-last-sexp)
 
 (autoload 'paredit-mode "paredit"
   "Minor mode for pseudo-structurally editing Lisp code."
