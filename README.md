@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/seagle0128/.emacs.d.svg?branch=master)](https://travis-ci.org/seagle0128/.emacs.d)
 [![Release Tag](https://img.shields.io/github/tag/seagle0128/.emacs.d.svg?label=release)](https://github.com/seagle0128/.emacs.d/releases/latest)
-[![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
+[![License](http://img.shields.io/:license-gpl3-blue.svg)](LICENSE)
 
 ![Centaur Emacs](logo.png)
 
@@ -148,7 +148,7 @@ For Example:
 ```
 
 The default package archives is `melpa`. You can change it in `custom.el`, or
-switch manually via `M-x switch-package-archives` anytime.
+set manually via `M-x set-package-archives` anytime.
 
 For the personal configurations, you could put to `~/.emacs.d/custom-post.el`.
 
