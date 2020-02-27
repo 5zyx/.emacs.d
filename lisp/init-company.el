@@ -30,21 +30,20 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
+(require 'init-custom)
+(require 'init-funcs)
 
 (use-package company
   :diminish
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :commands company-abort
   :bind (("M-/" . company-complete)
-         ("<backtab>" . company-yasnippet)
+         ("C-M-i" . company-complete)
          :map company-active-map
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next)
          ("<tab>" . company-complete-common-or-cycle)
          ("<backtab>" . my-company-yasnippet)
-         ;; ("C-c C-y" . my-company-yasnippet)
          :map company-search-map
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next))
@@ -78,7 +77,8 @@
     (use-package company-box
       :diminish
       :hook (company-mode . company-box-mode)
-      :init (setq company-box-backends-colors nil
+      :init (setq company-box-enable-icon centaur-icon
+                  company-box-backends-colors nil
                   company-box-show-single-candidate t
                   company-box-max-candidates 50
                   company-box-doc-delay 0.5)
@@ -124,13 +124,12 @@
                     (t . nil)))))
         (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp))
 
-      (when (and (display-graphic-p)
-                 (require 'all-the-icons nil t))
+      (when (icons-displayable-p)
         (declare-function all-the-icons-faicon 'all-the-icons)
         (declare-function all-the-icons-material 'all-the-icons)
         (declare-function all-the-icons-octicon 'all-the-icons)
         (setq company-box-icons-all-the-icons
-              `((Unknown . ,(all-the-icons-faicon "question-circle-o" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-silver))
+              `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.85 :v-adjust -0.2))
                 (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.05))
                 (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))
                 (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.05 :face 'all-the-icons-purple))

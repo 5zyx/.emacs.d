@@ -30,8 +30,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
+(require 'init-custom)
 
 ;; Prettify Symbols
 ;; e.g. display “lambda” as “λ”
@@ -80,7 +79,6 @@
 (use-package cask-mode)
 (use-package csharp-mode)
 (use-package csv-mode)
-(use-package dockerfile-mode)
 (use-package julia-mode)
 (use-package lua-mode)
 (use-package plantuml-mode)

@@ -30,9 +30,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const))
-
 (use-package markdown-mode
   :hook ((markdown-mode . auto-fill-mode))
   :mode (("README\\.md\\'" . gfm-mode))
@@ -43,7 +40,6 @@
         markdown-make-gfm-checkboxes-buttons t
         markdown-gfm-uppercase-checkbox t
         markdown-fontify-code-blocks-natively t
-        markdown-enable-math t
 
         markdown-content-type "application/xhtml+xml"
         markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
@@ -75,7 +71,12 @@ document.addEventListener('DOMContentLoaded', () => {
   ;; Install: pip install grip
   (use-package grip-mode
     :bind (:map markdown-mode-command-map
-           ("g" . grip-mode)))
+           ("g" . grip-mode))
+    :init
+    (setq grip-update-after-change nil)
+    (let ((credential (auth-source-user-and-password "api.github.com")))
+      (setq grip-github-user (car credential)
+            grip-github-password (cadr credential))))
 
   ;; Table of contents
   (use-package markdown-toc

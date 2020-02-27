@@ -30,8 +30,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
+(require 'init-custom)
 
 (use-package css-mode
   :ensure nil
@@ -120,6 +119,7 @@
 ;; Format HTML, CSS and JavaScript/JSON
 ;; Install: npm -g install prettier
 (use-package prettier-js
+  :diminish
   :hook ((js-mode js2-mode json-mode web-mode css-mode sgml-mode html-mode)
          .
          prettier-js-mode))

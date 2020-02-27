@@ -30,9 +30,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
-
 ;; Emacs lisp mode
 (use-package elisp-mode
   :ensure nil
@@ -50,7 +47,8 @@
          ("C-c C-b" . eval-buffer))
   :hook (emacs-lisp-mode . (lambda ()
                              "Disable the checkdoc checker."
-                             (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+                             (setq-local flycheck-disabled-checkers
+                                         '(emacs-lisp-checkdoc))))
   :config
   (when (boundp 'elisp-flymake-byte-compile-load-path)
     (add-to-list 'elisp-flymake-byte-compile-load-path load-path))

@@ -30,14 +30,13 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
+(require 'init-custom)
+(require 'init-funcs)
 
 ;; Windows/buffers sets shared among frames + save/load.
 (use-package persp-mode
   :diminish
   :defines (recentf-exclude ivy-ignore-buffers)
-  :functions persp--frame-parameter
   :commands (get-current-persp persp-contain-buffer-p)
   :hook ((after-init . persp-mode)
          (persp-mode . persp-load-frame)
@@ -52,13 +51,6 @@
   (defvar persp-frame-file (expand-file-name "persp-frame" persp-save-dir)
     "File of saving frame parameters.")
 
-  (defun persp--frame-parameter (parameter)
-    "Return current frame's value for PARAMETER."
-    (let ((value (frame-parameter nil parameter)))
-      (if (number-or-marker-p value)
-          value
-        0)))
-
   (defun persp-save-frame ()
     "Save the current frame parameters to file."
     (interactive)
@@ -70,10 +62,11 @@
            ";;; This is the previous frame parameters.\n"
            ";;; Last generated " (current-time-string) ".\n"
            "(setq initial-frame-alist\n"
-           (format "      '((top . %d)\n" (persp--frame-parameter 'top))
-           (format "        (left . %d)\n" (persp--frame-parameter 'left))
-           (format "        (width . %d)\n" (persp--frame-parameter 'width))
-           (format "        (height . %d)))\n" (persp--frame-parameter 'height)))
+           (format "      '((top . %d)\n" (frame-parameter nil 'top))
+           (format "        (left . %d)\n" (frame-parameter nil 'left))
+           (format "        (width . %d)\n" (frame-parameter nil 'width))
+           (format "        (height . %d)\n" (frame-parameter nil 'height))
+           (format "        (fullscreen . %s)))\n" (frame-parameter nil 'fullscreen)))
           (when (file-writable-p persp-frame-file)
             (write-file persp-frame-file)))
       (error
@@ -82,18 +75,21 @@
   (defun persp-load-frame ()
     "Load frame with the previous frame's geometry."
     (interactive)
+    (fix-fullscreen-cocoa)
     (when (file-readable-p persp-frame-file)
       (load persp-frame-file)))
 
-  ;; Don't save if the sate is not loaded
   (with-no-warnings
+    ;; Don't save if the sate is not loaded
     (defvar persp-state-loaded nil
       "Whether the state is loaded.")
 
     (defun my-persp-after-load-state (&rest _)
       (setq persp-state-loaded t))
     (advice-add #'persp-load-state-from-file :after #'my-persp-after-load-state)
-    (add-hook 'find-file-hook #'my-persp-after-load-state)
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (add-hook 'find-file-hook #'my-persp-after-load-state)))
 
     (defun my-persp-asave-on-exit (fn &optional interactive-query)
       (if persp-state-loaded
@@ -158,8 +154,8 @@
               (persp-mode-projectile-bridge-kill-perspectives)))))
   :init (setq persp-mode-projectile-bridge-persp-name-prefix "[p]")
   :config
-  ;; HACK: Allow saving to files
   (with-no-warnings
+    ;; HACK: Allow saving to files
     (defun my-persp-mode-projectile-bridge-add-new-persp (name)
       (let ((persp (persp-get-by-name name *persp-hash* :nil)))
         (if (eq :nil persp)

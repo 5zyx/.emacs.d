@@ -30,8 +30,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const))
+(require 'init-const)
 
 (use-package shell
   :ensure nil
@@ -59,7 +58,7 @@
        (t (comint-simple-send proc command))))
 
     (defun my-shell-mode-hook ()
-      "Shell mode customizations."
+      "Shell mode customization."
       (local-set-key '[up] 'comint-previous-input)
       (local-set-key '[down] 'comint-next-input)
       (local-set-key '[(shift tab)] 'comint-next-matching-input-from-input)
@@ -74,18 +73,18 @@
             eshell-output-filter-functions)
   :functions (compilation-filter my-advice-compilation-filter)
   :init
-  ;; For shell
+  ;; For shell and interpreters
   (setenv "TERM" "xterm-256color")
   (setq comint-output-filter-functions
         (remove 'ansi-color-process-output comint-output-filter-functions))
+  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
   (add-hook 'shell-mode-hook
             (lambda ()
-              ;; Disable font-locking in this buffer to improve performance
+              ;; Disable font-locking to improve performance
               (font-lock-mode -1)
-              ;; Prevent font-locking from being re-enabled in this buffer
+              ;; Prevent font-locking from being re-enabled
               (make-local-variable 'font-lock-function)
-              (setq font-lock-function (lambda (_) nil))
-              (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
+              (setq font-lock-function #'ignore)))
 
   ;; For eshell
   (with-eval-after-load 'esh-mode
@@ -104,13 +103,7 @@
                  string
                (xterm-color-filter string))))
   (advice-add 'compilation-filter :around #'my-advice-compilation-filter)
-  (advice-add 'gud-filter :around #'my-advice-compilation-filter)
-
-  ;; For prolog inferior
-  (with-eval-after-load 'prolog
-    (add-hook 'prolog-inferior-mode-hook
-              (lambda ()
-                (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))))
+  (advice-add 'gud-filter :around #'my-advice-compilation-filter))
 
 ;; Better term
 ;; @see https://github.com/akermu/emacs-libvterm#installation

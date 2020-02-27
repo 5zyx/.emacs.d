@@ -50,6 +50,7 @@
                          (eshell/alias "lt" "ls -ltFh")))
   :config
   (with-no-warnings
+    ;; For compatibility
     (unless (fboundp 'flatten-tree)
       (defalias 'flatten-tree #'eshell-flatten-list))
 

@@ -30,20 +30,26 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const))
+(require 'init-const)
 
 (use-package flycheck
   :diminish
-  :hook (after-init . global-flycheck-mode)
+  ;; FIXME: Fix args-out-of-range error
+  ;; @see https://github.com/flycheck/flycheck/issues/1677
+  ;; :hook (after-init . global-flycheck-mode)
+  :hook ((prog-mode markdown-mode) . (lambda ()
+                                       (unless (string-prefix-p "timemachine:" (buffer-name))
+                                         (flycheck-mode 1))))
   :config
-  (setq flycheck-emacs-lisp-load-path 'inherit)
+  (setq flycheck-global-modes
+        '(not text-mode outline-mode fundamental-mode org-mode
+              diff-mode shell-mode eshell-mode term-mode vterm-mode)
+        flycheck-emacs-lisp-load-path 'inherit
+        ;; Only check while saving and opening files
+        flycheck-check-syntax-automatically '(save mode-enabled)
+        flycheck-indication-mode 'right-fringe)
 
-  ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-
-  ;; Set fringe style
-  (setq flycheck-indication-mode 'right-fringe)
+  ;; Prettify fringe style
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [16 48 112 240 112 48 16] nil nil 'center))

@@ -8,12 +8,15 @@
 ;; (setq centaur-full-name "user name")           ; User full name
 ;; (setq centaur-mail-address "user@email.com")   ; Email address
 ;; (setq centaur-proxy "127.0.0.1:1080")          ; Network proxy
-;; (setq centaur-package-archives 'emacs-china)   ; Package repo: melpa, melpa-mirror, emacs-china, netease, ustsc, tencent or tuna
+;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
+;; (setq centaur-icon nil)                        ; Display icons or not: t or nil
+;; (setq centaur-package-archives 'emacs-china)   ; Package repo: melpa, melpa-mirror, emacs-china, netease, ustc, tencent or tuna
 ;; (setq centaur-theme 'light)                    ; Color theme: default, classic, colorful, dark, light, day or night
 ;; (setq centaur-dashboard nil)                   ; Use dashboard at startup or not: t or nil
 ;; (setq centaur-lsp 'eglot)                      ; Set LSP client: lsp-mode, eglot or nil
-;; (setq centaur-chinese-calendar nil)            ; Use Chinese calendar or not: t or nil
+;; (setq centaur-chinese-calendar t)              ; Use Chinese calendar or not: t or nil
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications
+;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
 ;; (setq centaur-benchmark-init t)                ; Enable initialization benchmark or not: t or nil
 
 ;; For Emacs devel
@@ -51,6 +54,12 @@
 ;;       smtpmail-default-smtp-server "smtp.gmail.com"
 ;;       smtpmail-smtp-server "smtp.gmail.com"
 ;;       smtpmail-smtp-service 587)
+
+;; Calendar
+;; Set location , then press `S' can show the time of sunrise and sunset
+;; (setq calendar-location-name "Chengdu"
+;;       calendar-latitude 30.67
+;;       calendar-longitude 104.07)
 
 ;; Misc.
 ;; (setq confirm-kill-emacs 'y-or-n-p)

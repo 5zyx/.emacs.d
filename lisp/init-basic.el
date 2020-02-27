@@ -30,16 +30,9 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const)
-  (require 'init-custom))
-
-;; Compatibility
-(unless (fboundp 'caadr)
-  (defun caadr (x)
-    "Return the `car' of the `car' of the `cdr' of X."
-    (declare (compiler-macro internal--compiler-macro-cXXr))
-    (car (car (cdr x)))))
+(require 'init-const)
+(require 'init-custom)
+(require 'init-funcs)
 
 ;; Personal information
 (setq user-full-name centaur-full-name
@@ -75,6 +68,7 @@
 ;; Explicitly set the prefered coding systems to avoid annoying prompt
 ;; from emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 
 (set-language-environment 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -85,9 +79,6 @@
 (set-terminal-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (modify-coding-system-alist 'process "*" 'utf-8)
-
-(setq locale-coding-system 'utf-8
-      default-process-coding-system '(utf-8 . utf-8))
 
 ;; Environment
 (when (or sys/mac-x-p sys/linux-x-p)
@@ -101,6 +92,7 @@
 ;; Start server
 (use-package server
   :ensure nil
+  :if centaur-server
   :hook (after-init . server-mode))
 
 ;; History
@@ -110,6 +102,7 @@
 
 (use-package recentf
   :ensure nil
+  :bind (("C-x C-r" . recentf-open-files))
   :hook (after-init . recentf-mode)
   :init (setq recentf-max-saved-items 300
               recentf-exclude
@@ -188,10 +181,7 @@
 
 ;; Fullscreen
 (when (display-graphic-p)
-  ;; WORKAROUND: To address blank screen issue with child-frame in fullscreen
-  (when (and sys/mac-cocoa-p emacs/>=26p)
-    (add-hook 'window-setup-hook (lambda () (setq ns-use-native-fullscreen nil))))
-
+  (add-hook 'window-setup-hook #'fix-fullscreen-cocoa)
   (bind-keys ("C-<f11>" . toggle-frame-fullscreen)
              ("C-s-f" . toggle-frame-fullscreen) ; Compatible with macOS
              ("S-s-<return>" . toggle-frame-fullscreen)

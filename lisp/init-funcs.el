@@ -30,12 +30,12 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const))
+(require 'cl-lib)
+
+(require 'init-const)
+(require 'init-custom)
 
 ;; Suppress warnings
-(defvar centaur-package-archives-alist)
-(defvar centaur-proxy)
 (defvar socks-noproxy)
 (defvar socks-server)
 
@@ -78,7 +78,7 @@ Same as `replace-string C-q C-m RET RET'."
   (interactive)
   (unless (minibuffer-window-active-p (selected-window))
     (revert-buffer t t)
-    (message "Reverted this buffer.")))
+    (message "Reverted this buffer")))
 (global-set-key (kbd "s-r") #'revert-this-buffer)
 
 (defun delete-this-file ()
@@ -147,15 +147,13 @@ Same as `replace-string C-q C-m RET RET'."
 
 ;; Open custom file
 (defun open-custom-file()
-  "Open custom.el if exists, otherwise create it."
+  "Open or create `custom-file'."
   (interactive)
-  (let ((custom-example
-         (expand-file-name "custom-example.el" user-emacs-directory)))
-    (unless (file-exists-p custom-file)
-      (if (file-exists-p custom-example)
-          (copy-file custom-example custom-file)
-        (error "Unable to find \"%s\"" custom-example)))
-    (find-file custom-file)))
+  (unless (file-exists-p custom-file)
+    (if (file-exists-p centaur-custom-example-file)
+        (copy-file centaur-custom-example-file custom-file)
+      (error "Unable to find \"%s\"" centaur-custom-example-file)))
+  (find-file custom-file))
 
 ;; Misc
 (defun create-scratch-buffer ()
@@ -191,6 +189,35 @@ Same as `replace-string C-q C-m RET RET'."
         (async-byte-recompile-directory dir)
       (byte-recompile-directory dir 0 t))))
 
+(defun icons-displayable-p ()
+  "Return non-nil if `all-the-icons' is displayable."
+  (and centaur-icon
+       (display-graphic-p)
+       (require 'all-the-icons nil t)))
+
+(defun centaur-set-variable (variable value &optional no-save)
+  "Set the VARIABLE to VALUE, and return VALUE.
+
+Save to `custom-file' if NO-SAVE is nil."
+  (customize-set-variable variable value)
+
+  (when (and (not no-save)
+             (file-writable-p custom-file))
+    (with-temp-buffer
+      (insert-file-contents custom-file)
+      (goto-char (point-min))
+
+      (while (re-search-forward (format "^[\t ]*[;]*[\t ]*(setq %s .*)"
+                                        (symbol-name variable))
+                                nil t)
+        (replace-match (format "(setq %s '%s)"
+                               (symbol-name variable)
+                               (symbol-name value))
+                       nil nil))
+
+      (write-region nil nil custom-file)
+      (message "Save %s (%s)" variable value))))
+
 (define-minor-mode centaur-read-mode
   "Minor Mode for better reading experience."
   :init-value nil
@@ -208,21 +235,34 @@ Same as `replace-string C-q C-m RET RET'."
         (mixed-pitch-mode -1)))))
 (global-set-key (kbd "M-<f7>") #'centaur-read-mode)
 
-;; Pakcage archives
-(defun set-package-archives (archives)
-  "Set specific package ARCHIVES repository."
+;; Pakcage repository (ELPA)
+(defun set-package-archives (archives &optional refresh async no-save)
+  "Set the package archives (ELPA).
+
+REFRESH is non-nil, will refresh archive contents.
+ASYNC specifies whether to perform the downloads in the background.
+Save to `custom-file' if NO-SAVE is nil."
   (interactive
    (list
-    (intern (completing-read
-             "Choose package archives: "
-             (mapcar #'car centaur-package-archives-alist)))))
-  (customize-set-variable 'centaur-package-archives archives)
+    (intern (completing-read "Select package archives: "
+                             (mapcar #'car centaur-package-archives-alist)))))
+  ;; Set option
+  (centaur-set-variable 'centaur-package-archives archives no-save)
+
+  ;; Refresh if need
+  (and refresh (package-refresh-contents async))
+
   (message "Set package archives to `%s'" archives))
+(defalias 'centaur-set-package-archives #'set-package-archives)
 
 ;; Refer to https://emacs-china.org/t/elpa/11192
-(defun centaur-test-package-archives ()
-  "Test speed of all package archives and display on the chart."
+(defun centaur-test-package-archives (&optional no-chart)
+  "Test connection speed of all package archives and display on chart.
+
+Not displaying the chart if NO-CHART is non-nil.
+Return the fastest package archive."
   (interactive)
+
   (let* ((urls (mapcar
                 (lambda (url)
                   (concat url "archive-contents"))
@@ -233,18 +273,40 @@ Same as `replace-string C-q C-m RET RET'."
          (durations (mapcar
                      (lambda (url)
                        (let ((start (current-time)))
-                         (message "Fetching %s" url)
-                         (call-process "curl" nil nil nil "--max-time" "10" url)
+                         (message "Fetching %s..." url)
+                         (cond ((executable-find "curl")
+                                (call-process "curl" nil nil nil "--max-time" "10" url))
+                               ((executable-find "wget")
+                                (call-process "wget" nil nil nil "--timeout=10" url))
+                               (t (user-error "curl or wget is not found")))
                          (float-time (time-subtract (current-time) start))))
-                     urls)))
-    (message "%s" urls)
-    (when (require 'chart nil t)
+                     urls))
+         (fastest (car (nth (cl-position (apply #'min durations) durations)
+                            centaur-package-archives-alist))))
+
+    ;; Display on chart
+    (when (and (not no-chart)
+               (require 'chart nil t)
+               (require 'url nil t))
       (chart-bar-quickie
        'horizontal
        "Speed test for the ELPA mirrors"
-       (mapcar (lambda (url) (url-host (url-generic-parse-url url))) urls) "Elpa"
+       (mapcar (lambda (url) (url-host (url-generic-parse-url url))) urls) "ELPA"
        (mapcar (lambda (d) (* 1e3 d)) durations) "ms"))
-    (message "%s" durations)))
+
+    (message "%s" urls)
+    (message "%s" durations)
+    (message "%s is the fastest package archive" fastest)
+
+    ;; Return the fastest
+    fastest))
+
+;; WORKAROUND: fix blank screen issue on macOS.
+(defun fix-fullscreen-cocoa ()
+  "Address blank screen issue with child-frame in fullscreen."
+  (and sys/mac-cocoa-p
+       emacs/>=26p
+       (setq ns-use-native-fullscreen nil)))
 
 
 
@@ -259,7 +321,7 @@ Same as `replace-string C-q C-m RET RET'."
           (cd dir)
           (shell-command "git pull")
           (message "Updating configurations...done"))
-      (message "\"%s\" doesn't exist." dir))))
+      (message "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages (&optional sync)
@@ -331,7 +393,7 @@ If SYNC is non-nil, the updating process is synchronous."
           (cd dir)
           (shell-command "git pull")
           (message "Updating dotfiles...done"))
-      (message "\"%s\" doesn't exist." dir))))
+      (message "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
@@ -344,7 +406,7 @@ If SYNC is non-nil, the updating process is synchronous."
           (cd dir)
           (shell-command "git pull")
           (message "Updating org files...done"))
-      (message "\"%s\" doesn't exist." dir))))
+      (message "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-org #'update-org)
 
 
@@ -357,39 +419,31 @@ If SYNC is non-nil, the updating process is synchronous."
   (run-hooks 'after-load-theme-hook))
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
 
-(defun centaur--standardize-theme (theme)
-  "Standardize THEME."
-  (pcase theme
-    ('default 'doom-one)
-    ('classic 'doom-molokai)
-    ('colorful 'doom-snazzy)
-    ('dark 'doom-palenight)
-    ('light 'doom-one-light)
-    ('day 'doom-opera-light)
-    ('night 'doom-city-lights)
-    (_ (or theme 'doom-one))))
+(defun centaur--real-theme (theme)
+  "Return real THEME name."
+  (or (alist-get theme centaur-theme-alist) theme))
 
 (defun centaur-compatible-theme-p (theme)
   "Check if the THEME is compatible. THEME is a symbol."
-  (string-prefix-p "doom" (symbol-name (centaur--standardize-theme theme))))
+  (string-prefix-p "doom" (symbol-name (centaur--real-theme theme))))
 
-(defun centaur-load-theme (theme)
-  "Set color THEME."
+(defun centaur-load-theme (theme &optional no-save)
+  "Set color THEME. Save to `custom-file' if NO-SAVE is nil."
   (interactive
    (list
     (intern (completing-read "Load theme: "
-                             '(default classic dark light daylight)))))
-  (let ((theme (centaur--standardize-theme theme)))
-    (mapc #'disable-theme custom-enabled-themes)
-    (load-theme theme t)))
+                             (mapcar #'car centaur-theme-alist)))))
+  ;; Disable others and enable new one
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme (centaur--real-theme theme) t)
 
-(defun centuar-dark-theme-p ()
+  ;; Set option
+  (centaur-set-variable 'centaur-theme theme no-save))
+(global-set-key (kbd "C-c T") #'centaur-load-theme)
+
+(defun centaur-dark-theme-p ()
   "Check if the current theme is a dark theme."
   (eq (frame-parameter nil 'background-mode) 'dark))
-
-(defun centuar-current-theme ()
-  "The current enabled theme."
-  (car custom-enabled-themes))
 
 
 
@@ -425,10 +479,11 @@ If SYNC is non-nil, the updating process is synchronous."
 (defun proxy-socks-show ()
   "Show SOCKS proxy."
   (interactive)
-  (if socks-noproxy
-      (message "Current SOCKS%d proxy is %s:%d"
-               (cadddr socks-server) (cadr socks-server) (caddr socks-server))
-    (message "No SOCKS proxy")))
+  (when (fboundp 'cadddr)                ; defined 25.2+
+    (if socks-noproxy
+        (message "Current SOCKS%d proxy is %s:%d"
+                 (cadddr socks-server) (cadr socks-server) (caddr socks-server))
+      (message "No SOCKS proxy"))))
 
 (defun proxy-socks-enable ()
   "Enable SOCKS proxy."

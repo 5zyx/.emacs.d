@@ -30,8 +30,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-const))
+(require 'init-const)
 
 ;; Delete selection if you insert
 (use-package delsel
@@ -41,10 +40,12 @@
 ;; Rectangle
 (use-package rect
   :ensure nil
-  :bind (("<C-return>" . (lambda ()
-                           (interactive)
-                           (unless (minibufferp)
-                             (rect-hydra/body)))))
+  :bind (:map text-mode-map
+         ("<C-return>" . rect-hydra/body)
+         :map prog-mode-map
+         ("<C-return>" . rect-hydra/body))
+  :init (with-eval-after-load 'org
+          (bind-key "<s-return>" #'rect-hydra/body org-mode-map))
   :pretty-hydra
   ((:title (pretty-hydra-title "Rectangle" 'material "border_all" :height 1.1 :v-adjust -0.225)
     :color amaranth :body-pre (rectangle-mark-mode) :post (deactivate-mark) :quit-key ("q" "C-g"))
@@ -87,9 +88,34 @@
          ("C-c C-z v" . browse-url-of-file))
   :init
   (with-eval-after-load 'dired
-    (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map))
-  (when (featurep 'xwidget-internal)
-    (bind-key "C-c C-z w" #'xwidget-webkit-browse-url)))
+    (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
+
+(use-package xwidget
+  :ensure nil
+  :if (featurep 'xwidget-internal)
+  :bind (("C-c C-z w" . xwidget-webkit-browse-url)
+         :map xwidget-webkit-mode-map
+         ("?" . xwidget-hydra/body))
+  :pretty-hydra
+  ((:title (pretty-hydra-title "Webkit" 'faicon "chrome")
+    :color amaranth :quit-key "q")
+   ("Navigate"
+    (("b" xwidget-webkit-back "back")
+     ("f" xwidget-webkit-forward "forward")
+     ("r" xwidget-webkit-reload "refresh")
+     ("SPC" xwidget-webkit-scroll-up "scroll up")
+     ("DEL" xwidget-webkit-scroll-down "scroll down")
+     ("S-SPC" xwidget-webkit-scroll-down "scroll down"))
+    "Zoom"
+    (("+" xwidget-webkit-zoom-in "zoom in")
+     ("=" xwidget-webkit-zoom-in "zoom in")
+     ("-" xwidget-webkit-zoom-out "zoom out"))
+    "Misc"
+    (("g" xwidget-webkit-browse-url "browse url" :exit t)
+     ("u" xwidget-webkit-current-url "show url" :exit t)
+     ("w" xwidget-webkit-current-url-message-kill "copy url" :exit t)
+     ("h" describe-mode "help" :exit t)
+     ("Q" quit-window "quit" :exit t)))))
 
 ;; Click to browse URL or to send to e-mail address
 (use-package goto-addr
@@ -160,12 +186,8 @@
   ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
   (add-to-list
    'aggressive-indent-dont-indent-if
-   '(and (or (derived-mode-p 'c-mode)
-             (derived-mode-p 'c++-mode)
-             (derived-mode-p 'csharp-mode)
-             (derived-mode-p 'java-mode)
-             (derived-mode-p 'go-mode)
-             (derived-mode-p 'swift-mode))
+   '(and (derived-mode-p 'c-mode 'c++-mode 'csharp-mode
+                         'java-mode 'go-mode 'swift-mode)
          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
                              (thing-at-point 'line))))))
 
@@ -265,10 +287,16 @@
          (flyspell-mode . (lambda ()
                             (dolist (key '("C-;" "C-," "C-."))
                               (unbind-key key flyspell-mode-map)))))
-  :init
-  (setq flyspell-issue-message-flag nil
-        ispell-program-name "aspell"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
+  :init (setq flyspell-issue-message-flag nil
+              ispell-program-name "aspell"
+              ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
+  :config
+  ;; Correcting words with flyspell via Ivy
+  (use-package flyspell-correct-ivy
+    :after ivy
+    :bind (:map flyspell-mode-map
+           ([remap flyspell-correct-word-before-point] . flyspell-correct-wrapper))
+    :init (setq flyspell-correct-interface #'flyspell-correct-ivy)))
 
 ;; Hungry deletion
 (use-package hungry-delete
@@ -297,15 +325,22 @@
          ([M-down] . pager-row-down)
          ([M-kp-2] . pager-row-down)))
 
-;; Undo/Redo
-(use-package undo-fu
-  :bind (([remap undo] . undo-fu-only-undo)
-         ([remap undo-only] . undo-fu-only-undo)
-         ("C-?" . undo-fu-only-redo)
-         ("M-_" . undo-fu-only-redo)))
+;; Treat undo history as a tree
+(use-package undo-tree
+  :diminish
+  :hook (after-init . global-undo-tree-mode)
+  :init
+  (setq undo-tree-visualizer-timestamps t
+        undo-tree-enable-undo-in-region nil
+        undo-tree-auto-save-history nil)
+
+  ;; HACK: keep the diff window
+  (with-no-warnings
+    (make-variable-buffer-local 'undo-tree-visualizer-diff)
+    (setq-default undo-tree-visualizer-diff t)))
 
 ;; Goto last change
-(use-package goto-last-change
+(use-package goto-chg
   :bind ("C-," . goto-last-change))
 
 ;; Record and jump to the last point in the buffer
