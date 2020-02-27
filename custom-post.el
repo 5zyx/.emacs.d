@@ -116,4 +116,4 @@
     ;; finally, switch to that window
     (other-window 1)))
 
-(define-key dired-mode-map "Y" 'ora-dired-rsync)
+(define-key dired-mode-map (kbd "<f5>") 'ora-dired-rsync)
