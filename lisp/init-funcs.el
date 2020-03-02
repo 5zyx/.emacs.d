@@ -201,21 +201,15 @@ Same as `replace-string C-q C-m RET RET'."
 
 Save to `custom-file' if NO-SAVE is nil."
   (customize-set-variable variable value)
-
   (when (and (not no-save)
              (file-writable-p custom-file))
     (with-temp-buffer
       (insert-file-contents custom-file)
       (goto-char (point-min))
-
-      (while (re-search-forward (format "^[\t ]*[;]*[\t ]*(setq %s .*)"
-                                        (symbol-name variable))
-                                nil t)
-        (replace-match (format "(setq %s '%s)"
-                               (symbol-name variable)
-                               (symbol-name value))
-                       nil nil))
-
+      (while (re-search-forward
+              (format "^[\t ]*[;]*[\t ]*(setq %s .*)" variable)
+              nil t)
+        (replace-match (format "(setq %s '%s)" variable value) nil nil))
       (write-region nil nil custom-file)
       (message "Save %s (%s)" variable value))))
 
@@ -444,7 +438,7 @@ If SYNC is non-nil, the updating process is synchronous."
             ;; Time-switching themes
             (setq circadian-themes centaur-auto-themes)
             (circadian-setup))
-        (user-error "`circadian' is not installed"))
+        (user-error "Restart to enable `auto' theme"))
     (progn
       ;; Disable others and enable new one
       (mapc #'disable-theme custom-enabled-themes)
