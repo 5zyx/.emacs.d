@@ -53,7 +53,7 @@
                           (lsp-enable-which-key-integration)
 
                           ;; Format and organize imports
-                          (unless (derived-mode-p 'c-mode 'c++-mode)
+                          (unless (apply #'derived-mode-p centaur-lsp-format-on-save-ignore-modes)
                             (add-hook 'before-save-hook #'lsp-format-buffer t t)
                             (add-hook 'before-save-hook #'lsp-organize-imports t t)))))
      :bind (:map lsp-mode-map
@@ -142,14 +142,7 @@
                (lambda ()
                  (setq lsp-ui-doc-border (face-foreground 'default))
                  (set-face-background 'lsp-ui-doc-background
-                                      (face-background 'tooltip))))
-
-     ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
-     ;; @see https://github.com/emacs-lsp/lsp-ui/issues/243
-     (defun my-lsp-ui-imenu-hide-mode-line ()
-       "Hide the mode-line in lsp-ui-imenu."
-       (setq mode-line-format nil))
-     (advice-add #'lsp-ui-imenu :after #'my-lsp-ui-imenu-hide-mode-line))
+                                      (face-background 'tooltip)))))
 
    ;; Completion
    (use-package company-lsp
@@ -419,8 +412,7 @@ Return a list of strings as the completion candidates."
      :config
      (with-eval-after-load 'projectile
        (setq projectile-project-root-files-top-down-recurring
-             (append '("compile_commands.json"
-                       ".ccls")
+             (append '("compile_commands.json" ".ccls")
                      projectile-project-root-files-top-down-recurring))))
 
    ;; Julia support
