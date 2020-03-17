@@ -84,6 +84,11 @@
     :if (icons-displayable-p)
     :hook (dired-mode . all-the-icons-dired-mode)
     :config
+    ;; FIXME: Refresh after creating or renaming the files/directories.
+    ;; @see https://github.com/jtbm37/all-the-icons-dired/issues/34.
+    (advice-add 'dired-do-create-files :around #'all-the-icons-dired--refresh-advice)
+    (advice-add 'dired-create-directory :around #'all-the-icons-dired--refresh-advice)
+
     (with-no-warnings
       (defun my-all-the-icons-dired--refresh ()
         "Display the icons of files in a dired buffer."
@@ -96,14 +101,17 @@
 
               (goto-char (point-min))
               (while (not (eobp))
-                (let ((file (dired-get-filename 'verbatim t)))
-                  (when file
-                    (let ((icon (if (file-directory-p file)
-                                    (all-the-icons-icon-for-dir file nil "")
-                                  (all-the-icons-icon-for-file file :v-adjust all-the-icons-dired-v-adjust))))
-                      (if (member file '("." ".."))
-                          (all-the-icons-dired--add-overlay (point) " \t")
-                        (all-the-icons-dired--add-overlay (point) (concat icon "\t"))))))
+                (when-let ((file (dired-get-filename 'verbatim t)))
+                  (let ((icon (if (file-directory-p file)
+                                  (let ((dir-icon (all-the-icons-icon-for-dir file nil "")))
+                                    (propertize dir-icon
+                                                'face `(:inherit ,(get-text-property 0 'face dir-icon)
+                                                        :foreground ,(face-foreground 'default)
+                                                        :height 0.9)))
+                                (all-the-icons-icon-for-file file :height 0.9 :v-adjust 0.0))))
+                    (if (member file '("." ".."))
+                        (all-the-icons-dired--add-overlay (point) "  \t")
+                      (all-the-icons-dired--add-overlay (point) (format "%s\t" icon)))))
                 (dired-next-line 1)))
           (message "Not display icons because of too many items.")))
       (advice-add #'all-the-icons-dired--refresh
