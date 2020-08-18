@@ -229,7 +229,7 @@ prepended to the element after the #+HEADER: tag."
     :functions (org-display-inline-images
                 org-remove-inline-images)
     :bind (:map org-mode-map
-           ("C-<f7>" . org-tree-slide-mode)
+           ("s-<f7>" . org-tree-slide-mode)
            :map org-tree-slide-mode-map
            ("<left>" . org-tree-slide-move-previous-tree)
            ("<right>" . org-tree-slide-move-next-tree)
@@ -271,7 +271,7 @@ prepended to the element after the #+HEADER: tag."
            (("C-c n I" . org-roam-insert-immediate))))
 
   (use-package org-roam-server
-    :functions xwidget-webkit-current-session
+    :functions xwidget-buffer xwidget-webkit-current-session
     :hook (org-roam-server-mode . org-roam-server-browse)
     :init
     (defun org-roam-server-browse ()

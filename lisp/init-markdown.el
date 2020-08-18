@@ -31,7 +31,6 @@
 ;;; Code:
 
 (use-package markdown-mode
-  :commands markdown--command-map-prompt
   :mode (("README\\.md\\'" . gfm-mode))
   :init
   (setq markdown-enable-wiki-links t
@@ -84,8 +83,9 @@ mermaid.initialize({
     (setq markdown-command "multimarkdown"))
 
   ;; Use `which-key' instead
-  (advice-add #'markdown--command-map-prompt :override #'ignore)
-  (advice-add #'markdown--style-map-prompt   :override #'ignore)
+  (with-no-warnings
+    (advice-add #'markdown--command-map-prompt :override #'ignore)
+    (advice-add #'markdown--style-map-prompt   :override #'ignore))
   :config
   (add-to-list 'markdown-code-lang-modes '("mermaid" . mermaid-mode))
 
@@ -110,7 +110,7 @@ mermaid.initialize({
            ("g" . grip-mode))
     :init
     (setq grip-update-after-change nil)
-    (let ((credential (auth-source-user-and-password "api.github.com")))
+    (when-let ((credential (auth-source-user-and-password "api.github.com")))
       (setq grip-github-user (car credential)
             grip-github-password (cadr credential))))
 
