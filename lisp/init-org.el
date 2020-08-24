@@ -101,7 +101,8 @@ prepended to the element after the #+HEADER: tag."
                   (if (or (region-active-p) (looking-back "^\s*" 1))
                       (org-hydra/body)
                     (self-insert-command 1)))))
-  :hook ((org-mode . (lambda ()
+  :hook (((org-babel-after-execute org-mode) . org-redisplay-inline-images) ; display image
+         (org-mode . (lambda ()
                        "Beautify org symbols."
                        (setq prettify-symbols-alist centaur-prettify-org-symbols-alist)
                        (prettify-symbols-mode 1)))
@@ -197,6 +198,7 @@ prepended to the element after the #+HEADER: tag."
     :if (executable-find "jupyter")     ; DO NOT remove
     :init (cl-pushnew '(ipython . t) load-language-list))
 
+  ;; Use mermadi-cli: npm install -g @mermaid-js/mermaid-cli
   (use-package ob-mermaid
     :init (cl-pushnew '(mermaid . t) load-language-list))
 
