@@ -10,6 +10,6 @@
  go get -u -v github.com/cweill/gotests/...
  go get -u -v github.com/fatih/gomodifytags
  go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
- go get -u -v github.com/uudashr/gopkgs/cmd/gopkgs
- go get -u -v onnef.co/go/tools/...
-
+#go get github.com/uudashr/gopkgs/cmd/gopkgs@latest
+ #go get -u -v onnef.co/go/tools/...
+go get -u github.com/haya14busa/gopkgs/cmd/gopkgs
