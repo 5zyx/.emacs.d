@@ -115,7 +115,7 @@
     (use-package company-box
       :diminish
       :defines company-box-icons-all-the-icons
-      ;; :hook (company-mode . company-box-mode)
+      :hook (company-mode . company-box-mode)
       :init (setq company-box-enable-icon centaur-icon
                   company-box-backends-colors nil
                   company-box-highlight-prefix t)
