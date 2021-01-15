@@ -24,14 +24,19 @@
          :recursive t
          :publishing-function org-html-publish-to-html
          :with-toc nil
+         :with-title t
+         :with-drawers t
+         :with-sub-superscript nil
+         :html-doctype "html5"
+         :html-head-include-default-style nil
          :headline-levels 4
-         :auto-preamble nil
-         :auto-sitemap nil
+         :html-preamble "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://gongzhitaao.org/orgcss/org.css\" />"
+         :auto-sitemap t
          :html-extension "html"
          :table-of-contents nil
-         :section-numbers t
+         :section-numbers nil
          ;; :html_head "<link rel=\"stylesheet\" type=\"text/css\" href=\"../assets/themes/havee/css/style.css\" />"
-         :body-only t)
+         :body-only nil)
 
         ("org-static-file"
          :base-directory "~/workspace/wow-yorick.github.io/_org/images/"
