@@ -38,7 +38,7 @@
          :section-numbers nil
          :sitemap-title "悟道地图"
          ;; :html_head "<link rel=\"stylesheet\" type=\"text/css\" href=\"../assets/themes/havee/css/style.css\" />"
-         :body-only nil)
+         :body-only t)
 
         ("org-static-file"
          :base-directory "~/workspace/wow-yorick.github.io/_org/images/"
