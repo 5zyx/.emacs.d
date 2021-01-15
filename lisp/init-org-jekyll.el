@@ -24,6 +24,7 @@
          :recursive t
          :publishing-function org-html-publish-to-html
          :with-toc nil
+         :auto-preamble t
          :with-title t
          :with-drawers t
          :with-sub-superscript nil
@@ -35,6 +36,7 @@
          :html-extension "html"
          :table-of-contents nil
          :section-numbers nil
+         :sitemap-title "悟道地图"
          ;; :html_head "<link rel=\"stylesheet\" type=\"text/css\" href=\"../assets/themes/havee/css/style.css\" />"
          :body-only nil)
 
