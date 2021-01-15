@@ -1,6 +1,9 @@
 (use-package evil
   :init (evil-mode 1))
 
+(require 'init-org-jekyll)
+(setq org-src-fontify-natively t)
+
 (tool-bar-mode 1)
 (menu-bar-mode 1)
 (scroll-bar-mode 1)
