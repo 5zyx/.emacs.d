@@ -1,8 +1,32 @@
 (use-package evil
   :init (evil-mode 1))
+(use-package htmlize)
 
 (require 'init-org-jekyll)
 (setq org-src-fontify-natively t)
+(org-block-begin-line
+ ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+(org-block-background
+ ((t (:background "#FFFFEA"))))
+(org-block-end-line
+ ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+
+;; (defface org-block-begin-line
+;;   '((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+;;   "Face used for the line delimiting the begin of source blocks.")
+
+;; (defface org-block-background
+;;   '((t (:background "#FFFFEA")))
+;;   "Face used for the source block background.")
+
+;; (defface org-block-end-line
+;;   '((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+;;   "Face used for the line delimiting the end of source blocks.")
+
+(require 'color)
+(set-face-attribute 'org-block nil :background
+                    (color-darken-name
+                     (face-attribute 'default :background) 3))
 
 (tool-bar-mode 1)
 (menu-bar-mode 1)
