@@ -2,6 +2,8 @@
   :init (evil-mode 1))
 (use-package htmlize)
 
+(use-package graphviz-dot-mode)
+
 (require 'init-org-jekyll)
 (setq org-src-fontify-natively t)
 
