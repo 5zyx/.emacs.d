@@ -11,6 +11,13 @@
 (menu-bar-mode 1)
 (scroll-bar-mode 1)
 
+;; active Org-babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)
+   (dot . t)))
+
 ;; How to detect the project root.
 ;; The default priority of detection is `ffip' > `projectile' > `project'.
 ;; nil means to use `default-directory'.
