@@ -2,12 +2,21 @@
   :init (evil-mode 1))
 (use-package htmlize)
 
+(use-package graphviz-dot-mode)
+
 (require 'init-org-jekyll)
 (setq org-src-fontify-natively t)
 
 (tool-bar-mode 1)
 (menu-bar-mode 1)
 (scroll-bar-mode 1)
+
+;; active Org-babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)
+   (dot . t)))
 
 ;; How to detect the project root.
 ;; The default priority of detection is `ffip' > `projectile' > `project'.
@@ -121,3 +130,12 @@
     (other-window 1)))
 
 (define-key dired-mode-map (kbd "<f5>") 'ora-dired-rsync)
+
+(defun endless/org-ispell ()
+  "Configure `ispell-skip-region-alist' for `org-mode'."
+  (make-local-variable 'ispell-skip-region-alist)
+  (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+  (add-to-list 'ispell-skip-region-alist '("~" "~"))
+  (add-to-list 'ispell-skip-region-alist '("=" "="))
+  (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
+(add-hook 'org-mode-hook #'endless/org-ispell)
