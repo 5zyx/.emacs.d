@@ -119,15 +119,14 @@
                     centaur-package-archives-alist)))
 
 (defcustom centaur-theme-alist
-  '((default  . doom-one)
-    (classic  . doom-monokai-classic)
-    (dark     . doom-dark+)
-    (light    . doom-one-light)
-    (warm     . doom-solarized-light)
-    (cold     . doom-city-lights)
-    (day      . doom-tomorrow-day)
-    (night    . doom-tomorrow-night)
-    (peace    . doom-zenburn))
+  '((default . doom-one)
+    (pro     . doom-monokai-pro)
+    (dark    . doom-dark+)
+    (light   . doom-one-light)
+    (warm    . doom-solarized-light)
+    (cold    . doom-city-lights)
+    (day     . doom-tomorrow-day)
+    (night   . doom-tomorrow-night))
   "List of themes mapped to internal themes."
   :group 'centaur
   :type '(alist :key-type (symbol :tag "Theme")
@@ -147,8 +146,8 @@ For example:
                 :value-type (symbol :tag "Theme")))
 
 (when (boundp 'ns-system-appearance)
-  (defcustom centaur-system-themes '((light  . doom-one-light)
-				                     (dark   . doom-one))
+  (defcustom centaur-system-themes '((light . doom-one-light)
+				                     (dark  . doom-one))
     "List of themes related the system appearance. It's only available on macOS."
     :group 'centaur
     :type '(alist :key-type (symbol :tag "Appearance")
@@ -157,10 +156,10 @@ For example:
 (defcustom centaur-theme 'default
   "The color theme."
   :group 'centaur
-  :type `(choice (const :tag "Auto" 'auto)
-                 (const :tag "Random" 'random)
+  :type `(choice (const :tag "Auto" auto)
+                 (const :tag "Random" random)
                  ,(if (boundp 'ns-system-appearance)
-                      '(const :tag "System" 'system)
+                      '(const :tag "System" system)
                     "")
                  ,@(mapcar
                     (lambda (item)
@@ -170,6 +169,12 @@ For example:
                               name)))
                     centaur-theme-alist)
                  symbol))
+
+(defcustom centaur-completion-style 'childframe
+  "Completion display style."
+  :group 'centaur
+  :type '(choice (const :tag "Minibuffer" minibuffer)
+                 (const :tag "Child Frame" childframe)))
 
 (defcustom centaur-dashboard t
   "Use dashboard at startup or not.
@@ -186,10 +191,9 @@ If Non-nil, save and restore the frame's geometry."
 (defcustom centaur-lsp 'lsp-mode
   "Set language server."
   :group 'centaur
-  :type '(choice
-          (const :tag "LSP Mode" 'lsp-mode)
-          (const :tag "Eglot" 'eglot)
-          nil))
+  :type '(choice (const :tag "LSP Mode" lsp-mode)
+                 (const :tag "Eglot" eglot)
+                 (const :tag "Disable" nil)))
 
 (defcustom centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode)
   "The modes that don't auto format and organize imports while saving the buffers.
@@ -252,11 +256,6 @@ Nil to use font supports ligatures."
   "Alist of symbol prettifications for `org-mode'."
   :group 'centaur
   :type '(alist :key-type string :value-type (choice character sexp)))
-
-(defcustom centaur-benchmark-init nil
-  "Enable the initialization benchmark or not."
-  :group 'centaur
-  :type 'boolean)
 
 ;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))

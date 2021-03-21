@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'init-const)
+(require 'init-funcs)
 
 ;; Git
 ;; See `magit-maybe-define-global-key-bindings'
@@ -78,6 +79,31 @@
       :init
       (setq magit-todos-nice (if (executable-find "nice") t nil))
       (magit-todos-mode 1))))
+
+;; Display transient in child frame
+(when (childframe-workable-p)
+  (use-package transient-posframe
+    :diminish
+    :custom-face
+    (transient-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face)))))
+    :hook (after-init . transient-posframe-mode)
+    :init
+    (setq transient-posframe-border-width 3
+          transient-posframe-min-height 21)
+
+    (with-eval-after-load 'solaire-mode
+      (setq transient-posframe-parameters
+            `((background-color . ,(face-background 'solaire-default-face)))))
+    :config
+    (add-hook 'after-load-theme-hook
+              (lambda ()
+                (posframe-delete-all)
+                (custom-set-faces
+                 `(transient-posframe-border
+                   ((t (:background ,(face-foreground 'font-lock-comment-face))))))
+                (with-eval-after-load 'solaire-mode
+                  (setf (alist-get 'background-color transient-posframe-parameters)
+                        (face-background 'solaire-default-face)))))))
 
 ;; Walk through git revisions of a file
 (use-package git-timemachine
