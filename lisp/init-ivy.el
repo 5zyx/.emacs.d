@@ -112,12 +112,12 @@
   :init
   (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 
-  (setq ivy-use-selectable-prompt t
+  (setq ivy-height 12
+        ivy-use-selectable-prompt t
         ivy-use-virtual-buffers t    ; Enable bookmarks and recentf
-        ivy-height 10
         ivy-fixed-height-minibuffer t
         ivy-count-format "(%d/%d) "
-        ivy-on-del-error-function nil
+        ivy-on-del-error-function #'ignore
         ivy-initial-inputs-alist nil)
 
   ;; Better performance on Windows
@@ -447,6 +447,7 @@ This is for use in `ivy-re-builders-alist'."
           (setq hydra-posframe-show-params
                 `(:internal-border-width 3
                   :internal-border-color ,(face-foreground 'font-lock-comment-face)
+                  :lines-truncate t
                   :poshandler ivy-hydra-poshandler-frame-center-below-fn))
           (with-eval-after-load 'solaire-mode
             (plist-put hydra-posframe-show-params
