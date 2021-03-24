@@ -236,37 +236,44 @@ Lisp function does not specify a special indentation."
         '(pre-command-hook post-command-hook focus-out-hook)
         "The hooks which should trigger automatic removal of the posframe.")
 
+      (defvar eldoc-posframe-delay 0.2
+        "Delay seconds to display `eldoc'.")
+
+      (defvar-local eldoc-posframe--timer nil)
+
       (defun eldoc-posframe-hide-posframe ()
         "Hide messages currently being shown if any."
+        (when eldoc-posframe--timer
+          (cancel-timer eldoc-posframe--timer))
+
         (posframe-hide eldoc-posframe-buffer)
         (dolist (hook eldoc-posframe-hide-posframe-hooks)
           (remove-hook hook #'eldoc-posframe-hide-posframe t)))
 
-      (defun eldoc-posframe-poshandler (info)
-        (let* ((pos (posn-x-y (plist-get info :position-info)))
-               (top (plist-get info :parent-window-top))
-               (left (plist-get info :parent-window-left))
-               (height (plist-get info :posframe-height))
-               (x (car pos))
-               (y (cdr pos)))
-          (cons (+ x left) (+ (- y height) top 2))))
-
       (defun eldoc-posframe-show-posframe (str &rest args)
         "Display STR with ARGS."
-        (eldoc-posframe-hide-posframe)
-        (when str
-          (posframe-show
-           eldoc-posframe-buffer
-           :string (apply 'format str args)
-           :postion (point)
-           :poshandler #'eldoc-posframe-poshandler
-           :internal-border-width 1
-           :internal-border-color (face-attribute 'font-lock-comment-face :foreground nil t)
-           :background-color (face-background 'tooltip nil t)
-           :left-fringe 4
-           :right-fringe 4))
+        (when eldoc-posframe--timer
+          (cancel-timer eldoc-posframe--timer))
+
+        (posframe-hide eldoc-posframe-buffer)
         (dolist (hook eldoc-posframe-hide-posframe-hooks)
-          (add-hook hook #'eldoc-posframe-hide-posframe nil t)))
+          (add-hook hook #'eldoc-posframe-hide-posframe nil t))
+
+        (setq eldoc-posframe--timer
+              (run-with-idle-timer
+               eldoc-posframe-delay nil
+               (lambda ()
+                 (when str
+                   (posframe-show
+                    eldoc-posframe-buffer
+                    :string (apply #'format str args)
+                    :postion (point)
+                    :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
+                    :left-fringe 8
+                    :right-fringe 8
+                    :internal-border-width 1
+                    :internal-border-color (face-attribute 'font-lock-comment-face :foreground)
+                    :background-color (face-background 'tooltip)))))))
 
       (setq eldoc-message-function #'eldoc-posframe-show-posframe))))
 
