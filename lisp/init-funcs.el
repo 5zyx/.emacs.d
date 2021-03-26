@@ -124,7 +124,7 @@ Same as `replace-string C-q C-m RET RET'."
       (progn
         (kill-new filename)
         (message "Copied '%s'" filename))
-    (message "WARNING: Current buffer is not attached to a file!")))
+    (warn "Current buffer is not attached to a file!")))
 
 ;; Browse URL
 (defun centaur-webkit-browse-url (url &optional pop-buffer new-session)
@@ -153,7 +153,7 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
         ((bound-and-true-p counsel-mode)
          (counsel-find-file url))
         (t (find-file url))))
-(defalias #'find-pdf-file #'centaur-find-pdf-file)
+(defalias 'find-pdf-file #'centaur-find-pdf-file)
 
 ;; Mode line
 (defun mode-line-height ()
