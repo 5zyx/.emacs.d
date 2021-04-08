@@ -96,7 +96,6 @@
 
          :map ivy-minibuffer-map
          ("C-w" . ivy-yank-word)
-         ("C-`" . ivy-avy)
 
          :map counsel-find-file-map
          ("C-h" . counsel-up-directory)
@@ -137,29 +136,23 @@
             counsel-find-file-occur-cmd
             "gls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 gls -d --group-directories-first")))
   :config
-  ;; persist views
-  (with-eval-after-load 'savehist
-    (add-to-list 'savehist-additional-variables 'ivy-views))
-
   (with-no-warnings
+    ;; persist views
+    (with-eval-after-load 'savehist
+      (add-to-list 'savehist-additional-variables 'ivy-views))
+
     ;; Display an arrow with the selected item
     (defun my-ivy-format-function-arrow (cands)
       "Transform CANDS into a string for minibuffer."
-      (ivy--format-function-generic
-       (lambda (str)
-         (concat (if (and (>= (length str) 1)
-                          (string= " " (substring str 0 1)))
-                     ">"
-                   "> ")
-                 (ivy--add-face str 'ivy-current-match)))
-       (lambda (str)
-         (concat (if (and (>= (length str) 1)
-                          (string= " " (substring str 0 1)))
-                     " "
-                   "  ")
-                 str))
-       cands
-       "\n"))
+      (if (display-graphic-p)
+          (ivy-format-function-line cands)
+        (ivy--format-function-generic
+         (lambda (str)
+           (ivy--add-face (concat "> " str "\n") 'ivy-current-match))
+         (lambda (str)
+           (concat "  " str "\n"))
+         cands
+         "")))
     (setf (alist-get 't ivy-format-functions-alist) #'my-ivy-format-function-arrow)
 
     ;; Pre-fill search keywords
@@ -380,6 +373,11 @@
   (use-package amx
     :init (setq amx-history-length 20))
 
+  ;; Avy integration
+  (use-package ivy-avy
+    :bind (:map ivy-minibuffer-map
+           ("C-'" . ivy-avy)))
+
   ;; Better sorting and filtering
   (use-package prescient
     :commands prescient-persist-mode
@@ -563,7 +561,7 @@ This is for use in `ivy-re-builders-alist'."
 ;; Display completion in child frame
 (when (childframe-workable-p)
   (use-package ivy-posframe
-    :defines (persp-load-buffer-functions persp-filter-save-buffers-functions)
+    :defines persp-load-buffer-functions
     :custom-face
     (ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face)))))
     :hook (ivy-mode . ivy-posframe-mode)
@@ -575,12 +573,7 @@ This is for use in `ivy-re-builders-alist'."
     (with-eval-after-load 'persp-mode
       (add-hook 'persp-load-buffer-functions
                 (lambda (&rest _)
-                  (posframe-delete-all)))
-      (add-to-list 'persp-filter-save-buffers-functions
-                   (lambda (b)
-                     "Ignore posframe buffers."
-                     (let ((bname (file-name-nondirectory (buffer-name b))))
-                       (string= ivy-posframe-buffer bname)))))
+                  (posframe-delete-all))))
     :config
     (add-hook 'after-load-theme-hook
               (lambda ()

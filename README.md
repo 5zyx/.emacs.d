@@ -97,7 +97,7 @@ extract to `~/.emacs.d`.
 Then start Emacs. Wait for a while to install packages at the first startup.
 Enjoy! :smile:
 
-**NOTE**: Start Emacs with the minimal configuration for fast startup and
+**Note**: Start Emacs with the minimal configuration for fast startup and
 troubleshooting.
 
 ``` shell
@@ -121,6 +121,13 @@ M-x centaur-update-packages
 
 # Update all including configurations, packages and dotfiles
 M-x centaur-update-all
+```
+
+**Trick**: Update configurations and packages in shell.
+
+``` shell
+alias upgrade_emacs='emacs -Q --batch -L "$HOME/.emacs.d/lisp/" -l "init-funcs.el" -l "init-package.el" --eval "(update-config-and-packages t)"'
+
 ```
 
 ### Docker
