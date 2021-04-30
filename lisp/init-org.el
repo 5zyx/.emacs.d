@@ -118,7 +118,8 @@ prepended to the element after the #+HEADER: tag."
       (when text (insert text))))
 
   ;; To speed up startup, don't put to init section
-  (setq org-directory centaur-org-directory
+  (setq org-modules nil                 ; Faster loading
+        org-directory centaur-org-directory
         org-capture-templates
         `(("i" "Idea" entry (file ,(concat org-directory "/idea.org"))
            "*  %^{Title} %?\n%U\n%a\n")
@@ -259,9 +260,14 @@ prepended to the element after the #+HEADER: tag."
                                     (text-scale-increase 0)
                                     (org-remove-inline-images)
                                     (read-only-mode -1))))
-    :config
-    (org-tree-slide-simple-profile)
-    (setq org-tree-slide-skip-outline-level 2))
+    :init (setq org-tree-slide-header nil
+                org-tree-slide-slide-in-effect t
+                org-tree-slide-heading-emphasis nil
+                org-tree-slide-cursor-init t
+                org-tree-slide-modeline-display 'outside
+                org-tree-slide-skip-done nil
+                org-tree-slide-skip-comments t
+                org-tree-slide-skip-outline-level 3))
 
   ;; Pomodoro
   (use-package org-pomodoro
