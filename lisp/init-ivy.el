@@ -424,6 +424,19 @@ This is for use in `ivy-re-builders-alist'."
       (setq hydra-hint-display-type 'posframe)
 
       (with-no-warnings
+        (defun my-hydra-posframe-show (str)
+          (require 'posframe)
+          (when hydra--posframe-timer
+            (cancel-timer hydra--posframe-timer))
+          (setq hydra--posframe-timer nil)
+          (apply #'posframe-show
+                 " *hydra-posframe*"
+                 :string (concat (propertize "\n" 'face '(:height 0.5))
+                                 str
+                                 (propertize "\n" 'face '(:height 0.5)))
+                 hydra-posframe-show-params))
+        (advice-add #'hydra-posframe-show :override #'my-hydra-posframe-show)
+
         (defun hydra-posframe-delete ()
           (require 'posframe)
           (unless hydra--posframe-timer
@@ -438,29 +451,29 @@ This is for use in `ivy-re-builders-alist'."
                     (list 'message (lambda (str) (message "%s" str)) (lambda () (message "")))
                     (list 'posframe #'hydra-posframe-show #'hydra-posframe-delete)))
 
-        (defun ivy-hydra-poshandler-frame-center-below-fn (info)
-          (let ((parent-frame (plist-get info :parent-frame))
-                (height (plist-get info :posframe-height))
-                (pos (posframe-poshandler-frame-center info))
-                (num 0))
+        (defun ivy-hydra-poshandler-frame-center-below (info)
+          (let ((num 0)
+                (pos (posframe-poshandler-frame-center-near-bottom info)))
             (dolist (frame (frame-list))
               (when (and (frame-visible-p frame)
                          (frame-parameter frame 'posframe-buffer))
                 (setq num (1+ num))))
             (cons (car pos)
-                  (- (truncate (/ (frame-pixel-height parent-frame) 2))
-                     (if (>= num 1) height 0)))))
+                  (- (cdr pos)
+                     (if (>= num 1)
+                         (plist-get info :posframe-height)
+                       0)))))
 
         (defun ivy-hydra-set-posframe-show-params ()
           "Set hydra-posframe style."
-          (posframe-delete-all)
           (setq hydra-posframe-show-params
                 `(:internal-border-width 3
-                  :internal-border-color ,(face-foreground 'font-lock-comment-face)
-                  :background-color ,(face-background 'tooltip)
+                  :internal-border-color ,(face-foreground 'font-lock-comment-face nil t)
+                  :background-color ,(face-background 'tooltip nil t)
+                  :left-fringe 16
+                  :right-fringe 16
                   :lines-truncate t
-                  :poshandler ivy-hydra-poshandler-frame-center-below-fn)))
-
+                  :poshandler ivy-hydra-poshandler-frame-center-below)))
         (ivy-hydra-set-posframe-show-params)
         (add-hook 'after-load-theme-hook #'ivy-hydra-set-posframe-show-params))))
 
@@ -571,13 +584,14 @@ This is for use in `ivy-re-builders-alist'."
   (use-package ivy-posframe
     :defines persp-load-buffer-functions
     :custom-face
-    (ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face)))))
+    (ivy-posframe ((t (:inherit tooltip))))
+    (ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
     :hook (ivy-mode . ivy-posframe-mode)
     :init
     (setq ivy-height 15
           ivy-posframe-border-width 3
-          ivy-posframe-parameters
-          `((background-color . ,(face-background 'tooltip))))
+          ivy-posframe-parameters '((left-fringe . 8)
+                                    (right-fringe . 8)))
 
     (with-eval-after-load 'persp-mode
       (add-hook 'persp-load-buffer-functions
@@ -586,22 +600,43 @@ This is for use in `ivy-re-builders-alist'."
     :config
     (add-hook 'after-load-theme-hook
               (lambda ()
-                (posframe-delete-all)
                 (custom-set-faces
-                 `(ivy-posframe-border
-                   ((t (:background ,(face-foreground 'font-lock-comment-face))))))
-                (setf (alist-get 'background-color ivy-posframe-parameters)
-                      (face-background 'tooltip))))
+                 '(ivy-posframe ((t (:inherit tooltip))))
+                 `(ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t))))))))
 
     (with-no-warnings
-      (defun ivy-posframe-display-at-frame-center-near-bottom (str)
-        (ivy-posframe--display str #'posframe-poshandler-frame-center-near-bottom-fn))
+      (defun my-ivy-posframe--minibuffer-setup (fn &rest args)
+        "Advice function of FN, `ivy--minibuffer-setup' with ARGS."
+        (if (not (display-graphic-p))
+            (apply fn args)
+          (let ((ivy-fixed-height-minibuffer nil))
+            (apply fn args))
+          (when (and ivy-posframe-hide-minibuffer
+                     (posframe-workable-p)
+                     (string-match-p "^ivy-posframe" (symbol-name ivy--display-function)))
+            (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+              (overlay-put ov 'window (selected-window))
+              (overlay-put ov 'ivy-posframe t)
+              (overlay-put ov 'face
+                           (let* ((face (if (facep 'solaire-minibuffer-face)
+                                            'solaire-minibuffer-face
+                                          'default))
+                                  (bg-color (face-background face nil t)))
+                             `(:background ,bg-color :foreground ,bg-color
+                               :box nil :underline nil
+                               :overline nil :strike-through nil)))
+              (setq-local cursor-type nil)))))
+      (advice-add #'ivy-posframe--minibuffer-setup :override #'my-ivy-posframe--minibuffer-setup)
 
-      (defun posframe-poshandler-frame-center-near-bottom-fn (info)
-        (let ((parent-frame (plist-get info :parent-frame))
-              (pos (posframe-poshandler-frame-center info)))
-          (cons (car pos)
-                (truncate (/ (frame-pixel-height parent-frame) 2)))))
+      (defun my-ivy-posframe--adjust-prompt (&rest _)
+        "Add top margin to the prompt."
+        (with-current-buffer ivy-posframe-buffer
+          (goto-char (point-min))
+          (insert (propertize "\n" 'face '(:height 0.3)))))
+      (advice-add #'ivy-posframe--add-prompt :after #'my-ivy-posframe--adjust-prompt)
+
+      (defun ivy-posframe-display-at-frame-center-near-bottom (str)
+        (ivy-posframe--display str #'posframe-poshandler-frame-center-near-bottom))
 
       (setf (alist-get t ivy-posframe-display-functions-alist)
             #'ivy-posframe-display-at-frame-center-near-bottom))))
