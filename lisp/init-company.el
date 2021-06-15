@@ -88,10 +88,10 @@
       ;; Enable in `lsp-mode'
       (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas)
 
-      (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
+      (defun my-company-yasnippet-disable-inline (fn cmd &optional arg &rest _ignore)
         "Enable yasnippet but disable it inline."
-        (if (eq command 'prefix)
-            (when-let ((prefix (funcall fun 'prefix)))
+        (if (eq cmd  'prefix)
+            (when-let ((prefix (funcall fn 'prefix)))
               (unless (memq (char-before (- (point) (length prefix)))
                             '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
                 prefix))
@@ -103,7 +103,7 @@
                      (len (length arg)))
                 (put-text-property 0 len 'yas-annotation snip arg)
                 (put-text-property 0 len 'yas-annotation-patch t arg)))
-            (funcall fun command arg))))
+            (funcall fn cmd  arg))))
       (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline)))
 
   ;; Better sorting and filtering
