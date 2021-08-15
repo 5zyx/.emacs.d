@@ -210,6 +210,7 @@
        :hook (lsp-mode . lsp-ui-mode)
        :init (setq lsp-ui-sideline-show-diagnostics nil
                    lsp-ui-sideline-ignore-duplicate t
+                   lsp-ui-doc-delay 0.1
                    lsp-ui-doc-position 'at-point
                    lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
                    lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
@@ -240,7 +241,7 @@
                                'face `(:background ,(face-foreground 'font-lock-comment-face)))
                    ;; :align-to is added here too
                    (propertize " " 'display '(space :height (1)))
-                   (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.2)))))))))
+                   (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5)))))))))
          (advice-add #'lsp-ui-doc--handle-hr-lines :override #'my-lsp-ui-doc--handle-hr-lines))
 
        ;; `C-g'to close doc
