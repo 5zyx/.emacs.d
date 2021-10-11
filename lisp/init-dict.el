@@ -75,7 +75,7 @@
 
   (with-no-warnings
     (defun my-youdao-dictionary--posframe-tip (string)
-      "Show STRING using posframe-show."
+      "Show STRING using `posframe-show'."
       (unless (and (require 'posframe nil t) (posframe-workable-p))
         (error "Posframe not workable"))
 
