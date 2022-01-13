@@ -132,6 +132,8 @@
      devdocs-major-mode-docs-alist)
 
     (defun devdocs-lookup+()
+    (setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
+    (defun devdocs-dwim()
       "Look up a DevDocs documentation entry.
 
 Install the doc if it's not installed."
