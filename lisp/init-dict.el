@@ -33,14 +33,17 @@
 (require 'init-const)
 
 ;; A multi dictionaries interface
-(use-package fanyi
-  :bind ("C-c d f" . fanyi-dwim))
 
 ;; OSX dictionary
 (when sys/macp
   (use-package osx-dictionary
     :bind (("C-c d s" . osx-dictionary-search-input)
            ("C-c d d" . osx-dictionary-search-pointer))))
+(when emacs/>=27p
+  (use-package fanyi
+    :bind (("C-c d f" . fanyi-dwim)
+           ("C-c d d" . fanyi-dwim2)
+           ("C-c d h" . fanyi-from-history))))
 
 ;; Youdao Dictionary
 (use-package youdao-dictionary
