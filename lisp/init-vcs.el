@@ -140,7 +140,7 @@
                                         (highlight-defined-mode t))
 
                                    ;; Display line numbers
-                                   (and (derived-mode-p 'prog-mode)
+                                   (and (derived-mode-p 'prog-mode 'yaml-mode)
                                         (fboundp 'display-line-numbers-mode)
                                         (display-line-numbers-mode t))))
          (before-revert . (lambda ()
