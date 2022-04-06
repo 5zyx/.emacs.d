@@ -111,16 +111,25 @@
 
 ;; A modern Packages Menu
 (use-package paradox
-  :init
-  (setq paradox-execute-asynchronously t
-        paradox-github-token t
-        paradox-display-star-count nil)
-
-  ;; Replace default `list-packages'
-  (defun my-paradox-enable (&rest _)
-    "Enable paradox, overriding the default package-menu."
-    (paradox-enable))
-  (advice-add #'list-packages :before #'my-paradox-enable)
+  :custom-face
+  (paradox-archive-face ((t (:inherit font-lock-doc-face))))
+  (paradox-description-face ((t (:inherit completions-annotations))))
+  :hook (after-init . paradox-enable)
+  :init (setq paradox-execute-asynchronously t
+              paradox-github-token t
+              paradox-display-star-count nil
+              paradox-status-face-alist ;
+              '(("built-in"  . font-lock-builtin-face)
+                ("available" . success)
+                ("new"       . (success bold))
+                ("held"      . font-lock-constant-face)
+                ("disabled"  . font-lock-warning-face)
+                ("avail-obso" . font-lock-comment-face)
+                ("installed" . font-lock-comment-face)
+                ("dependency" . font-lock-comment-face)
+                ("incompat"  . font-lock-comment-face)
+                ("deleted"   . font-lock-comment-face)
+                ("unsigned"  . font-lock-warning-face)))
   :config
   (when (fboundp 'page-break-lines-mode)
     (add-hook 'paradox-after-execute-functions
