@@ -163,14 +163,14 @@
 (use-package aggressive-indent
   :diminish
   :hook ((after-init . global-aggressive-indent-mode)
-         ;; FIXME: Disable in big files due to the performance issues
+         ;; HACK: Disable in big files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()
                         (if (> (buffer-size) (* 3000 80))
                             (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
-  (dolist (mode '(asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
+  (dolist (mode '(gitconfig-mode asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
     (push mode aggressive-indent-excluded-modes))
 
   ;; Disable in some commands
@@ -368,16 +368,22 @@
      ("h" hs-hide-block "hide block")
      ("l" hs-hide-level "hide level"))
     "Move"
-    (("C-a" mwim-beginning-of-code-or-line "⇤")
-     ("C-e" mwim-end-of-code-or-line "⇥")
+    (("C-a" mwim-beginning-of-code-or-line "⭰")
+     ("C-e" mwim-end-of-code-or-line "⭲")
      ("C-b" backward-char "←")
      ("C-n" next-line "↓")
      ("C-p" previous-line "↑")
-     ("C-f" forward-char "→"))))
+     ("C-f" forward-char "→")
+     ("C-v" pager-page-down "↘")
+     ("M-v" pager-page-up "↖")
+     ("M-<" beginning-of-buffer "⭶")
+     ("M->" end-of-buffer "⭸"))))
   :bind (:map hs-minor-mode-map
          ("C-~" . hideshow-hydra/body))
   :hook (prog-mode . hs-minor-mode)
   :config
+  ;; More functions
+  ;; @see https://karthinks.com/software/simple-folding-with-hideshow/
   (defun hs-cycle (&optional level)
     (interactive "p")
     (let (message-log-max
@@ -388,11 +394,7 @@
              (hs-hide-level 1)
              (setq this-command 'hs-cycle-children))
             ('hs-cycle-children
-             ;; TODO: Fix this case. `hs-show-block' needs to be
-             ;; called twice to open all folds of the parent
-             ;; block.
              (save-excursion (hs-show-block))
-             (hs-show-block)
              (setq this-command 'hs-cycle-subtree))
             ('hs-cycle-subtree
              (hs-hide-block))
@@ -411,7 +413,25 @@
       ('hs-toggle-all
        (save-excursion (hs-show-all))
        (setq this-command 'hs-global-show))
-      (_ (hs-hide-all)))))
+      (_ (hs-hide-all))))
+
+  ;; Display line counts
+  (defun hs-display-code-line-counts (ov)
+    "Display line counts when hiding codes."
+    (when (eq 'code (overlay-get ov 'hs))
+      (overlay-put ov 'display
+                   (concat
+                    " "
+                    (propertize
+                     (if (char-displayable-p ?⏷) "⏷" "...")
+                     'face 'shadow)
+                    (propertize
+                     (format " (%d lines)"
+                             (count-lines (overlay-start ov)
+                                          (overlay-end ov)))
+                     'face '(:inherit shadow :height 0.8))
+                    " "))))
+  (setq hs-set-up-overlay #'hs-display-code-line-counts))
 
 ;; Open files as another user
 (unless sys/win32p

@@ -447,12 +447,12 @@ This is for use in `ivy-re-builders-alist'."
                 `(:left-fringe 10
                   :right-fringe 10
                   :internal-border-width 3
-                  :internal-border-color ,(face-foreground 'font-lock-comment-face nil t)
+                  :internal-border-color ,(face-background 'posframe-border nil t)
                   :background-color ,(face-background 'tooltip nil t)
                   :lines-truncate t
                   :poshandler ivy-hydra-poshandler-frame-center-below)))
         (hydra-set-posframe-show-params)
-        (add-hook 'after-load-theme-hook #'hydra-set-posframe-show-params))))
+        (add-hook 'after-load-theme-hook #'hydra-set-posframe-show-params t))))
 
   ;; Ivy integration for Projectile
   (use-package counsel-projectile
@@ -571,7 +571,7 @@ This is for use in `ivy-re-builders-alist'."
   (use-package ivy-posframe
     :custom-face
     (ivy-posframe ((t (:inherit tooltip))))
-    (ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
+    (ivy-posframe-border ((t (:inherit posframe-border))))
     :hook (ivy-mode . ivy-posframe-mode)
     :init
     (setq ivy-height 15
@@ -579,14 +579,8 @@ This is for use in `ivy-re-builders-alist'."
           ivy-posframe-parameters '((left-fringe . 8)
                                     (right-fringe . 8)))
     :config
-    (add-hook 'after-load-theme-hook
-              (lambda ()
-                (custom-set-faces
-                 '(ivy-posframe ((t (:inherit tooltip))))
-                 `(ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t))))))))
-
     (with-no-warnings
-      ;; FIXME: hide minibuffer with same colors
+      ;; HACK: hide minibuffer with same colors
       (defun my-ivy-posframe--minibuffer-setup (fn &rest args)
         "Advice function of FN, `ivy--minibuffer-setup' with ARGS."
         (if (not (display-graphic-p))

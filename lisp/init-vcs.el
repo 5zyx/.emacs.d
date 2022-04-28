@@ -68,6 +68,8 @@
     (use-package forge
       :demand t
       :defines forge-topic-list-columns
+      :custom-face
+      (forge-topic-label ((t (:inherit variable-pitch :height 0.9 :width condensed :weight regular :underline nil))))
       :init
       (setq forge-topic-list-columns
             '(("#" 5 forge-topic-list-sort-by-number (:right-align t) number nil)
@@ -95,7 +97,7 @@
     :diminish
     :custom-face
     (transient-posframe ((t (:inherit tooltip))))
-    (transient-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
+    (transient-posframe-border ((t (:inherit posframe-border))))
     :hook (after-init . transient-posframe-mode)
     :init
     (setq transient-posframe-border-width 3
@@ -105,13 +107,6 @@
           transient-posframe-parameters '((left-fringe . 8)
                                           (right-fringe . 8)))
     :config
-    (add-hook
-     'after-load-theme-hook
-     (lambda ()
-       (custom-set-faces
-        '(transient-posframe ((t (:inherit tooltip))))
-        `(transient-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t))))))))
-
     (with-no-warnings
       (defun my-transient-posframe--prettify-frame ()
         (with-current-buffer (get-buffer-create transient--buffer-name)
@@ -218,7 +213,7 @@
                                 :left-fringe 8
                                 :right-fringe 8
                                 :internal-border-width 1
-                                :internal-border-color (face-foreground 'font-lock-comment-face nil t)
+                                :internal-border-color (face-background 'posframe-border nil t)
                                 :background-color (face-background 'tooltip nil t))
                  (unwind-protect
                      (push (read-event) unread-command-events)
