@@ -46,9 +46,6 @@
 (declare-function flymake-start 'flymake)
 (declare-function upgrade-packages 'init-package)
 
-(unless (fboundp 'caadr)
-  (defalias 'caadr #'cl-caadr))
-
 
 
 ;; Font
@@ -266,8 +263,10 @@ ASYNC specifies whether to perform the downloads in the background.
 Save to `custom-file' if NO-SAVE is nil."
   (interactive
    (list
-    (intern (completing-read "Select package archives: "
-                             (mapcar #'car centaur-package-archives-alist)))))
+    (intern
+     (ivy-read "Select package archives: "
+               (mapcar #'car centaur-package-archives-alist)
+               :preselect (symbol-name centaur-package-archives)))))
   ;; Set option
   (centaur-set-variable 'centaur-package-archives archives no-save)
 
@@ -581,12 +580,14 @@ If SYNC is non-nil, the updating process is synchronous."
 (defun centaur-load-theme (theme &optional no-save)
   "Load color THEME. Save to `custom-file' if NO-SAVE is nil."
   (interactive
-   (list (intern (completing-read
-                  "Load theme: "
-                  `(auto
-                    random
-                    ,(if (bound-and-true-p ns-system-appearance) 'system "")
-                    ,@(mapcar #'car centaur-theme-alist))))))
+   (list
+    (intern
+     (ivy-read "Load theme: "
+               `(auto
+                 random
+                 ,(if (bound-and-true-p ns-system-appearance) 'system "")
+                 ,@(mapcar #'car centaur-theme-alist))
+               :preselect (symbol-name centaur-theme)))))
   ;; Set option
   (centaur-set-variable 'centaur-theme theme no-save)
 
