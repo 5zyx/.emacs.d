@@ -1,14 +1,16 @@
 (use-package evil
   :init (evil-mode 1))
+
 (use-package htmlize)
+
+(use-package js-comint)
+
+(use-package esxml)
 
 (tool-bar-mode 1)
 (menu-bar-mode 1)
 (scroll-bar-mode 1)
 
-(setq org-confirm-babel-evaluate nil
-      org-src-fontify-natively t
-      org-src-tab-acts-natively t)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -26,3 +28,24 @@
    (sql        . t)
    (sqlite        . t)
    (plantuml   . t)))
+
+
+
+(add-hook 'org-insert-heading-hook
+          (lambda () (org-set-property "CREATED" (format-time-string "%Y/%m/%d %H:%M"))))
+
+
+(defun ob-js-insert-session-header-arg (session)
+  "Insert ob-js `SESSION' header argument.
+- `js-comint'
+- `skewer-mode'
+- `Indium'
+"
+  (interactive (list (completing-read "ob-js session: "
+                                      '("js-comint" "skewer-mode" "indium"))))
+  (org-babel-insert-header-arg
+   "session"
+   (pcase session
+     ("js-comint" "\"*Javascript REPL*\"")
+     ("skewer-mode" "\"*skewer-repl*\"")
+     ("indium" "\"*JS REPL*\""))))
