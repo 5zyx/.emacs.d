@@ -27,6 +27,7 @@
    (calc        . t)
    (sql        . t)
    (sqlite        . t)
+   (makefile . t)
    (plantuml   . t)))
 
 
@@ -49,3 +50,9 @@
      ("js-comint" "\"*Javascript REPL*\"")
      ("skewer-mode" "\"*skewer-repl*\"")
      ("indium" "\"*JS REPL*\""))))
+
+(add-to-list 'org-babel-default-header-args:plantuml
+             '((:cmdline . "-charset utf-8")
+               (:exports . "both")
+               (:session . "do-something")
+               (:dir . "./assets")))
