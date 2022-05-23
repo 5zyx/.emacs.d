@@ -62,7 +62,7 @@
     "Search word at point and display result with `posframe', `pos-tip', or buffer."
     (interactive)
     (if (display-graphic-p)
-        (if emacs/>=26p
+        (if (posframe-workable-p)
             (youdao-dictionary-search-at-point-posframe)
           (youdao-dictionary-search-at-point-tooltip))
       (youdao-dictionary-search-at-point)))
@@ -84,7 +84,7 @@
 
     (defun my-youdao-dictionary--posframe-tip (string)
       "Show STRING using `posframe-show'."
-      (unless (and (require 'posframe nil t) (posframe-workable-p))
+      (unless (posframe-workable-p)
         (error "Posframe not workable"))
 
       (if-let ((word (youdao-dictionary--region-or-word)))
