@@ -1,6 +1,6 @@
 ;; init-prog.el --- Initialize programming configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -42,9 +42,9 @@
   (setq-default prettify-symbols-alist centaur-prettify-symbols-alist)
   (setq prettify-symbols-unprettify-at-point 'right-edge))
 
-;; Tree-sitter
-;; Only support with dynamic module
-(when (functionp 'module-load)
+;; Tree-sitter: need dynamic module feature
+(when (and centaur-tree-sitter
+           (functionp 'module-load))
   (use-package tree-sitter
     :ensure tree-sitter-langs
     :diminish
@@ -55,13 +55,14 @@
 (use-package xref
   :ensure nil
   :init
-  (when (and (boundp 'xref-search-program) (executable-find "rg"))
-    (setq xref-search-program 'ripgrep))
-
   (with-no-warnings
+    (when (executable-find "rg")
+      (setq xref-search-program 'ripgrep))
+
     (if emacs/>=28p
-        (setq xref-show-xrefs-function #'xref-show-definitions-completing-read
-              xref-show-definitions-function #'xref-show-definitions-completing-read)
+        (setq xref-show-definitions-function #'xref-show-definitions-completing-read
+              xref-show-xrefs-function #'xref-show-definitions-completing-read)
+
       ;; Select from xref candidates with Ivy
       (use-package ivy-xref
         :after ivy
@@ -154,7 +155,9 @@ Install the doc if it's not installed."
       ;; Lookup the symbol at point
       (devdocs-lookup nil (thing-at-point 'symbol t)))))
 
+;; Misc. programming modes
 (use-package cask-mode)
+(use-package cmake-mode)
 (use-package csharp-mode)
 (use-package csv-mode)
 (use-package julia-mode)

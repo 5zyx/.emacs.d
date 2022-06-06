@@ -1,6 +1,6 @@
 ;; init-bookmark.el --- Initialize bookmark configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -56,7 +56,7 @@
                                      ((file-directory-p location)
                                       (propertize (format fmt "DIRED") 'face 'warning))
                                      (t (propertize (format fmt "FILE") 'face 'success)))))
-                 (icon       (if (icons-displayable-p)
+                 (icon       (if (icon-displayable-p)
                                  (cond
                                   ((file-remote-p location)
                                    (all-the-icons-octicon "radio-tower" :height 0.8 :v-adjust 0.0))
@@ -106,7 +106,7 @@ deletion, or > if it is flagged for displaying."
       (setq buffer-read-only t)
       (setq tabulated-list-format
             `[("" 1) ;; Space to add "*" for bookmark with annotation
-              ("" ,(if (icons-displayable-p) 2 0)) ;; Icons
+              ("" ,(if (icon-displayable-p) 2 0)) ;; Icons
               ("Bookmark" ,bookmark-bmenu-file-column bookmark-bmenu--name-predicate)
               ("Type" 9)
               ,@(if bookmark-bmenu-toggle-filenames

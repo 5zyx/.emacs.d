@@ -1,6 +1,6 @@
 ;; init-flycheck.el --- Initialize flycheck configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2009-2021 Vincent Zhang
+;; Copyright (C) 2009-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -60,7 +60,7 @@
         (flycheck-posframe-face ((t (:foreground ,(face-foreground 'success)))))
         (flycheck-posframe-info-face ((t (:foreground ,(face-foreground 'success)))))
         (flycheck-posframe-background-face ((t (:inherit tooltip))))
-        (flycheck-posframe-border-face ((t (:inherit font-lock-comment-face))))
+        (flycheck-posframe-border-face ((t (:inherit posframe-border))))
         :hook (flycheck-mode . flycheck-posframe-mode)
         :init
         (setq flycheck-posframe-border-width 1)
@@ -90,7 +90,7 @@
                  :left-fringe 8
                  :right-fringe 8
                  :internal-border-width flycheck-posframe-border-width
-                 :internal-border-color (face-foreground 'flycheck-posframe-border-face nil t)
+                 :internal-border-color (face-background 'flycheck-posframe-border-face nil t)
                  :poshandler poshandler
                  :hidehandler #'flycheck-posframe-hidehandler))))
           (advice-add #'flycheck-posframe-show-posframe :override #'my-flycheck-posframe-show-posframe)))

@@ -1,6 +1,6 @@
 ;; init-hydra.el --- Initialize hydra configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2021 Vincent Zhang
+;; Copyright (C) 2019-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -33,8 +33,17 @@
 (require 'init-custom)
 (require 'init-funcs)
 
+(use-package hydra
+  :hook (emacs-lisp-mode . hydra-add-imenu))
+
 (use-package pretty-hydra
   :bind ("<f6>" . toggles-hydra/body)
+  :hook (emacs-lisp-mode . (lambda ()
+                             (add-to-list
+                              'imenu-generic-expression
+                              '("Hydras"
+                                "^.*(\\(pretty-hydra-define\\) \\([a-zA-Z-]+\\)"
+                                2))))
   :init
   (cl-defun pretty-hydra-title (title &optional icon-type icon-name
                                       &key face height v-adjust)
@@ -43,7 +52,7 @@
           (height (or height 1.0))
           (v-adjust (or v-adjust 0.0)))
       (concat
-       (when (and (icons-displayable-p) icon-type icon-name)
+       (when (and (icon-displayable-p) icon-type icon-name)
          (let ((f (intern (format "all-the-icons-%s" icon-type))))
            (when (fboundp f)
              (concat
@@ -140,8 +149,6 @@
          "netease" :toggle (eq centaur-package-archives 'netease) :exit t)
         ("p s" (centaur-set-package-archives 'ustc t)
          "ustc" :toggle (eq centaur-package-archives 'ustc) :exit t)
-        ("p t" (centaur-set-package-archives 'tencent t)
-         "tencent" :toggle (eq centaur-package-archives 'tencent) :exit t)
         ("p u" (centaur-set-package-archives 'tuna t)
          "tuna" :toggle (eq centaur-package-archives 'tuna) :exit t)
         ("p T" (centaur-test-package-archives) "speed test" :exit t))))))

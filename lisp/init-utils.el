@@ -1,6 +1,6 @@
 ;; init-utils.el --- Initialize ultilities.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -92,7 +92,7 @@
       :functions posframe-poshandler-frame-center-near-bottom
       :custom-face
       (which-key-posframe ((t (:inherit tooltip))))
-      (which-key-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
+      (which-key-posframe-border ((t (:inherit posframe-border))))
       :init
       (setq which-key-posframe-border-width 3
             which-key-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
@@ -123,13 +123,7 @@ of the buffer text to be displayed in the popup"
 		                   :internal-border-width which-key-posframe-border-width
 		                   :internal-border-color (face-attribute 'which-key-posframe-border :background nil t)
 		                   :override-parameters which-key-posframe-parameters)))
-        (advice-add #'which-key-posframe--show-buffer :override #'my-which-key-posframe--show-buffer))
-
-      (add-hook 'after-load-theme-hook
-                (lambda ()
-                  (custom-set-faces
-                   '(which-key-posframe ((t (:inherit tooltip))))
-                   `(which-key-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))))))))
+        (advice-add #'which-key-posframe--show-buffer :override #'my-which-key-posframe--show-buffer)))))
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
@@ -216,26 +210,6 @@ of the buffer text to be displayed in the popup"
   (if (fboundp 'gfm-mode)
       (setq atomic-chrome-url-major-mode-alist
             '(("github\\.com" . gfm-mode)))))
-
-;; Music player
-(use-package bongo
-  :bind ("C-<f9>" . bongo)
-  :config
-  (with-eval-after-load 'dired
-    (with-no-warnings
-      (defun bongo-add-dired-files ()
-        "Add marked files to the Bongo library."
-        (interactive)
-        (bongo-buffer)
-        (let (file (files nil))
-          (dired-map-over-marks
-           (setq file (dired-get-filename)
-                 files (append files (list file)))
-           nil t)
-          (with-bongo-library-buffer
-           (mapc 'bongo-insert-file files)))
-        (bongo-switch-buffers))
-      (bind-key "b" #'bongo-add-dired-files dired-mode-map))))
 
 ;; Process
 (use-package proced
@@ -325,8 +299,31 @@ of the buffer text to be displayed in the popup"
 ;; Misc
 (use-package copyit)                    ; copy path, url, etc.
 (use-package focus)                     ; Focus on the current region
-(use-package list-environment)
 (use-package memory-usage)
+
+(use-package list-environment
+  :hook (list-environment-mode . (lambda ()
+                                   (setq tabulated-list-format
+                                         (vconcat `(("" ,(if (icon-displayable-p) 2 0)))
+                                                  tabulated-list-format))
+                                   (tabulated-list-init-header)))
+  :init
+  (with-no-warnings
+    (defun my-list-environment-entries ()
+      "Generate environment variable entries list for tabulated-list."
+      (mapcar (lambda (env)
+                (let* ((kv (split-string env "="))
+                       (key (car kv))
+                       (val (mapconcat #'identity (cdr kv) "=")))
+                  (list key (vector
+                             (if (icon-displayable-p)
+                                 (all-the-icons-octicon "key" :height 0.8 :v-adjust -0.05)
+                               "")
+                             `(,key face font-lock-keyword-face)
+                             `(,val face font-lock-string-face)))))
+              process-environment))
+    (advice-add #'list-environment-entries :override #'my-list-environment-entries)))
+
 (unless sys/win32p
   (use-package daemons)                 ; system services/daemons
   (use-package tldr))

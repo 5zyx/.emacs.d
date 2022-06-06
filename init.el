@@ -1,10 +1,10 @@
 ;;; init.el --- A Fancy and Fast Emacs Configuration.	-*- lexical-binding: t no-byte-compile: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
-;; Version: 5.9.0
+;; Version: 5.9.1
 ;; Keywords: .emacs.d centaur
 
 ;;
@@ -49,9 +49,9 @@
 
 
 ;;; Code:
-(fset 'battery-update #'ignore)
-(when (version< emacs-version "25.1")
-  (error "This requires Emacs 25.1 and above!"))
+
+(when (version< emacs-version "26.1")
+  (error "This requires Emacs 26.1 and above!"))
 
 ;; Speed up startup
 (setq auto-mode-case-fold nil)
@@ -132,6 +132,7 @@ Otherwise the startup will be very slow. "
 
 (require 'init-dict)
 (require 'init-docker)
+(require 'init-player)
 (require 'init-utils)
 
 ;; Programming

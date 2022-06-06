@@ -1,6 +1,6 @@
 ;; init-const.el --- Define constants.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -90,26 +90,6 @@ Loaded by `org-babel-load-file'.")
 (defconst sys/rootp
   (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
-
-(defconst emacs/>=25p
-  (>= emacs-major-version 25)
-  "Emacs is 25 or above.")
-
-(defconst emacs/>=26p
-  (>= emacs-major-version 26)
-  "Emacs is 26 or above.")
-
-(defconst emacs/>=25.3p
-  (or emacs/>=26p
-      (and (= emacs-major-version 25)
-           (>= emacs-minor-version 3)))
-  "Emacs is 25.3 or above.")
-
-(defconst emacs/>=25.2p
-  (or emacs/>=26p
-      (and (= emacs-major-version 25)
-           (>= emacs-minor-version 3)))
-  "Emacs is 25.2 or above.")
 
 (defconst emacs/>=27p
   (>= emacs-major-version 27)

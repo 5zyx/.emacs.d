@@ -1,6 +1,6 @@
 ;; init-org.el --- Initialize org configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -93,7 +93,7 @@
                        (prettify-symbols-mode 1)))
          (org-indent-mode . (lambda()
                               (diminish 'org-indent-mode)
-                              ;; WORKAROUND: Prevent text moving around while using brackets
+                              ;; HACK: Prevent text moving around while using brackets
                               ;; @see https://github.com/seagle0128/.emacs.d/issues/88
                               (make-variable-buffer-local 'show-paren-mode)
                               (setq show-paren-mode nil))))
@@ -130,14 +130,13 @@ prepended to the element after the #+HEADER: tag."
            "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
           ("n" "Note" entry (file ,(concat org-directory "/note.org"))
            "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
-          ("j" "Journal" entry (,(if emacs/>=26p 'file+olp+datetree 'file+datetree)
+          ("j" "Journal" entry ('file+olp+datetree
                                 ,(concat org-directory "/journal.org"))
            "*  %^{Title} %?\n%U\n%a\n" :clock-in t :clock-resume t)
-	      ("b" "Book" entry (,(if emacs/>=26p 'file+olp+datetree 'file+datetree)
+	      ("b" "Book" entry ('file+olp+datetree
                              ,(concat org-directory "/book.org"))
 	       "* Topic: %^{Description}  %^g %? Added: %U"))
 
-        org-agenda-files `(,centaur-org-directory)
         org-todo-keywords
         '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)" "|" "DONE(d)" "CANCEL(c)")
           (sequence "⚑(T)" "🏴(I)" "❓(H)" "|" "✔(D)" "✘(C)"))
@@ -147,11 +146,21 @@ prepended to the element after the #+HEADER: tag."
                              (?B . warning)
                              (?C . success))
 
+        ;; Agenda styling
+        org-agenda-files `(,centaur-org-directory)
+        org-agenda-block-separator ?─
+        org-agenda-time-grid
+        '((daily today require-timed)
+          (800 1000 1200 1400 1600 1800 2000)
+          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+        org-agenda-current-time-string
+        "⭠ now ─────────────────────────────────────────────────"
+
         org-tags-column -80
         org-log-done 'time
         org-catch-invisible-edits 'smart
         org-startup-indented t
-        org-ellipsis (if (and (display-graphic-p) (char-displayable-p ?⏷)) "\t⏷" nil)
+        org-ellipsis (if (char-displayable-p ?⏷) "\t⏷" nil)
         org-pretty-entities nil
         org-hide-emphasis-markers t)
 
@@ -181,19 +190,17 @@ prepended to the element after the #+HEADER: tag."
   (if emacs/>=27p
       (use-package org-modern
         :hook ((org-mode . org-modern-mode)
+               (org-agenda-finalize . org-modern-agenda)
                (org-modern-mode . (lambda ()
                                     "Adapt `org-modern-mode'."
-                                    ;; Looks better for tags
-                                    (setq line-spacing 0.1)
                                     ;; Disable Prettify Symbols mode
                                     (setq prettify-symbols-alist nil)
                                     (prettify-symbols-mode -1)))))
     (progn
-      (when emacs/>=26p
-        (use-package org-superstar
-          :if (and (display-graphic-p) (char-displayable-p ?◉))
-          :hook (org-mode . org-superstar-mode)
-          :init (setq org-superstar-headline-bullets-list '("◉""○""◈""◇""⁕"))))
+      (use-package org-superstar
+        :if (and (display-graphic-p) (char-displayable-p ?◉))
+        :hook (org-mode . org-superstar-mode)
+        :init (setq org-superstar-headline-bullets-list '("◉""○""◈""◇""⁕")))
       (use-package org-fancy-priorities
         :diminish
         :hook (org-mode . org-fancy-priorities-mode)
@@ -219,9 +226,7 @@ prepended to the element after the #+HEADER: tag."
                                (plantuml . t)))
 
   ;; ob-sh renamed to ob-shell since 26.1.
-  (if emacs/>=26p
-      (cl-pushnew '(shell . t) load-language-list)
-    (cl-pushnew '(sh . t) load-language-list))
+  (cl-pushnew '(shell . t) load-language-list)
 
   (use-package ob-go
     :init (cl-pushnew '(go . t) load-language-list))
@@ -314,7 +319,7 @@ prepended to the element after the #+HEADER: tag."
         ("C-c C-x m" . org-pomodoro)))))
 
 ;; Roam
-(when (and emacs/>=26p (executable-find "cc"))
+(when (executable-find "cc")
   (use-package org-roam
     :diminish
     :hook (after-init . org-roam-db-autosync-enable)

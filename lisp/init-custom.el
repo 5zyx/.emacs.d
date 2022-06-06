@@ -1,6 +1,6 @@
 ;; init-custom.el --- Define customizations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -98,9 +98,6 @@
       ,(cons 'ustc
              `(,(cons "gnu"   (concat proto "://mirrors.ustc.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.ustc.edu.cn/elpa/melpa/"))))
-      ,(cons 'tencent
-             `(,(cons "gnu"   (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
-               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
       ,(cons 'tuna
              `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))))
@@ -185,7 +182,7 @@ For example:
                  (const :tag "Child Frame" childframe)))
 
 (defcustom centaur-dashboard (not (daemonp))
-  "Use dashboard at startup or not.
+  "Display dashboard at startup or not.
 If Non-nil, use dashboard, otherwise will restore previous session."
   :group 'centaur
   :type 'boolean)
@@ -208,6 +205,11 @@ nil means disabled."
                  (const :tag "Eglot" eglot)
                  (const :tag "Disable" nil)))
 
+(defcustom centaur-tree-sitter nil
+  "Enable `tree-sitter' or not."
+  :group 'centaur
+  :type 'boolean)
+
 (defcustom centaur-lsp-format-on-save-ignore-modes
   '(c-mode c++-mode python-mode markdown-mode)
   "The modes that don't auto format and organize imports while saving the buffers.
@@ -216,8 +218,18 @@ nil means disabled."
   :group 'centaur
   :type '(repeat (symbol :tag "Major-Mode")))
 
+(defcustom centaur-tree-sitter t
+  "Enable `tree-sitter' or not."
+  :group 'centaur
+  :type 'boolean)
+
 (defcustom centaur-chinese-calendar nil
-  "Use Chinese calendar or not."
+  "Enable Chinese calendar or not."
+  :group 'centaur
+  :type 'boolean)
+
+(defcustom centaur-player nil
+  "Enable players or not."
   :group 'centaur
   :type 'boolean)
 

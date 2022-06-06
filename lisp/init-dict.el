@@ -52,8 +52,8 @@
          ("C-c d Y" . my-youdao-dictionary-search-at-point)
          ("C-c d y" . youdao-dictionary-search)
          :map youdao-dictionary-mode-map
-         ("h" . youdao-dictionary-hydra/body)
-         ("?" . youdao-dictionary-hydra/body))
+         ("h" . my-youdao-dictionary-help)
+         ("?" . my-youdao-dictionary-help))
   :init
   (setq url-automatic-caching t
         youdao-dictionary-use-chinese-word-segmentation t) ; 中文分词
@@ -62,7 +62,7 @@
     "Search word at point and display result with `posframe', `pos-tip', or buffer."
     (interactive)
     (if (display-graphic-p)
-        (if emacs/>=26p
+        (if (posframe-workable-p)
             (youdao-dictionary-search-at-point-posframe)
           (youdao-dictionary-search-at-point-tooltip))
       (youdao-dictionary-search-at-point)))
@@ -75,39 +75,50 @@
         ("q" quit-window "quit")
         ("C-g" nil nil)
         ("h" nil nil)
-        ("?" nil nil)))
+        ("?" nil nil))
+      (defun my-youdao-dictionary-help ()
+        "Show help in `hydra'."
+        (interactive)
+        (let ((hydra-hint-display-type 'message))
+          (youdao-dictionary-hydra/body))))
 
     (defun my-youdao-dictionary--posframe-tip (string)
       "Show STRING using `posframe-show'."
-      (unless (and (require 'posframe nil t) (posframe-workable-p))
+      (unless (posframe-workable-p)
         (error "Posframe not workable"))
 
-      (let ((word (youdao-dictionary--region-or-word)))
-        (if word
-            (progn
-              (with-current-buffer (get-buffer-create youdao-dictionary-buffer-name)
-                (let ((inhibit-read-only t))
-                  (erase-buffer)
-                  (youdao-dictionary-mode)
-                  (insert (propertize "\n" 'face '(:height 0.5)))
-                  (insert string)
-                  (insert (propertize "\n" 'face '(:height 0.5)))
-                  (set (make-local-variable 'youdao-dictionary-current-buffer-word) word)))
-              (posframe-show youdao-dictionary-buffer-name
-                             :position (point)
-                             :left-fringe 16
-                             :right-fringe 16
-                             :background-color (face-background 'tooltip nil t)
-                             :internal-border-color (face-foreground 'font-lock-comment-face nil t)
-                             :internal-border-width 1)
-              (unwind-protect
-                  (push (read-event) unread-command-events)
-                (progn
-                  (posframe-hide youdao-dictionary-buffer-name)
-                  (other-frame 0))))
-          (message "Nothing to look up"))))
-    (advice-add #'youdao-dictionary--posframe-tip
-                :override #'my-youdao-dictionary--posframe-tip)))
+      (if-let ((word (youdao-dictionary--region-or-word)))
+          (progn
+            (with-current-buffer (get-buffer-create youdao-dictionary-buffer-name)
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                (youdao-dictionary-mode)
+                (insert (propertize "\n" 'face '(:height 0.5)))
+                (insert string)
+                (insert (propertize "\n" 'face '(:height 0.5)))
+                (set (make-local-variable 'youdao-dictionary-current-buffer-word) word)))
+            (posframe-show youdao-dictionary-buffer-name
+                           :position (point)
+                           :left-fringe 16
+                           :right-fringe 16
+                           :max-width (/ (frame-width) 2)
+                           :max-height (/ (frame-height) 2)
+                           :background-color (face-background 'tooltip nil t)
+                           :internal-border-color (face-background 'posframe-border nil t)
+                           :internal-border-width 1)
+            (unwind-protect
+                (push (read-event) unread-command-events)
+              (progn
+                (posframe-hide youdao-dictionary-buffer-name)
+                (other-frame 0)))
+            (message "Nothing to look up"))))
+    (advice-add #'youdao-dictionary--posframe-tip :override #'my-youdao-dictionary--posframe-tip)))
+
+;; OSX dictionary
+(when sys/macp
+  (use-package osx-dictionary
+    :bind (("C-c d i" . osx-dictionary-search-input)
+           ("C-c d x" . osx-dictionary-search-pointer))))
 
 (provide 'init-dict)
 

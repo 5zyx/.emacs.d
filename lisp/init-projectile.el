@@ -1,6 +1,6 @@
 ;; init-projectile.el --- Initialize projectile configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2010-2021 Vincent Zhang
+;; Copyright (C) 2010-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -59,7 +59,7 @@
       (setq projectile-indexing-method 'alien
             projectile-enable-caching nil))
 
-    ;; FIXME: too slow while getting submodule files on Windows
+    ;; HACK: too slow while getting submodule files on Windows
     (setq projectile-git-submodule-command nil))
 
   ;; Support Perforce project

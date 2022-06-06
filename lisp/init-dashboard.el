@@ -1,6 +1,6 @@
 ;; init-dashboard.el --- Initialize dashboard configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2021 Vincent Zhang
+;; Copyright (C) 2018-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -34,7 +34,6 @@
 (require 'init-custom)
 
 ;; Dashboard
-(unless emacs/>=26p (setq centaur-dashboard nil))
 (when centaur-dashboard
   (use-package dashboard
     :diminish dashboard-mode
@@ -93,7 +92,7 @@
           dashboard-set-init-info t
           dashboard-set-file-icons centaur-icon
           dashboard-set-heading-icons centaur-icon
-          dashboard-heading-icons '((recents   . "file-text")
+          dashboard-heading-icons '((recents   . "history")
                                     (bookmarks . "bookmark")
                                     (agenda    . "calendar")
                                     (projects  . "briefcase")
@@ -101,7 +100,7 @@
 
           dashboard-set-footer t
           dashboard-footer (format "Powered by Vincent Zhang, %s" (format-time-string "%Y"))
-          dashboard-footer-icon (cond ((icons-displayable-p)
+          dashboard-footer-icon (cond ((icon-displayable-p)
                                        (all-the-icons-faicon "heart"
                                                              :height 1.1
                                                              :v-adjust -0.05
@@ -111,23 +110,23 @@
 
           dashboard-set-navigator t
           dashboard-navigator-buttons
-          `(((,(when (icons-displayable-p)
+          `(((,(when (icon-displayable-p)
                  (all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0))
               "Homepage" "Browse homepage"
               (lambda (&rest _) (browse-url centaur-homepage)))
-             (,(when (icons-displayable-p)
+             (,(when (icon-displayable-p)
                  (all-the-icons-material "restore" :height 1.35 :v-adjust -0.24))
               "Restore" "Restore previous session"
               (lambda (&rest _) (restore-previous-session)))
-             (,(when (icons-displayable-p)
+             (,(when (icon-displayable-p)
                  (all-the-icons-octicon "tools" :height 1.0 :v-adjust 0.0))
               "Settings" "Open custom file"
               (lambda (&rest _) (find-file custom-file)))
-             (,(when (icons-displayable-p)
+             (,(when (icon-displayable-p)
                  (all-the-icons-material "update" :height 1.35 :v-adjust -0.24))
               "Update" "Update Centaur Emacs"
               (lambda (&rest _) (centaur-update)))
-             (,(if (icons-displayable-p)
+             (,(if (icon-displayable-p)
                    (all-the-icons-faicon "question" :height 1.2 :v-adjust -0.1)
                  "?")
               "" "Help (?/h)"
@@ -156,7 +155,7 @@
             (insert (format "%s\n\n" (propertize title 'face 'dashboard-banner-logo-title)))))))
     (advice-add #'dashboard-insert-image-banner :override #'my-dashboard-insert-image-banner)
 
-    ;; FIXME: Insert copyright
+    ;; Insert copyright
     ;; @see https://github.com/emacs-dashboard/emacs-dashboard/issues/219
     (defun my-dashboard-insert-copyright ()
       "Insert copyright in the footer."

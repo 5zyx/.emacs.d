@@ -1,6 +1,6 @@
 ;; init-buffer.el --- Initialize ibuffer configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -40,9 +40,8 @@
   :config
   ;; Display icons for buffers
   (use-package all-the-icons-ibuffer
-    :init
-    (setq all-the-icons-ibuffer-icon centaur-icon)
-    (all-the-icons-ibuffer-mode 1))
+    :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
+    :init (setq all-the-icons-ibuffer-icon centaur-icon))
 
   (with-eval-after-load 'counsel
     (with-no-warnings
@@ -65,7 +64,7 @@
                         (ibuffer-do-sort-by-alphabetic)))))
   :config
   (setq ibuffer-projectile-prefix
-        (if (icons-displayable-p)
+        (if (icon-displayable-p)
             (concat
              (all-the-icons-octicon "file-directory"
                                     :face ibuffer-filter-group-name-face

@@ -1,6 +1,6 @@
 ;; init-shell.el --- Initialize shell configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2021 Vincent Zhang
+;; Copyright (C) 2006-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -113,72 +113,99 @@
            (executable-find "libtool")
            (executable-find "make"))
   (use-package vterm
-    :commands vterm--internal
     :bind (:map vterm-mode-map
            ([f9] . (lambda ()
                      (interactive)
-                     (and (fboundp 'shell-pop)
-                          (shell-pop nil)))))
-    :init
-    (setq vterm-always-compile-module t)
+                     (and (fboundp 'shell-pop-toggle)
+                          (shell-pop-toggle)))))
+    :init (setq vterm-always-compile-module t)))
 
-    (with-no-warnings
-      (when (childframe-workable-p)
-        (defvar vterm-posframe--frame nil)
-        (defun vterm-posframe-toggle ()
-          "Toggle `vterm' child frame."
-          (interactive)
-          (let ((buffer (vterm--internal #'ignore 100))
-                (width  (max 80 (/ (frame-width) 2)))
-                (height (/ (frame-height) 2)))
-            (if (and vterm-posframe--frame
-                     (frame-live-p vterm-posframe--frame)
-                     (frame-visible-p vterm-posframe--frame))
-                (progn
-                  (posframe-hide buffer)
-                  ;; Focus the parent frame
-                  (select-frame-set-input-focus (frame-parent vterm-posframe--frame)))
-              (let ((width  (max 80 (floor (* (frame-width) 0.62))))
-                    (height (floor (* (frame-height) 0.62))))
-                (setq vterm-posframe--frame
-                      (posframe-show
-                       buffer
-                       :poshandler #'posframe-poshandler-frame-center
-                       :hidehandler #'vterm-posframe-hidehandler
-                       :left-fringe 8
-                       :right-fringe 8
-                       :width width
-                       :height height
-                       :min-width width
-                       :min-height height
-                       :internal-border-width 3
-                       :internal-border-color (face-foreground 'font-lock-comment-face nil t)
-                       :background-color (face-background 'tooltip nil t)
-                       :override-parameters '((cursor-type . t))
-                       :accept-focus t))
-                ;; Blink cursor
-                (with-current-buffer buffer
-                  (save-excursion
-                    (vterm-clear t))
-                  (setq-local cursor-type 'box))
-                ;; Focus the child frame
-                (select-frame-set-input-focus vterm-posframe--frame)))))))))
+;; Shell Pop: leverage `popper'
+(with-no-warnings
+  (defvar shell-pop--frame nil)
+  (defvar shell-pop--window nil)
 
-;; Shell Pop
-(use-package shell-pop
-  :bind (("C-`" . (lambda ()
-                    (interactive)
-                    (if (fboundp 'vterm-posframe-toggle)
-                        (vterm-posframe-toggle)
-                      (shell-pop nil))))
-         ([f9] . shell-pop))
-  :init
-  (setq shell-pop-window-size 30
-        shell-pop-shell-type
-        (cond ((fboundp 'vterm) '("vterm" "*vterm*" #'vterm))
-              (sys/win32p '("eshell" "*eshell*" #'eshell))
-              (t '("terminal" "*terminal*"
-                   (lambda () (term shell-pop-term-shell)))))))
+  (defun shell-pop--shell (&optional arg)
+    "Run shell and return the buffer."
+    (cond ((fboundp 'vterm) (vterm arg))
+          (sys/win32p (eshell arg))
+          (t (shell))))
+
+  (defun shell-pop--hide-frame ()
+    "Hide child frame and refocus in parent frame."
+    (when (and (childframe-workable-p)
+               (frame-live-p shell-pop--frame)
+               (frame-visible-p shell-pop--frame))
+      (make-frame-invisible shell-pop--frame)
+      (select-frame-set-input-focus (frame-parent shell-pop--frame))
+      (setq shell-pop--frame nil)))
+
+  (defun shell-pop-toggle ()
+    "Toggle shell."
+    (interactive)
+    (shell-pop--hide-frame)
+    (if (window-live-p shell-pop--window)
+        (progn
+          (delete-window shell-pop--window)
+          (setq shell-pop--window nil))
+      (setq shell-pop--window
+            (get-buffer-window (shell-pop--shell)))))
+  (bind-keys ([f9]  . shell-pop-toggle)
+             ("C-`" . shell-pop-toggle))
+
+  (when (childframe-workable-p)
+    (defun shell-pop-posframe-hidehandler (_)
+      "Hidehandler used by `shell-pop-posframe-toggle'."
+      (not (eq (selected-frame) posframe--frame)))
+
+    (defun shell-pop-posframe-toggle ()
+      "Toggle shell in child frame."
+      (interactive)
+      (unless (childframe-workable-p)
+        (user-error "Child frame is not supported!"))
+
+      (let* ((buffer (shell-pop--shell))
+             (window (get-buffer-window buffer)))
+        ;; Hide window: for `popper'
+        (when (window-live-p window)
+          (delete-window window))
+
+        (if (and (frame-live-p shell-pop--frame)
+                 (frame-visible-p shell-pop--frame))
+            (progn
+              ;; Hide child frame and refocus in parent frame
+              (make-frame-invisible shell-pop--frame)
+              (select-frame-set-input-focus (frame-parent shell-pop--frame))
+              (setq shell-pop--frame nil))
+          (let ((width  (max 80 (floor (* (frame-width) 0.5))))
+                (height (floor (* (frame-height) 0.5))))
+            ;; Shell pop in child frame
+            (setq shell-pop--frame
+                  (posframe-show
+                   buffer
+                   :poshandler #'posframe-poshandler-frame-center
+                   :hidehandler #'shell-pop-posframe-hidehandler
+                   :left-fringe 8
+                   :right-fringe 8
+                   :width width
+                   :height height
+                   :min-width width
+                   :min-height height
+                   :internal-border-width 3
+                   :internal-border-color (face-background 'posframe-border nil t)
+                   :background-color (face-background 'tooltip nil t)
+                   :override-parameters '((cursor-type . t))
+                   :accept-focus t))
+
+            ;; Focus in child frame
+            (select-frame-set-input-focus shell-pop--frame)
+
+            (with-current-buffer buffer
+              (setq-local cursor-type 'box) ; blink cursor
+              (goto-char (point-max))
+              (when (fboundp 'vterm-reset-cursor-point)
+                (vterm-reset-cursor-point)))))))
+    (bind-key "C-`" #'shell-pop-posframe-toggle)))
 
 (provide 'init-shell)
 

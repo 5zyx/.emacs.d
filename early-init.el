@@ -1,6 +1,6 @@
 ;;; early-init.el --- Early initialization. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2021 Vincent Zhang
+;; Copyright (C) 2019-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -42,6 +42,9 @@
 
 ;; Inhibit resizing frame
 (setq frame-inhibit-implied-resize t)
+
+;; Set default coding system
+(set-language-environment "UTF-8")
 
 ;; Faster to disable these here (before they've been initialized)
 (push '(menu-bar-lines . 0) default-frame-alist)

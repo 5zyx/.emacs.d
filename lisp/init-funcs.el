@@ -1,6 +1,6 @@
 ;; init-funcs.el --- Define functions.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2021 Vincent Zhang
+;; Copyright (C) 2018-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -45,9 +45,6 @@
 (declare-function flycheck-buffer 'flycheck)
 (declare-function flymake-start 'flymake)
 (declare-function upgrade-packages 'init-package)
-
-(unless (fboundp 'caadr)
-  (defalias 'caadr #'cl-caadr))
 
 
 
@@ -220,11 +217,12 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
         (async-byte-recompile-directory temp-dir)
       (byte-recompile-directory temp-dir 0 t))))
 
-(defun icons-displayable-p ()
-  "Return non-nil if `all-the-icons' is displayable."
+(defun icon-displayable-p ()
+  "Return non-nil if icons are displayable."
   (and centaur-icon
-       (display-graphic-p)
-       (require 'all-the-icons nil t)))
+       (or (display-graphic-p) (daemonp))
+       (or (featurep 'all-the-icons)
+           (require 'all-the-icons nil t))))
 
 (defun centaur-set-variable (variable value &optional no-save)
   "Set the VARIABLE to VALUE, and return VALUE.
@@ -266,8 +264,10 @@ ASYNC specifies whether to perform the downloads in the background.
 Save to `custom-file' if NO-SAVE is nil."
   (interactive
    (list
-    (intern (completing-read "Select package archives: "
-                             (mapcar #'car centaur-package-archives-alist)))))
+    (intern
+     (ivy-read "Select package archives: "
+               (mapcar #'car centaur-package-archives-alist)
+               :preselect (symbol-name centaur-package-archives)))))
   ;; Set option
   (centaur-set-variable 'centaur-package-archives archives no-save)
 
@@ -328,7 +328,6 @@ Return the fastest package archive."
   "Address blank screen issue with child-frame in fullscreen.
 This issue has been addressed in 28."
   (and sys/mac-cocoa-p
-       emacs/>=26p
        (not emacs/>=28p)
        (bound-and-true-p ns-use-native-fullscreen)
        (setq ns-use-native-fullscreen nil)))
@@ -530,11 +529,11 @@ If SYNC is non-nil, the updating process is synchronous."
 
 (defun childframe-workable-p ()
   "Test whether childframe is workable."
-  (and emacs/>=26p
-       (eq centaur-completion-style 'childframe)
-       (not (or noninteractive
-                emacs-basic-display
-                (not (display-graphic-p))))))
+  (and (eq centaur-completion-style 'childframe)
+       (or (not (or noninteractive
+                    emacs-basic-display
+                    (not (display-graphic-p))))
+           (daemonp))))
 
 (defun centaur--theme-name (theme)
   "Return internal THEME name."
@@ -576,19 +575,21 @@ If SYNC is non-nil, the updating process is synchronous."
   (interactive)
   (let* ((themes (mapcar #'cdr centaur-theme-alist))
          (theme (nth (random (length themes)) themes)))
-    (if theme
-        (centaur--load-theme theme)
-      (user-error "Failed to load `random' theme"))))
+    (if (eq theme centaur-theme)
+        (centaur-load-random-theme)
+      (centaur--load-theme theme))))
 
 (defun centaur-load-theme (theme &optional no-save)
   "Load color THEME. Save to `custom-file' if NO-SAVE is nil."
   (interactive
-   (list (intern (completing-read
-                  "Load theme: "
-                  `(auto
-                    random
-                    ,(if (bound-and-true-p ns-system-appearance) 'system "")
-                    ,@(mapcar #'car centaur-theme-alist))))))
+   (list
+    (intern
+     (ivy-read "Load theme: "
+               `(auto
+                 random
+                 ,(if (bound-and-true-p ns-system-appearance) 'system "")
+                 ,@(mapcar #'car centaur-theme-alist))
+               :preselect (symbol-name centaur-theme)))))
   ;; Set option
   (centaur-set-variable 'centaur-theme theme no-save)
 

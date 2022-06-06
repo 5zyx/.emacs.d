@@ -1,6 +1,6 @@
 ;; init-docker.el --- Initialize docker configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2021 Vincent Zhang
+;; Copyright (C) 2019-2022 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -33,7 +33,7 @@
 ;; Docker
 (use-package docker
   :defines docker-image-run-arguments
-  :bind ("C-c k" . docker)
+  :bind ("C-c D" . docker)
   :init (setq docker-image-run-arguments '("-i" "-t" "--rm")
               docker-container-shell-file-name "/bin/bash"))
 
