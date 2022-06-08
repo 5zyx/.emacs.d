@@ -2,6 +2,7 @@
   :init (evil-mode 1))
 
 (use-package htmlize)
+(use-package racket-mode)
 
 (use-package js-comint)
 
