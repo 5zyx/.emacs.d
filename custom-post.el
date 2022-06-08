@@ -7,6 +7,14 @@
 
 (use-package esxml)
 
+(use-package ox-gfm
+  :after org)
+
+(use-package ox-hugo
+  :ensure t   ;Auto-install the package from Melpa
+  :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
+  :after ox)
+
 (tool-bar-mode 1)
 (menu-bar-mode 1)
 (scroll-bar-mode 1)
