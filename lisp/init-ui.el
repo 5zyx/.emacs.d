@@ -34,6 +34,19 @@
 (require 'init-custom)
 (require 'init-funcs)
 
+;; Optimization
+(setq idle-update-delay 1.0)
+
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+(setq fast-but-imprecise-scrolling t)
+(setq redisplay-skip-fontification-on-input t)
+
+;; Inhibit resizing frame
+(setq frame-inhibit-implied-resize t
+      frame-resize-pixelwise t)
+
 ;; Logo
 (setq fancy-splash-image centaur-logo)
 
@@ -50,24 +63,13 @@
                 (set-frame-parameter nil 'ns-appearance bg)
                 (setcdr (assq 'ns-appearance default-frame-alist) bg)))))
 
-;; Optimization
-(setq idle-update-delay 1.0)
-
-(setq-default cursor-in-non-selected-windows nil)
-(setq highlight-nonselected-windows nil)
-
-(setq fast-but-imprecise-scrolling t)
-(setq redisplay-skip-fontification-on-input t)
-
-;; Inhibit resizing frame
-(setq frame-inhibit-implied-resize t
-      frame-resize-pixelwise t)
-
 ;; Menu/Tool/Scroll bars
 (unless emacs/>=27p
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist))
+  (push '(vertical-scroll-bars) default-frame-alist)
+  (when (featurep 'ns)
+    (push '(ns-transparent-titlebar . t) default-frame-alist)))
 
 ;; Theme
 (if (centaur-compatible-theme-p centaur-theme)
@@ -329,24 +331,11 @@
       (dolist (icon mode-icon-alist)
         (add-to-list 'all-the-icons-mode-icon-alist icon)))))
 
-;; Show native line numbers if possible, otherwise use `linum'
-(if (fboundp 'display-line-numbers-mode)
-    (use-package display-line-numbers
-      :ensure nil
-      :hook ((prog-mode yaml-mode conf-mode) . display-line-numbers-mode)
-      :init (setq display-line-numbers-width-start t))
-  (use-package linum-off
-    :demand t
-    :defines linum-format
-    :hook (after-init . global-linum-mode)
-    :init (setq linum-format "%4d ")
-    :config
-    ;; Highlight current line number
-    (use-package hlinum
-      :defines linum-highlight-in-all-buffersp
-      :custom-face (linum-highlight-face ((t (:inherit default :background nil :foreground nil))))
-      :hook (global-linum-mode . hlinum-activate)
-      :init (setq linum-highlight-in-all-buffersp t))))
+;; Show line numbers
+(use-package display-line-numbers
+  :ensure nil
+  :hook ((prog-mode yaml-mode conf-mode) . display-line-numbers-mode)
+  :init (setq display-line-numbers-width-start t))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil
