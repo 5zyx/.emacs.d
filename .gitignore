@@ -85,3 +85,4 @@ url/
 var/
 workspace/
 lsp-cache/*
+custom.el
