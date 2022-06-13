@@ -75,14 +75,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(menu-bar-mode t)
  '(org-agenda-files
    '("/Users/yorick/Desktop/inspiration/draft.org" "/Users/yorick/Desktop/inspiration/pipe.org"))
  '(org-confirm-babel-evaluate nil)
+ '(org-export-backends '(hugo gfm md ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
  '(org-hugo-base-dir "~/workspace/blog/")
  '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
  '(org-use-sub-superscripts '{})
- '(plantuml-jar-args nil))
+ '(scroll-bar-mode 'right)
+ '(tool-bar-mode t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

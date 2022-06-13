@@ -223,7 +223,11 @@ prepended to the element after the #+HEADER: tag."
                                (sass . t)
                                (C . t)
                                (java . t)
-                               (plantuml . t)))
+                               (plantuml . t)
+                               (dot        . t)
+                               (calc        . t)
+                               (makefile . t)
+                               ))
 
   ;; ob-sh renamed to ob-shell since 26.1.
   (cl-pushnew '(shell . t) load-language-list)
