@@ -227,6 +227,8 @@ prepended to the element after the #+HEADER: tag."
                                (dot        . t)
                                (calc        . t)
                                (makefile . t)
+                               (sql . t)
+                               (sqlite . t)
                                ))
 
   ;; ob-sh renamed to ob-shell since 26.1.
