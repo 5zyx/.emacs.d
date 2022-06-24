@@ -9,6 +9,10 @@
   :after ox)
 
 
-
 (add-hook 'org-insert-heading-hook
           (lambda () (org-set-property "CREATED" (format-time-string "%Y/%m/%d %H:%M"))))
+
+;;If you also want to disable confirmation for SQL blocks:
+(setq org-confirm-babel-evaluate
+      (lambda (lang body)
+        (not (string= lang "sql"))))
