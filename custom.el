@@ -79,13 +79,14 @@
  '(org-agenda-files
    '("/Users/yorick/Desktop/inspiration/draft.org" "/Users/yorick/Desktop/inspiration/pipe.org"))
  '(org-confirm-babel-evaluate nil)
- '(org-export-backends '(hugo gfm md ascii html icalendar latex odt))
+ '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
  '(org-hugo-base-dir "~/workspace/blog/")
  '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
  '(org-use-sub-superscripts '{})
  '(scroll-bar-mode 'right)
- '(tool-bar-mode t))
+ '(tool-bar-mode t)
+ '(linum-mode t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

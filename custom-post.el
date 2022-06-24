@@ -9,7 +9,6 @@
   :after ox)
 
 
-
 (add-hook 'org-insert-heading-hook
           (lambda () (org-set-property "CREATED" (format-time-string "%Y/%m/%d %H:%M"))))
 
@@ -21,3 +20,8 @@
   (add-to-list 'ispell-skip-region-alist '("=" "="))
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
 (add-hook 'org-mode-hook #'endless/org-ispell)
+
+;;If you also want to disable confirmation for SQL blocks:
+(setq org-confirm-babel-evaluate
+      (lambda (lang body)
+        (not (string= lang "sql"))))
