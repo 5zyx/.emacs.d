@@ -76,8 +76,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode t)
- '(org-agenda-files
-   '("/Users/yorick/Desktop/inspiration/draft.org" "/Users/yorick/Desktop/inspiration/pipe.org"))
  '(org-confirm-babel-evaluate nil)
  '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
