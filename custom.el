@@ -75,6 +75,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(linum-mode t)
  '(menu-bar-mode t)
  '(org-confirm-babel-evaluate nil)
  '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
@@ -83,8 +84,7 @@
  '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
  '(org-use-sub-superscripts '{})
  '(scroll-bar-mode 'right)
- '(tool-bar-mode t)
- '(linum-mode t))
+ '(tool-bar-mode t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
