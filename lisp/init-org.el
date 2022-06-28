@@ -210,7 +210,7 @@ prepended to the element after the #+HEADER: tag."
         org-src-fontify-natively t
         org-src-tab-acts-natively t)
 
-  (defvar load-language-list '((emacs-lisp . t)
+  (defvar load-language-alist '((emacs-lisp . t)
                                (perl . t)
                                (python . t)
                                (ruby . t)
