@@ -141,12 +141,8 @@
   (use-package devdocs
     :commands (devdocs--installed-docs devdocs--available-docs)
     :bind (:map prog-mode-map
-<<<<<<< HEAD
-                ("M-<f1>" . devdocs-dwim))
-=======
            ("M-<f1>" . devdocs-dwim)
            ("C-h D"  . devdocs-dwim))
->>>>>>> update_stream/master
     :init
     (defconst devdocs-major-mode-docs-alist
       '((c-mode          . ("c"))
