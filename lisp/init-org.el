@@ -210,7 +210,6 @@ prepended to the element after the #+HEADER: tag."
         org-src-fontify-natively t
         org-src-tab-acts-natively t)
 
-<<<<<<< HEAD
   (defvar load-language-alist '((emacs-lisp . t)
                                (perl . t)
                                (python . t)
@@ -226,21 +225,7 @@ prepended to the element after the #+HEADER: tag."
                                (makefile . t)
                                (sql . t)
                                (sqlite . t)
-                               ))
-=======
-  (defconst load-language-alist
-    '((emacs-lisp . t)
-      (perl       . t)
-      (python     . t)
-      (ruby       . t)
-      (js         . t)
-      (css        . t)
-      (sass       . t)
-      (C          . t)
-      (java       . t)
-      (plantuml   . t))
-    "Alist of org ob languages.")
->>>>>>> update_stream/master
+                               ),"Alist of org ob languages.")
 
   ;; ob-sh renamed to ob-shell since 26.1.
   (cl-pushnew '(shell . t) load-language-alist)
