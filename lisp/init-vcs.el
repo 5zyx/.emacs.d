@@ -100,18 +100,19 @@
           transient-posframe-poshandler 'posframe-poshandler-frame-center
           transient-posframe-parameters '((left-fringe . 8)
                                           (right-fringe . 8)))
-    :config
-    (with-no-warnings
-      (defun my-transient-posframe--prettify-frame ()
-        (with-current-buffer (get-buffer-create transient--buffer-name)
-          (when posframe--frame
-            (goto-char (point-min))
-            (insert (propertize "\n" 'face '(:height 0.3)))
-            (goto-char (point-max))
-            (delete-char -3)          ; delete separate
-            (insert (propertize "\n" 'face '(:height 0.5)))
-            (posframe--set-frame-size posframe--frame nil nil nil nil))))
-      (advice-add #'transient--show :after #'my-transient-posframe--prettify-frame))))
+    ;; :config
+    ;; (with-no-warnings
+    ;;   (defun my-transient-posframe--prettify-frame ()
+    ;;     (with-current-buffer (get-buffer-create transient--buffer-name)
+    ;;       (when posframe--frame
+    ;;         (goto-char (point-min))
+    ;;         (insert (propertize "\n" 'face '(:height 0.3)))
+    ;;         (goto-char (point-max))
+    ;;         (delete-char -3)          ; delete separate
+    ;;         (insert (propertize "\n" 'face '(:height 0.5)))
+    ;;         (posframe--set-frame-size posframe--frame nil nil nil nil))))
+    ;;   (advice-add #'transient--show :after #'my-transient-posframe--prettify-frame))
+    ))
 
 ;; Walk through git revisions of a file
 (use-package git-timemachine
