@@ -50,7 +50,7 @@
                    files (append files (list file)))
              nil t)
             (with-bongo-library-buffer
-              (mapc 'bongo-insert-file files)))
+             (mapc 'bongo-insert-file files)))
           (bongo-switch-buffers))
         (bind-key "b" #'bongo-add-dired-files dired-mode-map))))
 
@@ -70,12 +70,16 @@
   ;; Simple mpd client
   (when (executable-find "mpc")
     (use-package simple-mpc
-      :commands (simple-mpc-call-mpc simple-mpc-call-mpc-strings)
+      :commands (simple-mpc-mode simple-mpc-call-mpc simple-mpc-call-mpc-strings)
       :functions (simple-mpc-current simple-mpc-start-timer)
-      :bind (("M-<f8>" . simple-mpc)
+      :custom-face
+      (simple-mpc-main-name ((t (:inherit font-lock-string-face :bold t :height 1.3))))
+      (simple-mpc-main-headers ((t (:inherit font-lock-keyword-face :bold t :height 1.1))))
+      :bind (("M-<f8>" . simple-mpc+)
              :map simple-mpc-mode-map
              ("P" . simple-mpc-play)
-             ("O" . simple-mpc-stop))
+             ("O" . simple-mpc-stop)
+             ("u" . simple-mpc-update))
       :init (setq simple-mpc-playlist-format
                   "%time%\t[[%title%\t%artist%\t%album%]|[%file%]]"
                   simple-mpc-table-separator "\t")
@@ -89,6 +93,51 @@
         "Stop the playback."
         (interactive)
         (simple-mpc-call-mpc nil "stop"))
+
+      (defun simple-mpc-update ()
+        "Update database."
+        (interactive)
+        (message "Updating music database...")
+        (simple-mpc-call-mpc nil "update")
+        (message "Updating music database...done"))
+
+      ;; Enhance UI
+      (defun simple-mpc+ (&optional _ignore-auto _noconfirm)
+        "Start simple-mpc.
+
+IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
+        (interactive)
+        (let ((buf (get-buffer-create simple-mpc-main-buffer-name)))
+          (with-current-buffer buf
+            (read-only-mode -1)
+            (erase-buffer)
+            (insert (propertize "🔊 Simple MPC\n"
+                                'face 'simple-mpc-main-name)
+
+                    (propertize "\n  ⚙️ Controls\n" 'face 'simple-mpc-main-headers)
+                    "\t [t]oggle\n"
+                    "\t [n]ext track\n"
+                    "\t [p]revious track\n"
+                    "\t seek [f]orward\n"
+                    "\t seek [b]ackward\n"
+                    "\t increase [V]olume\n"
+                    "\t decrease [v]olume\n"
+                    "\t toggle [r]epeat mode\n"
+
+                    (propertize "\n  🔈 Playlist\n" 'face 'simple-mpc-main-headers)
+                    "\t Start [P]laying\n"
+                    "\t St[O]p playing\n"
+                    "\t view [c]urrent playlist\n"
+                    "\t [C]lear current playlist\n"
+                    "\t [S]huffle playlist\n"
+                    "\t [l]oad playlist\n"
+                    "\t [u]pdate database\n"
+                    "\t [s]earch database\n"
+
+                    (propertize "\n  🛠️️ Misc\n" 'face 'simple-mpc-main-headers)
+                    "\t [q]uit")
+            (simple-mpc-mode) ; start major mode
+            (switch-to-buffer buf))))
 
       ;; Display current song in mode-line
       (defvar simple-mpc-current nil)
