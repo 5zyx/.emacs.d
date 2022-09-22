@@ -7,6 +7,7 @@
   :ensure t   ;Auto-install the package from Melpa
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
   :after ox)
+(use-package easy-hugo)
 
 
 (add-hook 'org-insert-heading-hook
