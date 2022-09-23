@@ -77,10 +77,11 @@
  ;; If there is more than one, they won't work right.
  '(easy-hugo-basedir "~/workspace/wow-yorick/blog/")
  '(easy-hugo-bloglist
-   '(((easy-hugo-basedir)
+   '((
+      (easy-hugo-basedir)
       (easy-hugo-bin . "hugo")
       (easy-hugo-url)
-      (easy-hugo-root)
+      (easy-hugo-root "~/workspace/wow-yorick/wow-yorick.github.io/")
       (easy-hugo-sshdomain)
       (easy-hugo-amazon-s3-bucket-name)
       (easy-hugo-google-cloud-storage-bucket-name)
