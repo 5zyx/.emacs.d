@@ -1,12 +1,14 @@
 (use-package evil
-  :init (evil-mode 1))
-(use-package htmlize)
+  :init (evil-mode 1)
+  :config (evil-set-initial-state 'easy-hugo 'emacs))
+  (use-package htmlize)
 (use-package racket-mode)
 (use-package esxml)
 (use-package ox-hugo
   :ensure t   ;Auto-install the package from Melpa
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
   :after ox)
+(use-package easy-hugo)
 
 
 (add-hook 'org-insert-heading-hook
