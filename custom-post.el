@@ -9,6 +9,7 @@
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
   :after ox)
 (use-package easy-hugo)
+(use-package leetcode)
 
 
 (add-hook 'org-insert-heading-hook

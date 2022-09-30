@@ -75,6 +75,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(leetcode-prefer-language "golang")
+ '(leetcode-prefer-sql "mysql")
+ '(leetcode-save-solutions t)
+ '(leetcode-directory "~/org/leetcode")
  '(easy-hugo-basedir "~/workspace/wow-yorick/blog/")
  '(easy-hugo-bloglist
    '((
