@@ -97,6 +97,7 @@ FACE defaults to inheriting from default and highlight."
   :diminish
   :functions (turn-off-symbol-overlay turn-on-symbol-overlay)
   :custom-face
+  (symbol-overlay-default-face ((t (:background ,(doom-color 'region)))))
   (symbol-overlay-face-1 ((t (:background ,(doom-blend 'blue 'bg 0.5)    :foreground ,(doom-color 'fg)))))
   (symbol-overlay-face-2 ((t (:background ,(doom-blend 'violet 'bg 0.5)  :foreground ,(doom-color 'fg)))))
   (symbol-overlay-face-3 ((t (:background ,(doom-blend 'yellow 'bg 0.5)  :foreground ,(doom-color 'fg)))))
@@ -212,7 +213,7 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
   :custom-face
-  (hl-todo ((t (:inherit default :height 0.5 :width condensed :weight bold :underline nil :inverse-video t))))
+  (hl-todo ((t (:inherit default :height 0.9 :width condensed :weight bold :underline nil :inverse-video t))))
   :bind (:map hl-todo-mode-map
          ([C-f3]    . hl-todo-occur)
          ("C-c t p" . hl-todo-previous)
