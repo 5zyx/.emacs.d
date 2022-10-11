@@ -75,14 +75,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(leetcode-prefer-language "golang")
- '(leetcode-prefer-sql "mysql")
- '(leetcode-save-solutions t)
- '(leetcode-directory "~/org/leetcode")
  '(easy-hugo-basedir "~/workspace/wow-yorick/blog/")
  '(easy-hugo-bloglist
-   '((
-      (easy-hugo-basedir)
+   '(((easy-hugo-basedir)
       (easy-hugo-bin . "hugo")
       (easy-hugo-url)
       (easy-hugo-root "~/workspace/wow-yorick/wow-yorick.github.io/")
@@ -101,8 +96,14 @@
       (easy-hugo-html-extension . "html")
       (easy-hugo-markdown-extension . "md")
       (easy-hugo-default-ext . ".md"))))
+ '(leetcode-directory "~/org/leetcode")
+ '(leetcode-prefer-language "golang")
+ '(leetcode-prefer-sql "mysql")
+ '(leetcode-save-solutions t)
  '(linum-mode t)
  '(menu-bar-mode t)
+ '(org-agenda-files
+   '("/Users/yudong/org/book.org" "/Users/yudong/org/gtd.org" "/Users/yudong/org/idea.org" "/Users/yudong/org/journal.org" "/Users/yudong/org/note.org"))
  '(org-confirm-babel-evaluate nil)
  '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
@@ -161,6 +162,14 @@
  '(pulse-highlight-face ((t (:inherit region))))
  '(pulse-highlight-start-face ((t (:inherit region))))
  '(symbol-overlay-default-face ((t (:inherit (region bold)))))
+ '(symbol-overlay-face-1 ((t (:background "#3c6d91" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-2 ((t (:background "#68668a" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-3 ((t (:background "#8a7557" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-4 ((t (:background "#81583e" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-5 ((t (:background "#934c4f" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-6 ((t (:background "#775188" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-7 ((t (:background "#60754c" :foreground "#bbc2cf"))))
+ '(symbol-overlay-face-8 ((t (:background "#378299" :foreground "#bbc2cf"))))
  '(transient-posframe ((t (:inherit tooltip))))
  '(transient-posframe-border ((t (:inherit posframe-border))))
  '(which-key-posframe ((t (:inherit tooltip))))
