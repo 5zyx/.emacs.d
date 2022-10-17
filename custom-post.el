@@ -1,6 +1,5 @@
 (use-package evil
-  :init (evil-mode 1)
-  :config (evil-set-initial-state 'easy-hugo 'emacs))
+  :init (evil-mode 1))
   (use-package htmlize)
 (use-package racket-mode)
 (use-package esxml)
