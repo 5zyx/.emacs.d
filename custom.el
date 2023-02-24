@@ -100,7 +100,7 @@
  '(leetcode-prefer-language "golang")
  '(leetcode-prefer-sql "mysql")
  '(leetcode-save-solutions t)
- '(linum-mode t)
+ '(linum-mode t t)
  '(menu-bar-mode t)
  '(org-agenda-files
    '("/Users/yudong/org/book.org" "/Users/yudong/org/gtd.org" "/Users/yudong/org/idea.org" "/Users/yudong/org/journal.org" "/Users/yudong/org/note.org" "/Users/yudong/org/work-flow.org"))
@@ -109,6 +109,7 @@
  '(org-export-with-sub-superscripts '{})
  '(org-hugo-base-dir "~/workspace/wow-yorick/blog")
  '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
+ '(org-table-convert-region-max-lines 5000)
  '(org-use-sub-superscripts '{})
  '(scroll-bar-mode 'right)
  '(tool-bar-mode t))
