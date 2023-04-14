@@ -325,7 +325,7 @@
      :bind (:map lsp-mode-map
             ("<f5>" . dap-debug)
             ("M-<f5>" . dap-hydra))
-     :hook ((after-init     . dap-auto-configure-mode)
+     :hook (;(after-init     . dap-auto-configure-mode)
             (dap-stopped    . (lambda (_) (dap-hydra)))
             (dap-terminated . (lambda (_) (dap-hydra/nil)))
 
