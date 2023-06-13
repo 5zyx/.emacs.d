@@ -103,7 +103,7 @@
  '(linum-mode t t)
  '(menu-bar-mode t)
  '(org-agenda-files
-   '("/Users/yudong/org/work-flow.org" "/Users/yudong/org/book.org" "/Users/yudong/org/gtd.org" "/Users/yudong/org/idea.org" "/Users/yudong/org/journal.org" "/Users/yudong/org/note.org"))
+   '("~/org/work-flow.org" "~/org/book.org" "~/org/gtd.org" "~/org/idea.org" "~/org/journal.org" "~/org/note.org"))
  '(org-confirm-babel-evaluate nil)
  '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
