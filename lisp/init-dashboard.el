@@ -97,13 +97,11 @@
           dashboard-path-max-length 60
           dashboard-center-content t
           dashboard-show-shortcuts nil
-          dashboard-items '((recents  . 10)
+          dashboard-items '((recents  . 8)
                             (bookmarks . 5)
                             (projects . 5))
 
-          dashboard-set-init-info t
           dashboard-display-icons-p #'icons-displayable-p
-          dashboard-icon-type 'nerd-icons
           dashboard-set-file-icons centaur-icon
           dashboard-set-heading-icons centaur-icon
           dashboard-heading-icons '((recents   . "nf-oct-history")
@@ -111,13 +109,6 @@
                                     (agenda    . "nf-oct-calendar")
                                     (projects  . "nf-oct-briefcase")
                                     (registers . "nf-oct-database"))
-
-          dashboard-set-footer t
-          dashboard-footer-icon (cond
-                                 ((icons-displayable-p)
-                                  (nerd-icons-octicon "nf-oct-heart" :height 1.2 :face 'nerd-icons-lred))
-
-                                 (t (propertize ">" 'face 'dashboard-footer)))
 
           dashboard-set-navigator t
           dashboard-navigator-buttons
@@ -141,11 +132,20 @@
                    (nerd-icons-mdicon "nf-md-help" :height 1.5)
                  "?")
               "" "Help (?/h)"
-              (lambda (&rest _) (dashboard-hydra/body))
-              font-lock-string-face))))
+              (lambda (&rest _) (dashboard-hydra/body)))))
+
+          dashboard-set-footer t
+          dashboard-footer-icon
+          (if (icons-displayable-p)
+              (nerd-icons-octicon "nf-oct-heart" :height 1.2 :face 'nerd-icons-lred)
+            (propertize ">" 'face 'dashboard-footer)))
 
     (dashboard-setup-startup-hook)
     :config
+    ;; WORKAROUND: no icons are displayed on Windows
+    ;; @see https://github.com/emacs-dashboard/emacs-dashboard/issues/471
+    (advice-add #'dashboard-replace-displayable :override #'identity)
+
     ;; Insert copyright
     ;; @see https://github.com/emacs-dashboard/emacs-dashboard/issues/219
     (defun my-dashboard-insert-copyright ()
