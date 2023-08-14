@@ -30,8 +30,13 @@
 
 ;;; Code:
 
+<<<<<<< HEAD
 (require 'init-const)
 (require 'init-funcs)
+=======
+(eval-when-compile
+  (require 'init-const))
+>>>>>>> update_stream/master
 
 ;; Directory operations
 (use-package dired

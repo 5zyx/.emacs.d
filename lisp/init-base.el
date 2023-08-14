@@ -31,8 +31,11 @@
 ;;; Code:
 
 (require 'subr-x)
+<<<<<<< HEAD
 (require 'init-const)
 (require 'init-custom)
+=======
+>>>>>>> update_stream/master
 (require 'init-funcs)
 
 ;; Compatibility

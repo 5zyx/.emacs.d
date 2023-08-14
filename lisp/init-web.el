@@ -30,7 +30,12 @@
 
 ;;; Code:
 
+<<<<<<< HEAD
 (require 'init-custom)
+=======
+(eval-when-compile
+  (require 'init-custom))
+>>>>>>> update_stream/master
 
 ;; eww
 (use-package eww
@@ -126,6 +131,7 @@
 ;; Live browser JavaScript, CSS, and HTML interaction
 (use-package skewer-mode
   :diminish
+  :functions diminish
   :hook (((js-mode js2-mode)   . skewer-mode)
          (css-mode             . skewer-css-mode)
          ((html-mode web-mode) . skewer-html-mode))

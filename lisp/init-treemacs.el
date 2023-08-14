@@ -30,8 +30,13 @@
 
 ;;; Code:
 
+<<<<<<< HEAD
 (require 'init-const)
 (require 'init-custom)
+=======
+(eval-when-compile
+  (require 'init-custom))
+>>>>>>> update_stream/master
 
 ;; A tree layout file explorer
 (use-package treemacs

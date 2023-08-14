@@ -30,7 +30,12 @@
 
 ;;; Code:
 
+<<<<<<< HEAD
 (require 'init-const)
+=======
+(eval-when-compile
+  (require 'init-const))
+>>>>>>> update_stream/master
 
 (bind-key "M-<f7>" #'centaur-read-mode)
 

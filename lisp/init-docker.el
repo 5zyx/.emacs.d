@@ -30,7 +30,12 @@
 
 ;;; Code:
 
+<<<<<<< HEAD
 (require 'init-const)
+=======
+(eval-when-compile
+  (require 'init-const))
+>>>>>>> update_stream/master
 
 ;; Docker
 (use-package docker
