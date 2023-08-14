@@ -71,6 +71,12 @@
     (setq flymake-diagnostic-at-point-display-diagnostic-function
           #'flymake-diagnostic-at-point-display-posframe)))
 
+(use-package sideline-flymake
+  :diminish sideline-mode
+  :hook (flymake-mode . sideline-mode)
+  :init (setq sideline-flymake-display-mode 'point
+              sideline-backends-right '(sideline-flymake)))
+
 (provide 'init-flymake)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
