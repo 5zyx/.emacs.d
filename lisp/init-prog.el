@@ -49,8 +49,6 @@
     :hook (after-init . global-treesit-auto-mode)
     :init (setq treesit-auto-install 'prompt)))
 
-<<<<<<< HEAD
-=======
 ;; Show function arglist or variable docstring
 (use-package eldoc
   :ensure nil
@@ -68,7 +66,6 @@
       (setf (alist-get 'left-fringe eldoc-box-frame-parameters) 8
             (alist-get 'right-fringe eldoc-box-frame-parameters) 8))))
 
->>>>>>> update_stream/master
 ;; Search tool
 (use-package grep
   :ensure nil
