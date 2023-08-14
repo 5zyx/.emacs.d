@@ -85,44 +85,22 @@
         ;; Enable flashing mode-line on errors
         (doom-themes-visual-bell-config)
 
-<<<<<<< HEAD
-        ;; WORKAROUND: Visual bell on 29
-=======
         ;; WORKAROUND: Visual bell on 29+
->>>>>>> update_stream/master
         ;; @see https://github.com/doomemacs/themes/issues/733
         (with-no-warnings
           (defun my-doom-themes-visual-bell-fn ()
             "Blink the mode-line red briefly. Set `ring-bell-function' to this to use it."
-<<<<<<< HEAD
-            (let* ((buf (current-buffer))
-                   (cookies `(,(face-remap-add-relative 'mode-line-active
-                                                        'doom-themes-visual-bell)
-                              ,(face-remap-add-relative 'mode-line
-                                                        'doom-themes-visual-bell))))
-=======
             (let ((buf (current-buffer))
                   (cookies (mapcar (lambda (face)
                                      (face-remap-add-relative face 'doom-themes-visual-bell))
                                    '(mode-line mode-line-active))))
->>>>>>> update_stream/master
               (force-mode-line-update)
               (run-with-timer 0.15 nil
                               (lambda ()
                                 (with-current-buffer buf
                                   (mapc #'face-remap-remove-relative cookies)
                                   (force-mode-line-update))))))
-<<<<<<< HEAD
-          (advice-add #'doom-themes-visual-bell-fn :override #'my-doom-themes-visual-bell-fn))
-
-        ;; Enable customized theme
-        ;; FIXME: https://github.com/emacs-lsp/lsp-treemacs/issues/89
-        (when (featurep 'all-the-icons)
-          (with-eval-after-load 'lsp-treemacs
-            (doom-themes-treemacs-config)))))
-=======
           (advice-add #'doom-themes-visual-bell-fn :override #'my-doom-themes-visual-bell-fn))))
->>>>>>> update_stream/master
   (progn
     (warn "The current theme is incompatible!")
     (centaur-load-theme centaur-theme t)))
