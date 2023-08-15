@@ -31,9 +31,6 @@
 ;;; Code:
 (require 'cl-lib)
 
-(require 'init-const)
-(require 'init-custom)
-
 ;; Suppress warnings
 (eval-when-compile
   (require 'init-const)
@@ -69,7 +66,7 @@
 
 (defun delete-carrage-returns ()
   "Delete `^M' characters in the buffer.
-Same as `replace-string C-q C-m RET RET'."
+Same as '`replace-string' `C-q' `C-m' `RET' `RET''."
   (interactive)
   (save-excursion
     (goto-char 0)
@@ -132,8 +129,8 @@ Same as `replace-string C-q C-m RET RET'."
 (defun centaur-webkit-browse-url (url &optional pop-buffer new-session)
   "Browse URL with xwidget-webkit' and switch or pop to the buffer.
 
-POP-BUFFER specifies whether to pop to the buffer.
-NEW-SESSION specifies whether to create a new xwidget-webkit session."
+  POP-BUFFER specifies whether to pop to the buffer.
+  NEW-SESSION specifies whether to create a new xwidget-webkit session."
   (interactive (progn
                  (require 'browse-url)
                  (browse-url-interactive-arg "xwidget-webkit URL: ")))
@@ -245,7 +242,7 @@ Native tree-sitter is introduced since 29."
 (defun centaur-set-variable (variable value &optional no-save)
   "Set the VARIABLE to VALUE, and return VALUE.
 
-  Save to `custom-file' if NO-SAVE is nil."
+  Save to option `custom-file' if NO-SAVE is nil."
   (customize-set-variable variable value)
   (when (and (not no-save)
              (file-writable-p custom-file))
@@ -254,8 +251,8 @@ Native tree-sitter is introduced since 29."
       (goto-char (point-min))
       (while (re-search-forward
               (format "^[\t ]*[;]*[\t ]*(setq %s .*)" variable)
-              nil t)
-        (replace-match (format "(setq %s '%s)" variable value) nil nil))
+                               nil t)
+  (replace-match (format "(setq %s '%s)" variable value) nil nil))
       (write-region nil nil custom-file)
       (message "Saved %s (%s) to %s" variable value custom-file))))
 
@@ -281,17 +278,16 @@ Native tree-sitter is introduced since 29."
 
 ;; Pakcage repository (ELPA)
 (defun set-package-archives (archives &optional refresh async no-save)
-  "Set the package archives (ELPA).
+  "Set the package ARCHIVES (ELPA).
 
 REFRESH is non-nil, will refresh archive contents.
 ASYNC specifies whether to perform the downloads in the background.
-Save to `custom-file' if NO-SAVE is nil."
+Save to option `custom-file' if NO-SAVE is nil."
   (interactive
    (list
     (intern
-     (ivy-read "Select package archives: "
-               (mapcar #'car centaur-package-archives-alist)
-               :preselect (symbol-name centaur-package-archives)))))
+     (completing-read "Select package archives: "
+                      (mapcar #'car centaur-package-archives-alist)))))
   ;; Set option
   (centaur-set-variable 'centaur-package-archives archives no-save)
 
@@ -433,10 +429,9 @@ This issue has been addressed in 28."
 
 (defun childframe-workable-p ()
   "Whether childframe is workable."
-  (or (not (or noninteractive
-               emacs-basic-display
-               (not (display-graphic-p))))
-      (daemonp)))
+  (not (or noninteractive
+           emacs-basic-display
+           (not (display-graphic-p)))))
 
 (defun childframe-completion-workable-p ()
   "Whether childframe completion is workable."
@@ -463,7 +458,7 @@ This issue has been addressed in 28."
        (memq (centaur--theme-name theme) custom-enabled-themes)))
 
 (defun centaur--load-theme (theme)
-  "Disable others and enable new one."
+  "Disable others and enable new THEME."
   (when-let ((theme (centaur--theme-name theme)))
     (mapc #'disable-theme custom-enabled-themes)
     (load-theme theme t)))
@@ -483,16 +478,19 @@ This issue has been addressed in 28."
       (centaur--load-theme theme))))
 
 (defun centaur-load-theme (theme &optional no-save)
-  "Load color THEME. Save to `custom-file' if NO-SAVE is nil."
+  "Load color THEME. Save to option `custom-file' if NO-SAVE is nil."
   (interactive
    (list
     (intern
-     (ivy-read "Load theme: "
-               `(auto
-                 random
-                 system
-                 ,@(mapcar #'car centaur-theme-alist))
-               :preselect (symbol-name centaur-theme)))))
+     (completing-read "Load theme: "
+                      `(auto
+                        random
+                        system
+                        ,@(mapcar #'car centaur-theme-alist))))))
+
+  ;; Disable time-switching themes
+  (when (fboundp #'circadian-activate-latest-theme)
+    (cancel-function-timers #'circadian-activate-latest-theme))
 
   ;; Disable system theme
   (when (bound-and-true-p auto-dark-mode)
@@ -540,7 +538,7 @@ This issue has been addressed in 28."
           (fullscreen))))
 
 (defun centaur-frame--fullscreen-p ()
-  "Returns Non-nil if the frame is fullscreen."
+  "Return Non-nil if the frame is fullscreen."
   (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth)))
 
 (defun centaur-frame-maximize ()

@@ -41,23 +41,6 @@
   (when sys/win32p
     (setenv "GIT_ASKPASS" "git-gui--askpass"))
 
-  ;; Exterminate Magit buffers
-  (with-no-warnings
-    (defun my-magit-kill-buffers (&rest _)
-      "Restore window configuration and kill all Magit buffers."
-      (interactive)
-      (magit-restore-window-configuration)
-      (let ((buffers (magit-mode-get-buffers)))
-        (when (eq major-mode 'magit-status-mode)
-          (mapc (lambda (buf)
-                  (with-current-buffer buf
-                    (if (and magit-this-process
-                             (eq (process-status magit-this-process) 'run))
-                        (bury-buffer buf)
-                      (kill-buffer buf))))
-                buffers))))
-    (setq magit-bury-buffer-function #'my-magit-kill-buffers))
-
   ;; Access Git forges from Magit
   (use-package forge
     :demand t
@@ -80,7 +63,6 @@
   (use-package magit-todos
     :defines magit-todos-nice
     :commands magit-todos--scan-with-git-grep
-    :bind ("C-c C-t" . ivy-magit-todos)
     :init
     (setq magit-todos-nice (if (executable-find "nice") t nil))
     (setq magit-todos-scanner #'magit-todos--scan-with-git-grep)
@@ -101,25 +83,18 @@
     (transient-posframe-border ((t (:inherit posframe-border :background unspecified))))
     :hook (after-init . transient-posframe-mode)
     :init
-    (setq transient-posframe-border-width 3
+    (setq transient-posframe-border-width posframe-border-width
           transient-posframe-min-height nil
           transient-posframe-min-width 80
           transient-posframe-poshandler 'posframe-poshandler-frame-center
           transient-posframe-parameters '((left-fringe . 8)
                                           (right-fringe . 8)))
-    ;; :config
-    ;; (with-no-warnings
-    ;;   (defun my-transient-posframe--prettify-frame ()
-    ;;     (with-current-buffer (get-buffer-create transient--buffer-name)
-    ;;       (when posframe--frame
-    ;;         (goto-char (point-min))
-    ;;         (insert (propertize "\n" 'face '(:height 0.3)))
-    ;;         (goto-char (point-max))
-    ;;         (delete-char -3)          ; delete separate
-    ;;         (insert (propertize "\n" 'face '(:height 0.5)))
-    ;;         (posframe--set-frame-size posframe--frame nil nil nil nil))))
-    ;;   (advice-add #'transient--show :after #'my-transient-posframe--prettify-frame))
-    ))
+    :config
+    (with-no-warnings
+      (defun my-transient-posframe--hide ()
+        "Hide transient posframe."
+        (posframe-hide transient--buffer-name))
+      (advice-add #'transient-posframe--delete :override #'my-transient-posframe--hide))))
 
 ;; Walk through git revisions of a file
 (use-package git-timemachine
@@ -216,6 +191,8 @@
                                                 (propertize "\n" 'face '(:height 0.3)))
                                 :left-fringe 8
                                 :right-fringe 8
+                                :max-width (round (* (frame-width) 0.62))
+                                :max-height (round (* (frame-height) 0.62))
                                 :internal-border-width 1
                                 :internal-border-color (face-background 'posframe-border nil t)
                                 :background-color (face-background 'tooltip nil t))

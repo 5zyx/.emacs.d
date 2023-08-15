@@ -30,9 +30,6 @@
 
 ;;; Code:
 
-(require 'init-const)
-(require 'init-funcs)
-
 ;; Delete selection if you insert
 (use-package delsel
   :ensure nil
@@ -161,28 +158,28 @@
   :hook (after-init . ace-pinyin-global-mode))
 
 ;; Minor mode to aggressively keep your code always indented
-;(use-package aggressive-indent
-;  :diminish
-;  :hook ((after-init . global-aggressive-indent-mode)
-;         ;; NOTE: Disable in large files due to the performance issues
-;         ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
-;         (find-file . (lambda ()
-;                        (when (too-long-file-p)
-;                          (aggressive-indent-mode -1)))))
-;  :config
-;  ;; Disable in some modes
-;  (dolist (mode '(gitconfig-mode asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
-;    (push mode aggressive-indent-excluded-modes))
-;
-;  ;; Disable in some commands
-;  (add-to-list 'aggressive-indent-protected-commands #'delete-trailing-whitespace t)
-;
-;  ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
-;  (add-to-list 'aggressive-indent-dont-indent-if
-;               '(and (derived-mode-p 'c-mode 'c++-mode 'csharp-mode
-;                                     'java-mode 'go-mode 'swift-mode)
-;                     (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-;                                         (thing-at-point 'line))))))
+(use-package aggressive-indent
+  :diminish
+  :hook ((after-init . global-aggressive-indent-mode)
+         ;; NOTE: Disable in large files due to the performance issues
+         ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
+         (find-file . (lambda ()
+                        (when (too-long-file-p)
+                          (aggressive-indent-mode -1)))))
+  :config
+  ;; Disable in some modes
+  (dolist (mode '(gitconfig-mode asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
+    (push mode aggressive-indent-excluded-modes))
+
+  ;; Disable in some commands
+  (add-to-list 'aggressive-indent-protected-commands #'delete-trailing-whitespace t)
+
+  ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
+  (add-to-list 'aggressive-indent-dont-indent-if
+               '(and (derived-mode-p 'c-mode 'c++-mode 'csharp-mode
+                                     'java-mode 'go-mode 'swift-mode)
+                     (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+                                         (thing-at-point 'line))))))
 
 ;; Show number of matches in mode-line while searching
 (use-package anzu
@@ -316,14 +313,7 @@
                               (unbind-key key flyspell-mode-map)))))
   :init (setq flyspell-issue-message-flag nil
               ispell-program-name "aspell"
-              ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
-  :config
-  ;; Correcting words with flyspell via Ivy
-  (use-package flyspell-correct-ivy
-    :after ivy
-    :bind (:map flyspell-mode-map
-           ([remap flyspell-correct-word-before-point] . flyspell-correct-wrapper))
-    :init (setq flyspell-correct-interface #'flyspell-correct-ivy)))
+              ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
 
 ;; Hungry deletion
 (use-package hungry-delete
@@ -340,19 +330,10 @@
 
 ;; Move to the beginning/end of line or code
 (use-package mwim
-  :bind (([remap move-beginning-of-line] . mwim-beginning-of-code-or-line)
-         ([remap move-end-of-line] . mwim-end-of-code-or-line)))
-
-;; Windows-scroll commands
-(use-package pager
-  :bind (([remap scroll-up-command] . pager-page-down)
-         ([remap scroll-down-command] . pager-page-up)
-         ([next]   . pager-page-down)
-         ([prior]  . pager-page-up)
-         ([M-up]   . pager-row-up)
-         ([M-kp-8] . pager-row-up)
-         ([M-down] . pager-row-down)
-         ([M-kp-2] . pager-row-down)))
+  :bind (("C-a" . mwim-beginning-of-code-or-line)
+         ("C-e" . mwim-end-of-code-or-line)
+         ("<home>" . mwim-beginning-of-line-or-code)
+         ("<end>" . mwim-end-of-line-or-code)))
 
 ;; Treat undo history as a tree
 (if emacs/>=28p
@@ -370,14 +351,6 @@
 ;; Goto last change
 (use-package goto-chg
   :bind ("C-," . goto-last-change))
-
-;; Preview when `goto-char'
-(use-package goto-char-preview
-  :bind ([remap goto-char] . goto-char-preview))
-
-;; Preview when `goto-line'
-(use-package goto-line-preview
-  :bind ([remap goto-line] . goto-line-preview))
 
 ;; Handling capitalized subwords in a nomenclature
 (use-package subword

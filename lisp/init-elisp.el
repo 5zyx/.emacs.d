@@ -30,9 +30,6 @@
 
 ;;; Code:
 
-(require 'init-custom)
-(require 'init-funcs)
-
 ;; Emacs lisp mode
 (use-package elisp-mode
   :ensure nil
@@ -206,66 +203,6 @@ Lisp function does not specify a special indentation."
                 (revert-buffer nil t)))))))
     (bind-key "r" #'remove-hook-at-point help-mode-map)))
 
-;; Show function arglist or variable docstring
-;; `global-eldoc-mode' is enabled by default.
-(use-package eldoc
-  :ensure nil
-  :diminish
-  :config
-  (with-no-warnings
-    ;; Display `eldoc' in child frame
-    (when (and (require 'posframe nil t) (posframe-workable-p))
-      (defvar eldoc-posframe-buffer "*eldoc-posframe-buffer*"
-        "The posframe buffer name use by eldoc-posframe.")
-
-      (defvar eldoc-posframe-hide-posframe-hooks
-        '(pre-command-hook post-command-hook focus-out-hook)
-        "The hooks which should trigger automatic removal of the posframe.")
-
-      (defvar eldoc-posframe-delay 0.2
-        "Delay seconds to display `eldoc'.")
-
-      (defvar-local eldoc-posframe--timer nil)
-
-      (defun eldoc-posframe-hide-posframe ()
-        "Hide messages currently being shown if any."
-        (when eldoc-posframe--timer
-          (cancel-timer eldoc-posframe--timer))
-
-        (posframe-hide eldoc-posframe-buffer)
-        (dolist (hook eldoc-posframe-hide-posframe-hooks)
-          (remove-hook hook #'eldoc-posframe-hide-posframe t)))
-
-      (defun eldoc-posframe-show-posframe (str &rest args)
-        "Display STR with ARGS."
-        (when eldoc-posframe--timer
-          (cancel-timer eldoc-posframe--timer))
-
-        (posframe-hide eldoc-posframe-buffer)
-        (dolist (hook eldoc-posframe-hide-posframe-hooks)
-          (add-hook hook #'eldoc-posframe-hide-posframe nil t))
-
-        (setq eldoc-posframe--timer
-              (run-with-idle-timer
-               eldoc-posframe-delay nil
-               (lambda ()
-                 (when str
-                   (posframe-show
-                    eldoc-posframe-buffer
-                    :string (concat (propertize "\n" 'face '(:height 0.3))
-                                    (apply #'format str args)
-                                    (propertize "\n\n" 'face '(:height 0.3)))
-                    :postion (point)
-                    :left-fringe 8
-                    :right-fringe 8
-                    :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
-                    :internal-border-width 1
-                    :internal-border-color (face-foreground 'font-lock-comment-face nil t)
-                    :background-color (face-background 'tooltip nil t)))))))
-      (add-hook 'emacs-lisp-mode-hook
-                (lambda ()
-                  (setq-local eldoc-message-function #'eldoc-posframe-show-posframe))))))
-
 ;; Interactive macro expander
 (use-package macrostep
   :bind (:map emacs-lisp-mode-map
@@ -289,12 +226,6 @@ Lisp function does not specify a special indentation."
   :hook (helpful-mode . cursor-sensor-mode) ; for remove-advice button
   :init
   (with-no-warnings
-    (with-eval-after-load 'counsel
-      (setq counsel-describe-function-function #'helpful-callable
-            counsel-describe-variable-function #'helpful-variable
-            counsel-describe-symbol-function #'helpful-symbol
-            counsel-descbinds-function #'helpful-callable))
-
     (with-eval-after-load 'apropos
       ;; patch apropos buttons to call helpful instead of help
       (dolist (fun-bt '(apropos-function apropos-macro apropos-command))
