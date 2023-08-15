@@ -30,15 +30,9 @@
 
 ;;; Code:
 
-<<<<<<< HEAD
-(require 'init-const)
-(require 'init-custom)
-(require 'init-funcs)
-=======
 (eval-when-compile
   (require 'init-const)
   (require 'init-custom))
->>>>>>> update_stream/master
 
 ;; At first startup
 (when (and (file-exists-p centaur-custom-example-file)

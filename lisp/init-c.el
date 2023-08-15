@@ -30,12 +30,8 @@
 
 ;;; Code:
 
-<<<<<<< HEAD
-(require 'init-funcs)
-=======
 (eval-when-compile
   (require 'init-custom))
->>>>>>> update_stream/master
 
 ;; C/C++ Mode
 (use-package cc-mode

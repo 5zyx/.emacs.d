@@ -30,12 +30,8 @@
 
 ;;; Code:
 
-<<<<<<< HEAD
-(require 'init-custom)
-=======
 (eval-when-compile
   (require 'init-custom))
->>>>>>> update_stream/master
 
 ;; eww
 (use-package eww

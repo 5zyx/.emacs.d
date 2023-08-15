@@ -63,10 +63,6 @@
                        (ibuffer-do-sort-by-project-file-relative))))
   :init (setq ibuffer-project-use-cache t)
   :config
-<<<<<<< HEAD
-  (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote"))
-  (add-to-list 'ibuffer-project-root-functions '("\\*.+\\*" . "Default")))
-=======
   (defun my-ibuffer-project-group-name (root type)
     "Return group name for project ROOT and TYPE."
     (if (and (stringp type) (> (length type) 0))
@@ -83,7 +79,6 @@
       (setq ibuffer-project-root-functions
             '((ibuffer-project-project-root . "Project")
               (file-remote-p . "Remote"))))))
->>>>>>> update_stream/master
 
 (provide 'init-ibuffer)
 

@@ -30,15 +30,9 @@
 
 ;;; Code:
 
-<<<<<<< HEAD
-(require 'init-custom)
-(require 'init-const)
-(require 'init-funcs)
-=======
 (eval-when-compile
   (require 'init-const)
   (require 'init-custom))
->>>>>>> update_stream/master
 
 ;; Prettify Symbols
 ;; e.g. display “lambda” as “λ”
