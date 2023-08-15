@@ -2,7 +2,7 @@
 ;; -------------------------------------------------------------------------
 ;; Tabspaces Session File for Emacs
 ;; -------------------------------------------------------------------------
-;; Created Tue Aug 15 10:17:53 2023
+;; Created Tue Aug 15 10:27:15 2023
 
 ;; Tabs and buffers:
-(setq tabspaces--session-list '((nil . "*scratch*")))
+(setq tabspaces--session-list '((("/Users/yudong/.emacs.d/custom.el") . "*scratch*")))
