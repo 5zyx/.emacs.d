@@ -114,8 +114,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(easy-hugo-basedir  "~/workspace/wow-yorick/blog/")
- '(easy-hugo-postdir  "content/posts")
+ '(desktop-save-mode nil)
+ '(easy-hugo-basedir "~/workspace/wow-yorick/blog/")
+ '(easy-hugo-postdir "content/posts")
  '(leetcode-directory "~/org/leetcode")
  '(leetcode-prefer-language "golang")
  '(leetcode-prefer-sql "mysql")
@@ -174,7 +175,7 @@
  '(lsp-headerline-breadcrumb-symbols-warning-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#ECBE7B"))) t)
  '(lsp-ui-sideline-code-action ((t (:inherit warning))) t)
  '(macrostep-expansion-highlight-face ((t (:inherit tooltip :extend t))) t)
- '(org-ellipsis ((t (:foreground nil))) t)
+ '(org-ellipsis ((t (:foreground nil))))
  '(org-pomodoro-mode-line ((t (:inherit warning))) t)
  '(org-pomodoro-mode-line-break ((t (:inherit success))) t)
  '(org-pomodoro-mode-line-overtime ((t (:inherit error))) t)
