@@ -89,3 +89,4 @@ url/
 var/
 workspace/
 lsp-cache/*
+tabsession.el
