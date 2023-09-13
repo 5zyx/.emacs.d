@@ -17,7 +17,7 @@ centaur的备份分支，添加了自己需要的插件及配置
 - [Prerequisite](#prerequisite)
   - [OS](#os)
   - [GNU Emacs](#gnu-emacs)
-  - [Dotfiles](#dotfiles)
+  - [Dotfiles (Optional)](#dotfiles)
 - [Quick Start](#quick-start)
   - [Install](#install)
   - [Update](#update)
@@ -81,7 +81,7 @@ latest stable release - currently **28.2**.
 
 Please refer to [Installing Emacs](http://wikemacs.org/index.php/Installing_Emacs).
 
-### Dotfiles
+### Dotfiles (Optional)
 
 Recommend to use [Centaur Dotfiles](https://github.com/seagle0128/dotfiles).
 
