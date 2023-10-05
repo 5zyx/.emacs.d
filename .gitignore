@@ -74,11 +74,8 @@ rust-playground/
 server/
 session*
 snippets/
-<<<<<<< HEAD
 site-lisp/
-=======
 templates/
->>>>>>> update_stream/master
 thumbs/
 tldr/
 tmp*
@@ -90,3 +87,4 @@ var/
 workspace/
 lsp-cache/*
 tabsession.el
+.emacs.desktop
