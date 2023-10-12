@@ -26,68 +26,67 @@
 (require 'baidu-dictionary)
 
 ;; Baidu Dictionary
-;; (use-package baidu-dictionary
-;;   :load-file "site-lisp/baidu-dictionary.el"
-;;   :bind (("C-c y"   . my-baidu-dictionary-search-at-point)
-;;          ("C-c d Y" . my-baidu-dictionary-search-at-point)
-;;          ("C-c d y" . baidu-dictionary-search-async)
-;;          :map baidu-dictionary-mode-map
-;;          ("h"       . my-baidu-dictionary-help)
-;;          ("?"       . my-baidu-dictionary-help))
-;;   :init
-;;   (setq url-automatic-caching t)
-;;   (setq baidu-dictionary-use-chinese-word-segmentation t) ; 中文分词
-;;   :config
-;;   (with-no-warnings
-;;     (with-eval-after-load 'hydra
-;;       (defhydra baidu-dictionary-hydra (:color blue)
-;;         ("p" baidu-dictionary-play-voice-of-current-word "play voice of current word")
-;;         ("y" baidu-dictionary-play-voice-at-point "play voice at point")
-;;         ("q" quit-window "quit")
-;;         ("C-g" nil nil)
-;;         ("h" nil nil)
-;;         ("?" nil nil))
-;;       (defun my-baidu-dictionary-help ()
-;;         "Show help in `hydra'."
-;;         (interactive)
-;;         (let ((hydra-hint-display-type 'message))
-;;           (baidu-dictionary-hydra/body))))
+(use-package baidu-dictionary
+  :load-path "site-lisp/"
+  :bind (("C-c y"   . my-baidu-dictionary-search-at-point)
+         ("C-c d Y" . my-baidu-dictionary-search-at-point)
+         ("C-c d y" . baidu-dictionary-search-async)
+         ("h"       . my-baidu-dictionary-help)
+         ("?"       . my-baidu-dictionary-help))
+  :init
+  (setq url-automatic-caching t)
+  (setq baidu-dictionary-use-chinese-word-segmentation t) ; 中文分词
+  :config
+  (with-no-warnings
+    (with-eval-after-load 'hydra
+      (defhydra baidu-dictionary-hydra (:color blue)
+        ("p" baidu-dictionary-play-voice-of-current-word "play voice of current word")
+        ("y" baidu-dictionary-play-voice-at-point "play voice at point")
+        ("q" quit-window "quit")
+        ("C-g" nil nil)
+        ("h" nil nil)
+        ("?" nil nil))
+      (defun my-baidu-dictionary-help ()
+        "Show help in `hydra'."
+        (interactive)
+        (let ((hydra-hint-display-type 'message))
+          (baidu-dictionary-hydra/body))))
 
-;;     (defun my-baidu-dictionary-search-at-point ()
-;;       "Search word at point and display result with `posframe', `pos-tip' or buffer."
-;;       (interactive)
-;;       (if (posframe-workable-p)
-;;           (baidu-dictionary-search-at-point-posframe)
-;;         (baidu-dictionary-search-at-point)))
+    (defun my-baidu-dictionary-search-at-point ()
+      "Search word at point and display result with `posframe', `pos-tip' or buffer."
+      (interactive)
+      (if (posframe-workable-p)
+          (baidu-dictionary-search-at-point-posframe)
+        (baidu-dictionary-search-at-point)))
 
-;;     (defun my-baidu-dictionary--posframe-tip (string)
-;;       "Show STRING using `posframe-show'."
-;;       (unless (posframe-workable-p)
-;;         (error "Posframe not workable"))
+    (defun my-baidu-dictionary--posframe-tip (string)
+      "Show STRING using `posframe-show'."
+      (unless (posframe-workable-p)
+        (error "Posframe not workable"))
 
-;;       (if-let ((word (baidu-dictionary--region-or-word)))
-;;           (progn
-;;             (with-current-buffer (get-buffer-create baidu-dictionary-buffer-name)
-;;               (let ((inhibit-read-only t))
-;;                 (erase-buffer)
-;;                 (baidu-dictionary-mode)
-;;                 (insert string)
-;;                 (set (make-local-variable 'baidu-dictionary-current-buffer-word) word)))
-;;             (posframe-show
-;;              baidu-dictionary-buffer-name
-;;              :position (point)
-;;              :left-fringe 8
-;;              :right-fringe 8
-;;              :max-width (/ (frame-width) 2)
-;;              :max-height (/ (frame-height) 2)
-;;              :background-color (face-background 'tooltip nil t)
-;;              :internal-border-color (face-background 'posframe-border nil t)
-;;              :internal-border-width 1)
-;;             (unwind-protect
-;;                 (push (read-event) unread-command-events)
-;;               (progn
-;;                 (posframe-hide baidu-dictionary-buffer-name)
-;;                 (other-frame 0)))
-;;             (message "Nothing to look up"))))
-;;     (advice-add #'baidu-dictionary--posframe-tip
-;;                 :override #'my-baidu-dictionary--posframe-tip)))
+      (if-let ((word (baidu-dictionary--region-or-word)))
+          (progn
+            (with-current-buffer (get-buffer-create baidu-dictionary-buffer-name)
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                                        ;(baidu-dictionary-mode)
+                (insert string)
+                (set (make-local-variable 'baidu-dictionary-current-buffer-word) word)))
+            (posframe-show
+             baidu-dictionary-buffer-name
+             :position (point)
+             :left-fringe 8
+             :right-fringe 8
+             :max-width (/ (frame-width) 2)
+             :max-height (/ (frame-height) 2)
+             :background-color (face-background 'tooltip nil t)
+             :internal-border-color (face-background 'posframe-border nil t)
+             :internal-border-width 1)
+            (unwind-protect
+                (push (read-event) unread-command-events)
+              (progn
+                (posframe-hide baidu-dictionary-buffer-name)
+                (other-frame 0)))
+            (message "Nothing to look up"))))
+    (advice-add #'baidu-dictionary--posframe-tip
+                :override #'my-baidu-dictionary--posframe-tip)))
