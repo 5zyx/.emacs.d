@@ -132,7 +132,8 @@
  '(org-table-convert-region-max-lines 5000)
  '(org-use-sub-superscripts '{})
  '(scroll-bar-mode 'right)
- '(tool-bar-mode t))
+ '(tool-bar-mode t)
+ '(warning-suppress-log-types '((emacs))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
