@@ -28,29 +28,19 @@
 ;; Baidu Dictionary
 (use-package baidu-dictionary
   :load-path "site-lisp/"
-  :bind (("C-c y"   . my-baidu-dictionary-search-at-point)
-         ("C-c d Y" . my-baidu-dictionary-search-at-point)
-         ("C-c d y" . baidu-dictionary-search-async)
-         ("h"       . my-baidu-dictionary-help)
-         ("?"       . my-baidu-dictionary-help))
+  :bind (("C-c y"   . my-baidu-dictionary-search-at-point))
   :init
   (setq url-automatic-caching t)
-  (setq baidu-dictionary-use-chinese-word-segmentation t) ; 中文分词
   :config
   (with-no-warnings
     (with-eval-after-load 'hydra
+      (setq baidu-dictionary-use-chinese-word-segmentation t) ; 中文分词
       (defhydra baidu-dictionary-hydra (:color blue)
-        ("p" baidu-dictionary-play-voice-of-current-word "play voice of current word")
-        ("y" baidu-dictionary-play-voice-at-point "play voice at point")
         ("q" quit-window "quit")
         ("C-g" nil nil)
         ("h" nil nil)
         ("?" nil nil))
-      (defun my-baidu-dictionary-help ()
-        "Show help in `hydra'."
-        (interactive)
-        (let ((hydra-hint-display-type 'message))
-          (baidu-dictionary-hydra/body))))
+      )
 
     (defun my-baidu-dictionary-search-at-point ()
       "Search word at point and display result with `posframe', `pos-tip' or buffer."
