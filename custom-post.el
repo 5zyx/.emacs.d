@@ -27,7 +27,7 @@
 
 ;; Baidu Dictionary
 (use-package baidu-dictionary
-  :load-path "site-lisp/"
+  :load-path "site-lisp/baidu-dictionary/"
   :bind (("C-c y"   . my-baidu-dictionary-search-at-point))
   :init
   (setq url-automatic-caching t)
