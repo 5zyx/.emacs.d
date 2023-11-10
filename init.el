@@ -110,7 +110,7 @@ Otherwise the startup will be very slow."
 
 ;; Preferences
 (require 'init-base)
-;;(require 'init-hydra)
+(require 'init-hydra)
 
 (require 'init-ui)
 (require 'init-edit)
