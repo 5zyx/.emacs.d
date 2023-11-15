@@ -205,6 +205,7 @@ prepended to the element after the #+HEADER: tag."
       (sass       . t)
       (C          . t)
       (java       . t)
+<<<<<<< HEAD
       (plantuml   . t)
       (dot        . t)
       (calc        . t)
@@ -212,10 +213,11 @@ prepended to the element after the #+HEADER: tag."
       (sql . t)
       (sqlite . t)
       (scheme        . t))
+=======
+      (shell      . t)
+      (plantuml   . t))
+>>>>>>> update_stream/master
     "Alist of org ob languages.")
-
-  ;; ob-sh renamed to ob-shell since 26.1.
-  (cl-pushnew '(shell . t) load-language-alist)
 
   (use-package ob-go
     :init (cl-pushnew '(go . t) load-language-alist))
