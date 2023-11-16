@@ -205,18 +205,14 @@ prepended to the element after the #+HEADER: tag."
       (sass       . t)
       (C          . t)
       (java       . t)
-<<<<<<< HEAD
       (plantuml   . t)
       (dot        . t)
       (calc        . t)
       (makefile . t)
       (sql . t)
       (sqlite . t)
-      (scheme        . t))
-=======
       (shell      . t)
-      (plantuml   . t))
->>>>>>> update_stream/master
+      (scheme        . t))
     "Alist of org ob languages.")
 
   (use-package ob-go
