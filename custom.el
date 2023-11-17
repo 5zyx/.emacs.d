@@ -133,7 +133,8 @@
  '(org-use-sub-superscripts '{})
  '(scroll-bar-mode 'right)
  '(tool-bar-mode t)
- '(warning-suppress-log-types '((emacs))))
+ '(warning-suppress-log-types '((emacs)))
+ '(youdao-dictionary-use-chinese-word-segmentation t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
