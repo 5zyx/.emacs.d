@@ -17,7 +17,7 @@ centaur的备份分支，添加了自己需要的插件及配置
 - [Prerequisite](#prerequisite)
   - [OS](#os)
   - [GNU Emacs](#gnu-emacs)
-  - [Dotfiles (Optional)](#dotfiles)
+  - [Dotfiles (Optional)](#dotfiles-optional)
 - [Quick Start](#quick-start)
   - [Install](#install)
   - [Update](#update)
