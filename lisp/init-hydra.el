@@ -142,9 +142,8 @@
         ("t n" (centaur-load-theme 'night) "night"
          :toggle (centaur-theme-enable-p 'night) :exit t)
         ("t o" (centaur-load-theme
-                (let ((x (intern (completing-read "Load custom theme: "
-                                                  (all-completions "doom" (custom-available-themes))))))
-                  (or (car (rassoc x centaur-theme-alist)) x)))
+                (intern (completing-read "Load custom theme: "
+                                         (custom-available-themes))))
          "others"
          :toggle (not (or (rassoc (car custom-enabled-themes) centaur-theme-alist)
                           (rassoc (cadr custom-enabled-themes) centaur-theme-alist)))
