@@ -131,6 +131,8 @@
  '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
  '(org-table-convert-region-max-lines 5000)
  '(org-use-sub-superscripts '{})
+ '(org-html-validation-link nil)
+                                        ;'(org-html-postamble "Copyright © Solid")
  '(scroll-bar-mode 'right)
  '(tool-bar-mode t)
  '(warning-suppress-log-types '((emacs)))
