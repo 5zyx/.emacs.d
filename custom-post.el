@@ -10,6 +10,8 @@
 (use-package easy-hugo)
 (use-package leetcode)
 
+(global-display-line-numbers-mode t)
+
 
 (add-hook 'org-insert-heading-hook
           (lambda () (org-set-property "CREATED" (format-time-string "%Y/%m/%d %H:%M"))))
