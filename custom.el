@@ -128,7 +128,7 @@
  '(org-export-backends '(hugo gfm md pdf ascii html icalendar latex odt))
  '(org-export-with-sub-superscripts '{})
  '(org-hugo-base-dir "~/workspace/wow-yorick/blog")
- '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2022.4.jar")
+ '(org-plantuml-jar-path "~/.emacs.d/tools/plantuml-1.2024.4.jar")
  '(org-table-convert-region-max-lines 5000)
  '(org-use-sub-superscripts '{})
  '(org-html-validation-link nil)
