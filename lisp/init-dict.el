@@ -38,77 +38,156 @@
   :bind (("C-c d f" . fanyi-dwim)
          ("C-c d d" . fanyi-dwim2)
          ("C-c d h" . fanyi-from-history))
-  :custom (fanyi-providers '(fanyi-haici-provider fanyi-longman-provider))
+  :custom (fanyi-providers '(fanyi-haici-provider
+                             fanyi-youdao-thesaurus-provider
+                             fanyi-etymon-provider
+                             fanyi-longman-provider)))
 
-  (use-package go-translate
-    :bind (("C-c d g" . gts-do-translate))
-    :init (setq gts-translate-list '(("en" "zh") ("zh" "en")))))
-
-;; Youdao Dictionary
-(use-package youdao-dictionary
-  :bind (("C-c y"   . my-youdao-dictionary-search-at-point)
-         ("C-c d Y" . my-youdao-dictionary-search-at-point)
-         ("C-c d y" . youdao-dictionary-search-async)
-         :map youdao-dictionary-mode-map
-         ("h"       . my-youdao-dictionary-help)
-         ("?"       . my-youdao-dictionary-help))
+(use-package go-translate
+  :bind (("C-c g"   . gt-do-translate)
+         ("C-c u"   . gt-do-text-utiliuty)
+         ("C-c y"   . gt-youdao-dict-translate-dwim)
+         ("C-c d b" . gt-bing-translate)
+         ("C-c d B" . gt-bing-translate-dwim)
+         ("C-c d g" . gt-do-translate)
+         ("C-c d m" . gt-multi-dict-translate-dwim)
+         ("C-c d M" . gt-multi-dict-translate)
+         ("C-c d y" . gt-youdao-dict-translate)
+         ("C-c d Y" . gt-youdao-dict-translate-dwim)
+         ("C-c d s" . gt-do-setup)
+         ("C-c d u" . gt-do-text-utility))
   :init
-  (setq url-automatic-caching t)
-  (setq youdao-dictionary-use-chinese-word-segmentation t) ; 中文分词
+  (setq gt-langs '(en zh)
+        gt-buffer-render-window-config
+        '((display-buffer-reuse-window display-buffer-in-side-window)
+          (side . bottom)
+          (slot . 1)
+          (window-height . 0.4)))
   :config
-  (with-no-warnings
-    (with-eval-after-load 'hydra
-      (defhydra youdao-dictionary-hydra (:color blue)
-        ("p" youdao-dictionary-play-voice-of-current-word "play voice of current word")
-        ("y" youdao-dictionary-play-voice-at-point "play voice at point")
-        ("q" quit-window "quit")
-        ("C-g" nil nil)
-        ("h" nil nil)
-        ("?" nil nil))
-      (defun my-youdao-dictionary-help ()
-        "Show help in `hydra'."
-        (interactive)
-        (let ((hydra-hint-display-type 'message))
-          (youdao-dictionary-hydra/body))))
+  ;; Same behavior with `popper'
+  (add-hook 'gt-buffer-render-output-hook
+            (lambda ()
+              "Focus in the dict result window."
+              (when-let ((win (get-buffer-window gt-buffer-render-buffer-name)))
+                (and (window-live-p win) (select-window win)))))
+  (advice-add #'keyboard-quit :before
+              (lambda (&rest _)
+                "Close dict result window via `C-g'."
+                (when-let ((win (get-buffer-window gt-buffer-render-buffer-name)))
+                  (and (window-live-p win) (delete-window win)))))
 
-    (defun my-youdao-dictionary-search-at-point ()
-      "Search word at point and display result with `posframe', `pos-tip' or buffer."
-      (interactive)
-      (if (posframe-workable-p)
-          (youdao-dictionary-search-at-point-posframe)
-        (youdao-dictionary-search-at-point)))
+  ;; Translators
+  (setq gt-preset-translators
+        `((default          . ,(gt-translator :taker   (cdar (gt-ensure-plain gt-preset-takers))
+                                              :engines (cdar (gt-ensure-plain gt-preset-engines))
+                                              :render  (cdar (gt-ensure-plain gt-preset-renders))))
+          (youdao-dict      . ,(gt-translator :taker (gt-taker :langs '(en zh) :text 'word :prompt t)
+                                              :engines (gt-youdao-dict-engine)
+                                              :render (gt-buffer-render)))
+          (youdao-dict-dwim . ,(gt-translator :taker (gt-taker :langs '(en zh) :text 'word)
+                                              :engines (gt-youdao-dict-engine)
+                                              :render (if (display-graphic-p)
+                                                          (gt-posframe-pop-render)
+                                                        (gt-buffer-render))))
+          (bing             . ,(gt-translator :taker (gt-taker :langs '(en zh) :text 'word :prompt t)
+                                              :engines (gt-bing-engine)
+                                              :render (gt-buffer-render)))
+          (bing-dwim        . ,(gt-translator :taker (gt-taker :langs '(en zh) :text 'word)
+                                              :engines (gt-bing-engine)
+                                              :render (if (display-graphic-p)
+                                                          (gt-posframe-pop-render)
+                                                        (gt-buffer-render))))
+          (multi-dict       . ,(gt-translator :taker (gt-taker :langs '(en zh) :prompt t)
+                                              :engines (list (gt-bing-engine)
+                                                             (gt-youdao-dict-engine)
+                                                             (gt-youdao-suggest-engine)
+                                                             (gt-google-engine))
+                                              :render (gt-buffer-render)))
+          (multi-dict-dwim  . ,(gt-translator :taker (gt-taker :langs '(en zh))
+                                              :engines (list (gt-bing-engine)
+                                                             (gt-youdao-dict-engine)
+                                                             (gt-youdao-suggest-engine)
+                                                             (gt-google-engine))
+                                              :render (gt-buffer-render)))
+          (Text-Utility     . ,(gt-text-utility :taker (gt-taker :pick nil)
+                                                :render (gt-buffer-render)))))
+  (setq gt-default-translator (alist-get 'multi-dict-dwim gt-preset-translators))
 
-    (defun my-youdao-dictionary--posframe-tip (string)
-      "Show STRING using `posframe-show'."
-      (unless (posframe-workable-p)
-        (error "Posframe not workable"))
+  (defun gt-youdao-dict-translate ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'youdao-dict gt-preset-translators)))
+      (gt-do-translate)))
 
-      (if-let ((word (youdao-dictionary--region-or-word)))
-          (progn
-            (with-current-buffer (get-buffer-create youdao-dictionary-buffer-name)
-              (let ((inhibit-read-only t))
-                (erase-buffer)
-                (youdao-dictionary-mode)
-                (insert string)
-                (set (make-local-variable 'youdao-dictionary-current-buffer-word) word)))
-            (posframe-show
-             youdao-dictionary-buffer-name
-             :position (point)
-             :left-fringe 8
-             :right-fringe 8
-             :max-width (/ (frame-width) 2)
-             :max-height (/ (frame-height) 2)
-             :background-color (face-background 'tooltip nil t)
-             :internal-border-color (face-background 'posframe-border nil t)
-             :internal-border-width 1)
-            (unwind-protect
-                (push (read-event) unread-command-events)
-              (progn
-                (posframe-hide youdao-dictionary-buffer-name)
-                (other-frame 0)))
-            (message "Nothing to look up"))))
-    (advice-add #'youdao-dictionary--posframe-tip
-                :override #'my-youdao-dictionary--posframe-tip)))
+  (defun gt-youdao-dict-translate-dwim ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'youdao-dict-dwim gt-preset-translators)))
+      (gt-do-translate)))
+
+  (defun gt-bing-translate ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'bing gt-preset-translators)))
+      (gt-do-translate)))
+
+  (defun gt-bing-translate-dwim ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'bing-dwim gt-preset-translators)))
+      (gt-do-translate)))
+
+  (defun gt-multi-dict-translate ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'multi-dict gt-preset-translators)))
+      (gt-do-translate)))
+
+  (defun gt-multi-dict-translate-dwim ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'multi-dict-dwim gt-preset-translators)))
+      (gt-do-translate)))
+
+  (defun gt-do-text-utility ()
+    (interactive)
+    (let ((gt-default-translator (alist-get 'Text-Utility gt-preset-translators)))
+      (gt-do-translate)))
+
+  ;; Tweak child frame
+  (defclass gt-posframe-pop-render (gt-buffer-render)
+    ((width       :initarg :width        :initform 70)
+     (height      :initarg :height       :initform 15)
+     (forecolor   :initarg :forecolor    :initform nil)
+     (backcolor   :initarg :backcolor    :initform nil)
+     (padding     :initarg :padding      :initform 16)
+     (bd-width    :initarg :bd-width     :initform 1)
+     (bd-color    :initarg :bd-color     :initform nil))
+    "Pop up a childframe to show the result.
+The frame will disappear when do do anything but focus in it.
+Manually close the frame with `q'.")
+
+  (cl-defmethod gt-init ((render gt-posframe-pop-render) translator)
+    (with-slots (width height bd-width forecolor backcolor bd-color padding) render
+      (let ((inhibit-read-only t)
+            (buf gt-posframe-pop-render-buffer))
+        ;; create
+        (unless (buffer-live-p (get-buffer buf))
+          (posframe-show buf
+                         :string "Loading..."
+                         :timeout gt-posframe-pop-render-timeout
+                         :width width
+                         :height height
+                         :min-width width
+                         :min-height height
+                         :foreground-color (or forecolor (face-foreground 'tooltip nil t))
+                         :background-color (or backcolor (face-background 'tooltip nil t))
+                         :internal-border-width bd-width
+                         :border-color (or bd-color (face-background 'posframe-border nil t))
+                         :left-fringe padding
+                         :right-fringe padding
+                         :position (point)
+                         :poshandler gt-posframe-pop-render-poshandler))
+        ;; render
+        (gt-buffer-render-init buf render translator)
+        (posframe-refresh buf)
+        ;; setup
+        (with-current-buffer buf
+          (gt-buffer-render-key ("q" "Close") (posframe-delete buf)))))))
 
 ;; OSX dictionary
 (when sys/macp
