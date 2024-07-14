@@ -244,7 +244,11 @@
         (when-let ((window (caar popper-open-popup-alist))
                    (buffer (cdar popper-open-popup-alist)))
           (when (and (with-current-buffer buffer
+<<<<<<< HEAD
                        (not (derived-mode-p 'ehell-mode
+=======
+                       (not (derived-mode-p 'eshell-mode
+>>>>>>> update_stream/master
                                             'shell-mode
                                             'term-mode
                                             'vterm-mode)))
