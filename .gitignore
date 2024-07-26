@@ -32,7 +32,13 @@
 /ac-comphist.dat
 /amx-items
 /bookmarks
+<<<<<<< HEAD
 /company-statistics-cache.el
+=======
+/custom-post.el
+/custom.el
+/gt-known-words.txt
+>>>>>>> update_stream/master
 /history
 /nov-places
 /package-quickstart.el
