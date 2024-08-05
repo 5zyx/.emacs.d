@@ -209,13 +209,17 @@ or`~/.emacs.d/custom-post.el`.
 ## Hydra
 
 | Name                     | Scope                 | Keybinding        | Description                          |
-| ------------------------ | --------------------- | ----------------- | ------------------------------------ |
+|--------------------------|-----------------------|-------------------|--------------------------------------|
 | `toggles-hydra`          | global                | `<f6>`            | Global option toggles                |
 | `window-hydra`           | global                | `C-c w`/`C-x o w` | Window management                    |
 | `doom-modeline-hydra`    | doom-modeline-mode    | `C-<f6>`          | Mode-line options and actions        |
+<<<<<<< HEAD
 | `hydra-ivy`              | minibuffer, ivy-mode  | `C-o`             | Additional key bindings for Ivy      |
 | `ivy-hydra-read-action`  | minibuffer, ivy-mode  | `M-o`             | Actions for`ivy-dispatching-done`    |
 | `hydra-dired-qick-sort`  | dired                 | `S`               | Options for `dired-quick-sort`       |
+=======
+| `hydra-dired-qick-sort`  | dired-mode            | `S`               | Options for `dired-quick-sort`       |
+>>>>>>> update_stream/master
 | `org-hydra`              | org-mode              | `<`               | Org template                         |
 | `dashboard-hydra`        | dashboard-mode        | `h`/`?`           | Actions for the dashboard            |
 | `dumb-jump-hydra`        | global                | `C-M-j`           | Jump to definition                   |
@@ -228,7 +232,7 @@ or`~/.emacs.d/custom-post.el`.
 | `hideshow-hydra`         | prog-mode             | `C-~`             | Actions for `hideshow`               |
 | `lsp-ui-hydra`           | lsp-ui-mode           | `M-<f6>`          | Actions for `lsp-ui`                 |
 | `dap-hydra`              | dap-mode              | `M-<f5>`          | Actions for `dap-debug`              |
-| `elfeed-hydra`           | elfeed                | `?`               | Actions for RSS reader `elfeed`      |
+| `elfeed-hydra`           | elfeed-search-mode    | `?`               | Actions for RSS reader `elfeed`      |
 | `xwidget-hydra`          | xwidget-webkit-mode   | `?`               | Actions for embedded webkit browser  |
 
 ## Screenshots
