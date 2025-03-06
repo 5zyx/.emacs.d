@@ -44,7 +44,7 @@
     (("a" (hot-expand "<a") "ascii")
      ("c" (hot-expand "<c") "center")
      ("C" (hot-expand "<C") "comment")
-     ("e" (hot-expand "<e") "example")
+     ("x" (hot-expand "<e") "example")
      ("E" (hot-expand "<E") "export")
      ("h" (hot-expand "<h") "html")
      ("l" (hot-expand "<l") "latex")
@@ -59,7 +59,7 @@
      ("L" (hot-expand "<L") "LaTeX"))
     "Source"
     (("s" (hot-expand "<s") "src")
-     ("m" (hot-expand "<s" "emacs-lisp") "emacs-lisp")
+     ("e" (hot-expand "<s" "emacs-lisp") "emacs-lisp")
      ("y" (hot-expand "<s" "python :results output") "python")
      ("p" (hot-expand "<s" "perl") "perl")
      ("w" (hot-expand "<s" "powershell") "powershell")
@@ -67,7 +67,8 @@
      ("S" (hot-expand "<s" "sh") "sh")
      ("g" (hot-expand "<s" "go :imports '\(\"fmt\"\)") "golang"))
     "Misc"
-    (("u" (hot-expand "<s" "plantuml :file CHANGE.png") "plantuml")
+    (("m" (hot-expand "<s" "mermaid :file chart.png") "mermaid")
+     ("u" (hot-expand "<s" "plantuml :file chart.png") "plantuml")
      ("Y" (hot-expand "<s" "ipython :session :exports both :results raw drawer\n$0") "ipython")
      ("P" (progn
             (insert "#+HEADERS: :results output :exports both :shebang \"#!/usr/bin/env perl\"\n")
@@ -168,7 +169,7 @@ prepended to the element after the #+HEADER: tag."
   (add-to-list 'org-structure-template-alist '("n" . "note"))
 
   ;; Use embedded webkit browser if possible
-  (when (and (featurep 'xwidget-internal) (display-graphic-p))
+  (when (xwidget-workable-p)
     (push '("\\.\\(x?html?\\|pdf\\)\\'"
             .
             (lambda (file _link)
@@ -256,7 +257,7 @@ prepended to the element after the #+HEADER: tag."
     :diminish
     :bind (:map org-mode-map
            ("C-c C-h" . org-preview-html-mode))
-    :init (when (and (featurep 'xwidget-internal) (display-graphic-p))
+    :init (when (xwidget-workable-p)
             (setq org-preview-html-viewer 'xwidget)))
 
   ;; Presentation
