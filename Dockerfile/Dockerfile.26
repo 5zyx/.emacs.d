@@ -22,7 +22,11 @@ RUN apt-get upgrade -y
 RUN apt-get install -y git emacs-nox
 =======
 RUN apt-get update
+<<<<<<< HEAD:Dockerfile/Dockerfile.26
 RUN apt-get install -y emacs-nox
+>>>>>>> update_stream/master:Dockerfile/Dockerfile.29
+=======
+RUN apt-get install -y emacs29-nox
 >>>>>>> update_stream/master:Dockerfile/Dockerfile.29
 RUN git clone --depth 1 https://github.com/seagle0128/.emacs.d.git ~/.emacs.d
 
