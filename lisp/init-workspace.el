@@ -34,6 +34,7 @@
   (require 'init-custom))
 
 (use-package tabspaces
+  :functions tabspaces-mode
   :hook (after-init . (lambda() (unless centaur-dashboard (tabspaces-mode t))))
   :custom
   (tab-bar-show nil)
@@ -46,30 +47,30 @@
   (tabspaces-session t)
   (tabspaces-session-auto-restore (not centaur-dashboard))
   :config
-  ;; Filter Buffers for Consult-Buffer
-  (with-eval-after-load 'consult
-    ;; hide full buffer list (still available with "b" prefix)
-    (consult-customize consult--source-buffer :hidden t :default nil)
-    ;; set consult-workspace buffer list
-    (defvar consult--source-workspace
-      (list :name     "Workspace Buffer"
-            :narrow   ?w
-            :history  'buffer-name-history
-            :category 'buffer
-            :state    #'consult--buffer-state
-            :default  t
-            :items    (lambda () (consult--buffer-query
-                             :predicate #'tabspaces--local-buffer-p
-                             :sort 'visibility
-                             :as #'buffer-name)))
-      "Set workspace buffer list for consult-buffer.")
-    (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+  (with-no-warnings
+    ;; Filter Buffers for Consult-Buffer
+    (with-eval-after-load 'consult
+      ;; hide full buffer list (still available with "b" prefix)
+      (consult-customize consult--source-buffer :hidden t :default nil)
+      ;; set consult-workspace buffer list
+      (defvar consult--source-workspace
+        (list :name     "Workspace Buffer"
+              :narrow   ?w
+              :history  'buffer-name-history
+              :category 'buffer
+              :state    #'consult--buffer-state
+              :default  t
+              :items    (lambda () (consult--buffer-query
+                               :predicate #'tabspaces--local-buffer-p
+                               :sort 'visibility
+                               :as #'buffer-name)))
+        "Set workspace buffer list for consult-buffer.")
+      (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
-  (defun my-tabspaces-burry-window (&rest _)
-    "Burry *Messages* buffer"
-    (quit-windows-on messages-buffer-name))
-  (advice-add #'tabspaces-restore-session :after #'my-tabspaces-burry-window))
-
+    (defun my-tabspaces-burry-window (&rest _)
+      "Burry *Messages* buffer."
+      (quit-windows-on messages-buffer-name))
+    (advice-add #'tabspaces-restore-session :after #'my-tabspaces-burry-window)))
 
 (provide 'init-workspace)
 
