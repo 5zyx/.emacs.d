@@ -1,3 +1,5 @@
+(setq gc-cons-threshold 100000000)
+
 (use-package evil
   :init (evil-mode 1))
   (use-package htmlize)
