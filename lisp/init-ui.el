@@ -281,15 +281,14 @@
 
 ;; A minor-mode menu for mode-line
 (use-package minions
-  :hook (doom-modeline-mode . minions-mode))
+  :hook (after-init . minions-mode))
 
 ;; Icons
 (use-package nerd-icons
   :commands nerd-icons-install-fonts
   :functions font-installed-p
   :config
-  (when (and (display-graphic-p)
-             (not (font-installed-p nerd-icons-font-family)))
+  (unless (font-installed-p nerd-icons-font-family)
     (nerd-icons-install-fonts t)))
 
 ;; Show line numbers
@@ -348,9 +347,6 @@
 ;; Smooth scrolling
 (when emacs/>=29p
   (use-package ultra-scroll
-    :ensure nil
-    :init (unless (package-installed-p 'ultra-scroll)
-            (package-vc-install "https://github.com/jdtsmith/ultra-scroll"))
     :hook (after-init . ultra-scroll-mode)))
 
 ;; Use fixed pitch where it's sensible
