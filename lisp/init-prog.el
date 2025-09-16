@@ -69,7 +69,6 @@
   :config
   (when (childframe-workable-p)
     (use-package eldoc-box
-      :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
       :custom
       (eldoc-box-lighter nil)
       (eldoc-box-only-multi-line t)
@@ -109,7 +108,7 @@
 
 ;; Browse devdocs.io documents using EWW
 (use-package devdocs
-  :autoload (devdocs--installed-docs devdocs--available-docs)
+  :autoload devdocs--available-docs
   :commands (devdocs-install devdocs-lookup)
   :bind (:map prog-mode-map
          ("M-<f1>" . devdocs-dwim)
@@ -163,11 +162,10 @@ Install the doc if it's not installed."
 ;; ---------------------------------------------------------------------------
 ;; Miscellaneous Programming Modes
 ;; ---------------------------------------------------------------------------
-(use-package csv-mode)
-(unless emacs/>=29p
-  (use-package csharp-mode))
 (use-package cask-mode)
 (use-package cmake-mode)
+(use-package csv-mode)
+(use-package cue-sheet-mode)
 (use-package dart-mode)
 (use-package julia-mode)
 (use-package lua-mode)

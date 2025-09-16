@@ -4,7 +4,7 @@
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
-;; Version: 8.2.1
+;; Version: 8.3.0
 ;; Keywords: .emacs.d centaur
 
 ;;
@@ -145,6 +145,7 @@ Avoid placing large files like EAF in `site-lisp` to prevent slow startup."
 (require 'init-check)
 (require 'init-lsp)
 (require 'init-dap)
+(require 'init-ai)
 
 (require 'init-prog)
 (require 'init-elisp)

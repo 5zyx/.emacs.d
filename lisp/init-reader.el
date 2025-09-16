@@ -59,9 +59,9 @@
 
     ;; Recover last viewed position
     (use-package saveplace-pdf-view
-      :functions pdf-info-check-epdfinfo
       :when (ignore-errors (pdf-info-check-epdfinfo) t)
       :autoload (saveplace-pdf-view-find-file-advice saveplace-pdf-view-to-alist-advice)
+      :functions pdf-info-check-epdfinfo
       :init
       (advice-add 'save-place-find-file-hook :around #'saveplace-pdf-view-find-file-advice)
       (advice-add 'save-place-to-alist :around #'saveplace-pdf-view-to-alist-advice))))
@@ -105,7 +105,9 @@
      ("G" elfeed-search-fetch "update")
      ("y" elfeed-search-yank "copy URL")
      ("+" elfeed-search-tag-all "tag all")
-     ("-" elfeed-search-untag-all "untag all"))
+     ("-" elfeed-search-untag-all "untag all")
+     ("<" elfeed-search-first-entry "first entry")
+     (">" elfeed-search-last-entry "last entry"))
     "Filter"
     (("l" elfeed-search-live-filter "live filter")
      ("s" elfeed-search-set-filter "set filter")
@@ -119,11 +121,10 @@
      ("u" elfeed-search-tag-all-unread "mark unread")
      ("r" elfeed-search-untag-all-unread "mark read")
      ("RET" elfeed-search-show-entry "show"))))
-  :bind (("C-x w" . elfeed)
+  :bind (("C-x j" . elfeed)
          :map elfeed-search-mode-map
-         ("?" . elfeed-hydra/body)
-         :map elfeed-show-mode-map
-         ("q" . delete-window))
+         ("h" . elfeed-hydra/body)
+         ("?" . elfeed-hydra/body))
   :hook (elfeed-show-mode . centaur-read-mode)
   :init (setq url-queue-timeout 30
               elfeed-db-directory (locate-user-emacs-file ".elfeed")
@@ -152,7 +153,7 @@
             ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
             (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 
-    (defun lucius/elfeed-search-print-entry--better-default (entry)
+    (defun my-elfeed-search-print-entry (entry)
       "Print ENTRY to the buffer."
       (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
              (date-width (car (cdr elfeed-search-date-format)))
@@ -181,50 +182,29 @@
         (insert (propertize date 'face 'elfeed-search-date-face) " ")
         (insert (propertize title-column 'face title-faces 'kbd-help title))
         (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
-        ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
         (when feed-title
           (insert " " (concat (nerd-icon-for-tags tags) " ")
                   (propertize feed-title 'face 'elfeed-search-feed-face) " "))
         (when tags (insert "(" tags-str ")"))))
 
-    (setq  elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default))
+    (setq  elfeed-search-print-entry-function #'my-elfeed-search-print-entry))
 
   ;; Use xwidget if possible
-  (with-no-warnings
-    (defun my-elfeed-show-visit (&optional use-generic-p)
-      "Visit the current entry in your browser using `browse-url'.
-If there is a prefix argument, visit the current entry in the
-browser defined by `browse-url-generic-program'."
-      (interactive "P")
-      (let ((link (elfeed-entry-link elfeed-show-entry)))
-        (when link
-          (message "Sent to browser: %s" link)
-          (if use-generic-p
-              (browse-url-generic link)
-            (centaur-browse-url link)))))
-    (advice-add #'elfeed-show-visit :override #'my-elfeed-show-visit)
-
-    (defun my-elfeed-search-browse-url (&optional use-generic-p)
-      "Visit the current entry in your browser using `browse-url'.
-If there is a prefix argument, visit the current entry in the
-browser defined by `browse-url-generic-program'."
-      (interactive "P")
-      (let ((entries (elfeed-search-selected)))
-        (cl-loop for entry in entries
-                 do (elfeed-untag entry 'unread)
-                 when (elfeed-entry-link entry)
-                 do (if use-generic-p
-                        (browse-url-generic it)
-                      (centaur-browse-url it)))
-        (mapc #'elfeed-search-update-entry entries)
-        (unless (or elfeed-search-remain-on-entry (use-region-p))
-          (forward-line))))
-    (advice-add #'elfeed-search-browse-url :override #'my-elfeed-search-browse-url)))
+  (when (xwidget-workable-p)
+    (use-package elfeed-webkit
+      :bind (:map elfeed-show-mode-map
+             ("%" . elfeed-webkit-toggle))
+      :config
+      ;; Fix incorrect keymap after disabling webkit
+      (defun my-elfeed-webkit-reset-keymap ()
+        "Reset local keymap."
+        (use-local-map elfeed-show-mode-map))
+      (advice-add #'elfeed-webkit--disable :after #'my-elfeed-webkit-reset-keymap))))
 
 ;; Another Atom/RSS reader
 (use-package newsticker
   :ensure nil
-  :bind ("C-x W" . newsticker-show-news)
+  :bind ("C-x J" . newsticker-show-news)
   :hook (newsticker-treeview-item-mode . centaur-read-mode)
   :init (setq newsticker-url-list
               '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
