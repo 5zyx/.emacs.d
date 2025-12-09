@@ -51,7 +51,8 @@
 ;; Display Flymake errors with overlays
 (use-package flyover
   :diminish
-  :hook flymake-mode)
+  :hook flymake-mode
+  :custom (flyover-checkers '(flymake)))
 
 (provide 'init-check)
 
