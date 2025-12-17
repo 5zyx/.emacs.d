@@ -34,9 +34,6 @@
   (require 'init-const)
   (require 'init-custom))
 
-(declare-function centaur-treesit-available-p "init-funcs")
-(declare-function childframe-workable-p "init-funcs")
-
 ;; ---------------------------------------------------------------------------
 ;; Code Display & Utilities
 ;; ---------------------------------------------------------------------------
@@ -53,6 +50,7 @@
 (when (centaur-treesit-available-p)
   ;; Automatic Tree-sitter grammar management
   (use-package treesit-auto
+    :functions centaur-treesit-available-p
     :hook (after-init . global-treesit-auto-mode)
     :init (setq treesit-auto-install 'prompt))
 
@@ -70,14 +68,22 @@
   (when (childframe-workable-p)
     (use-package eldoc-mouse
       :diminish
+      :functions childframe-workable-p
       :bind (:map eldoc-mouse-mode-map
              ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
-      :hook (eglot-managed-mode emacs-lisp-mode)
-      :init (setq eldoc-mouse-posframe-border-color (face-background 'posframe-border nil t))
-      :config
-      (tooltip-mode -1)                 ; Conflict with `track-mouse'
-      (add-to-list 'eldoc-mouse-posframe-override-parameters
-                   `(background-color . ,(face-background 'tooltip nil t))))))
+      :hook ((eglot-managed-mode emacs-lisp-mode)
+             (after-load-theme . eldoc-mouse-set-appearance))
+      :init
+      (defun eldoc-mouse-set-appearance ()
+        "Set appearance of eldoc-mouse."
+        (setq eldoc-mouse-posframe-override-parameters
+              `((drag-internal-border . t)
+                (foreground-color . ,(face-foreground 'tooltip nil t))
+                (background-color . ,(face-background 'tooltip nil t)))
+              eldoc-mouse-posframe-border-color
+              (face-background 'posframe-border nil t)))
+      (eldoc-mouse-set-appearance)
+      :config (tooltip-mode -1))))      ; conflict with `track-mouse'
 
 ;; Cross-referencing commands
 (use-package xref
@@ -96,7 +102,7 @@
 ;; Code styles
 (use-package editorconfig
   :diminish
-  :hook (after-init . editorconfig-mode))
+  :hook after-init)
 
 ;; Run commands quickly
 (use-package quickrun
