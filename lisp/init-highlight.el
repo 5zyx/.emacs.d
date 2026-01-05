@@ -160,15 +160,16 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight indentions
 (use-package indent-bars
   :custom
-  (indent-bars-color '(highlight :face-bg t :blend 0.225))
+  (indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.4))
+  (indent-bars-highlight-current-depth '(:face default :blend 0.4))
+  (indent-bars-pattern ".")
+  (indent-bars-width-frac 0.1)
+  (indent-bars-pad-frac 0.1)
+  (indent-bars-color-by-depth nil)
   (indent-bars-treesit-support centaur-tree-sitter)
   (indent-bars-no-descend-string t)
-  (indent-bars-treesit-ignore-blank-lines-types '("module"))
   (indent-bars-prefer-character t)
-  (indent-bars-treesit-scope '((python function_definition class_definition for_statement
-				                       if_statement with_statement while_statement)))
-  :hook (prog-mode yaml-mode)
-  :config (require 'indent-bars-ts))
+  :hook (prog-mode yaml-mode yaml-ts-mode))
 
 ;; Colorize color names in buffers
 (use-package colorful-mode
