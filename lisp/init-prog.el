@@ -1,6 +1,6 @@
 ;; init-prog.el --- Initialize programming configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -52,12 +52,7 @@
   (use-package treesit-auto
     :functions centaur-treesit-available-p
     :hook (after-init . global-treesit-auto-mode)
-    :init (setq treesit-auto-install 'prompt))
-
-  ;; Code folding using Tree-sitter
-  (use-package treesit-fold
-    :custom (treesit-fold-line-count-show t)
-    :hook (after-init . global-treesit-fold-mode)))
+    :init (setq treesit-auto-install 'prompt)))
 
 ;; Show function arglist or variable docstring
 (use-package eldoc

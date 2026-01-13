@@ -1,6 +1,6 @@
 ;; init-custom.el --- Define customizations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -76,7 +76,8 @@
   :type 'boolean)
 
 (defcustom centaur-use-exec-path-from-shell
-  (or (memq window-system '(mac ns x)) (daemonp))
+  (and (or (memq window-system '(mac ns x)) (daemonp))
+       (not (bound-and-true-p ns-emacs-plus-version)))
   "Use `exec-path-from-shell' or not.
 If using emacs-plus with path ejection, set to nil."
   :group 'centaur

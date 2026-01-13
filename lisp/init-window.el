@@ -1,6 +1,6 @@
 ;; init-window.el --- Initialize window configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -96,7 +96,6 @@
          ("C-c w" . ace-window-hydra/body)
          ("C-x |" . split-window-horizontally-instead)
          ("C-x _" . split-window-vertically-instead))
-  :hook (emacs-startup . ace-window-display-mode)
   :config
   (defun toggle-window-split ()
     (interactive)
@@ -125,27 +124,7 @@
       (user-error "`toggle-window-split' only supports two windows")))
 
   ;; Bind hydra to dispatch list
-  (add-to-list 'aw-dispatch-alist '(?w ace-window-hydra/body) t)
-
-  ;; Select widnow via `M-1'...`M-9'
-  (defun aw--select-window (number)
-    "Slecet the specified window."
-    (when (numberp number)
-      (let ((found nil))
-        (dolist (win (aw-window-list))
-          (when (and (window-live-p win)
-                     (eq number
-                         (string-to-number
-                          (window-parameter win 'ace-window-path))))
-            (setq found t)
-            (aw-switch-to-window win)))
-        (unless found
-          (message "No specified window: %d" number)))))
-  (dotimes (n 9)
-    (bind-key (format "M-%d" (1+ n))
-              (lambda ()
-                (interactive)
-                (aw--select-window (1+ n))))))
+  (add-to-list 'aw-dispatch-alist '(?w ace-window-hydra/body) t))
 
 ;; Enforce rules for popups
 (use-package popper
