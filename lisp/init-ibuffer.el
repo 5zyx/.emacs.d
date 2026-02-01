@@ -1,6 +1,6 @@
 ;; init-buffer.el --- Initialize ibuffer configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -40,7 +40,7 @@
 
 ;; Display icons for buffers
 (use-package nerd-icons-ibuffer
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+  :hook ibuffer-mode
   :init (setq nerd-icons-ibuffer-icon centaur-icon))
 
 ;; Group ibuffer's list by project

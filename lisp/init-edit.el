@@ -1,6 +1,6 @@
 ;; init-edit.el --- Initialize editing configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -167,12 +167,12 @@
 (use-package aggressive-indent
   :diminish
   :autoload aggressive-indent-mode
-  :functions too-long-file-p
+  :functions file-too-long-p
   :hook ((after-init . global-aggressive-indent-mode)
          ;; NOTE: Disable in large files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()
-                        (when (too-long-file-p)
+                        (when (file-too-long-p)
                           (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
@@ -238,7 +238,6 @@
 
 ;; Automatic parenthesis pairing
 (use-package elec-pair
-  :ensure nil
   :hook (after-init . electric-pair-mode)
   :init (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
@@ -247,17 +246,15 @@
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :defines desktop-minor-mode-table
-  :bind (("C-;" . iedit-mode)
+  :bind (:map global-map
+         ("C-;" . iedit-mode)
          ("C-x r RET" . iedit-rectangle-mode)
-         :map isearch-mode-map ("C-;" . iedit-mode-from-isearch)
-         :map esc-map ("C-;" . iedit-execute-last-modification)
-         :map help-map ("C-;" . iedit-mode-toggle-on-function))
-  :config
-  ;; Avoid restoring `iedit-mode'
-  (with-eval-after-load 'desktop
-    (add-to-list 'desktop-minor-mode-table
-                 '(iedit-mode nil))))
+         :map isearch-mode-map
+         ("C-;" . iedit-mode-from-isearch)
+         :map esc-map
+         ("C-;" . iedit-execute-last-modification)
+         :map help-map
+         ("C-;" . iedit-mode-toggle-on-function)))
 
 ;; Increase selected region by semantic units
 (use-package expand-region
@@ -323,11 +320,12 @@
   :ensure nil
   :diminish
   :if (executable-find "aspell")
-  :hook (((text-mode outline-mode) . flyspell-mode)
-         (prog-mode . flyspell-prog-mode)
-         (flyspell-mode . (lambda ()
-                            (dolist (key '("C-;" "C-," "C-."))
-                              (unbind-key key flyspell-mode-map)))))
+  :bind (:map flyspell-mode-map
+         ("C-;" . nil)
+         ("C-," . nil)
+         ("C-." . nil))
+  :hook ((text-mode outline-mode)
+         (prog-mode . flyspell-prog-mode))
   :init (setq flyspell-issue-message-flag nil
               flyspell-issue-welcome-flag nil
               ispell-program-name "aspell"
@@ -359,8 +357,7 @@
 (use-package subword
   :ensure nil
   :diminish
-  :hook ((prog-mode . subword-mode)
-         (minibuffer-setup . subword-mode)))
+  :hook (prog-mode minibuffer-setup))
 
 ;; Flexible text folding
 (use-package hideshow

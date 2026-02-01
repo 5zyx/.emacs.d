@@ -1,6 +1,6 @@
 ;; init-utils.el --- Initialize ultilities.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -66,7 +66,7 @@
   (which-key-add-key-based-replacements "C-x t" "tab & treemacs")
   (which-key-add-key-based-replacements "C-x w" "window & highlight")
   (which-key-add-key-based-replacements "C-x w ^" "window")
-  (which-key-add-key-based-replacements "C-x x" "buffer")
+
   (which-key-add-key-based-replacements "C-x C-a" "edebug")
   (which-key-add-key-based-replacements "C-x RET" "coding-system")
   (which-key-add-key-based-replacements "C-x X" "edebug")
@@ -105,23 +105,20 @@
   (which-key-add-major-mode-key-based-replacements 'gfm-mode
     "C-c C-t" "markdown-header")
   (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-x" "markdown-toggle")
+    "C-c C-x" "markdown-toggle"))
 
-  (when (childframe-completion-workable-p)
-    (use-package which-key-posframe
-      :diminish
-      :autoload which-key-posframe-mode
-      :defines posframe-border-width
-      :functions posframe-poshandler-frame-center-near-bottom
-      :custom-face
-      (which-key-posframe ((t (:inherit tooltip))))
-      (which-key-posframe-border ((t (:inherit posframe-border :background unspecified))))
-      :init
-      (setq which-key-posframe-border-width posframe-border-width
-            which-key-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
-            which-key-posframe-parameters '((left-fringe . 8)
-                                            (right-fringe . 8)))
-      (which-key-posframe-mode 1))))
+(when (childframe-completion-workable-p)
+  (use-package which-key-posframe
+    :diminish
+    :defines posframe-border-width
+    :custom-face
+    (which-key-posframe-border ((t (:inherit posframe-border :background unspecified))))
+    :hook which-key-mode
+    :init
+    (setq which-key-posframe-border-width posframe-border-width
+          which-key-posframe-poshandler 'posframe-poshandler-frame-center-near-bottom
+          which-key-posframe-parameters '((left-fringe . 8)
+                                          (right-fringe . 8)))))
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
@@ -155,9 +152,8 @@
 
 ;; Writable `grep' buffer
 (use-package wgrep
-  :init
-  (setq wgrep-auto-save-buffer t
-        wgrep-change-readonly-file t))
+  :init (setq wgrep-auto-save-buffer t
+              wgrep-change-readonly-file t))
 
 ;; Fast search tool `ripgrep'
 (use-package rg
@@ -285,63 +281,10 @@
   :init (setq ztree-draw-unicode-lines t
               ztree-show-number-of-children t))
 
-;; A suite of opinionated Transient UIs
-(when emacs/>=29p
-  (use-package casual-suite
-    :bind ((:map global-map
-            ("C-'" . casual-avy-tmenu)
-            ("C-o" . casual-editkit-main-tmenu))
-           (:map bookmark-bmenu-mode-map
-            ("C-o" . casual-bookmarks-tmenu))
-           (:map calc-mode-map
-            ("C-o" . casual-calc-tmenu))
-           (:map dired-mode-map
-            ("C-o" . casual-dired-tmenu))
-           (:map isearch-mode-map
-            ("C-o" . casual-isearch-tmenu))
-           (:map Info-mode-map
-            ("C-o" . casual-info-tmenu)))
-    :init
-    (with-no-warnings
-      (with-eval-after-load 'ibuffer
-        (bind-keys :map ibuffer-mode-map
-          ("C-o" . casual-ibuffer-tmenu)
-          ("F" . casual-ibuffer-filter-tmenu)
-          ("s" . casual-ibuffer-sortby-tmenu)))
-
-      (with-eval-after-load 're-builder
-        (bind-keys :map reb-mode-map
-          ("C-o" . casual-re-builder-tmenu))
-        (bind-keys :map reb-lisp-mode-map
-          ("C-o" . casual-re-builder-tmenu)))
-
-      (with-eval-after-load 'symbol-overlay
-        (bind-keys :map symbol-overlay-map
-          ("C-o" . casual-symbol-overlay-tmenu)))
-
-      (with-eval-after-load 'org-agenda
-        (bind-keys :map org-agenda-mode-map
-          ("C-o" . casual-agenda-tmenu))))))
-
 ;; Misc
-(use-package disk-usage)
-(use-package memory-usage)
+(use-package file-info
+  :bind ("C-c c i" . file-info-show))
 (use-package reveal-in-folder)
-
-(use-package list-environment
-  :init
-  (with-no-warnings
-    (defun my-list-environment-entries ()
-      "Generate environment variable entries list for tabulated-list."
-      (mapcar (lambda (env)
-                (let* ((kv (split-string env "="))
-                       (key (car kv))
-                       (val (mapconcat #'identity (cdr kv) "=")))
-                  (list key (vector
-                             `(,key face font-lock-keyword-face)
-                             `(,val face font-lock-string-face)))))
-              process-environment))
-    (advice-add #'list-environment-entries :override #'my-list-environment-entries)))
 
 (provide 'init-utils)
 

@@ -1,6 +1,6 @@
 ;; init-elixir.el --- Initialize elixir configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2025 N.Ahmet BASTUG
+;; Copyright (C) 2019-2026 N.Ahmet BASTUG
 
 ;; Author: N.Ahmet BASTUG <bastugn@itu.edu.tr>
 ;; URL: https://github.com/kosantosbik/.emacs.d
@@ -30,14 +30,25 @@
 
 ;;; Code:
 
-(use-package elixir-mode
-  :config
+(defun elixir-auto-config ()
+  "Configure elixir automatically."
   (use-package alchemist
     :diminish (alchemist-mode alchemist-phoenix-mode)
-    :hook (((elixir-mode elixir-ts-mode) . alchemist-mode)
+    :hook ((elixir-mode elixir-ts-mode)
            (alchemist-mode . alchemist-phoenix-mode))))
 
-(provide 'init-elixir)
+(if (centaur-treesit-available-p)
+    (use-package elixir-ts-mode
+      :functions centaur-treesit-available-p
+      :mode (("\\.elixir\\'" . elixir-ts-mode)
+             ("\\.ex\\'"     . elixir-ts-mode)
+             ("\\.exs\\'"    . elixir-ts-mode)
+             ("mix\\.lock"   . elixir-ts-mode))
+      :config (elixir-auto-config))
+  (use-package elixir-mode
+    :config (elixir-auto-config)))
+
+  (provide 'init-elixir)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-elixir.el ends here

@@ -1,6 +1,6 @@
 ;; init-base.el --- Better default configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -84,10 +84,9 @@
 (use-package gcmh
   :diminish
   :hook (emacs-startup . gcmh-mode)
-  :init
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x1000000)) ; 16MB
+  :init (setq gcmh-idle-delay 'auto
+              gcmh-auto-idle-delay-factor 10
+              gcmh-high-cons-threshold #x4000000)) ; 64MB
 
 ;; Set UTF-8 as the default coding system
 (when (fboundp 'set-charset-priority)
@@ -109,8 +108,7 @@
   (set-selection-coding-system 'utf-8))
 
 ;; Environment
-(when (and centaur-use-exec-path-from-shell
-           (or (memq window-system '(mac ns x)) (daemonp)))
+(when centaur-use-exec-path-from-shell
   (use-package exec-path-from-shell
     :commands exec-path-from-shell-initialize
     :custom (exec-path-from-shell-arguments '("-l"))
@@ -153,6 +151,7 @@
 
 ;; Misc.
 (use-package simple
+  :diminish visual-line-mode
   :ensure nil
   :hook ((after-init . size-indication-mode)
          (text-mode . visual-line-mode)
@@ -218,8 +217,9 @@
       sentence-end-double-space nil
       word-wrap-by-category t)
 
-;; Async
+;; Asynchronous processing
 (use-package async
+  :diminish (async-bytecomp-package-mode dired-async-mode)
   :functions (async-bytecomp-package-mode dired-async-mode)
   :init
   (unless sys/win32p

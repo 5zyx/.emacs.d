@@ -1,6 +1,6 @@
 ;; init-const.el --- Define constants.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -96,8 +96,7 @@ Loaded by `org-babel-load-file'.")
   "Emacs is 29 or above.")
 
 (defconst emacs/>=29.2p
-  (and (>= emacs-major-version 29)
-       (>= emacs-minor-version 2))
+  (version<= "29.2" emacs-version)
   "Emacs is 29.2 or above.")
 
 (defconst emacs/>=30p

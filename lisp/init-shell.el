@@ -1,6 +1,6 @@
 ;; init-shell.el --- Initialize shell configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -179,7 +179,8 @@
                    :min-height height
                    :internal-border-width 3
                    :internal-border-color (face-background 'region nil t)
-                   :background-color (face-background 'tooltip nil t)
+                   :background-color (face-background 'default nil t)
+                   :foreground-color (face-foreground 'default nil t)
                    :override-parameters '((cursor-type . t))
                    :respect-mode-line t
                    :accept-focus t))

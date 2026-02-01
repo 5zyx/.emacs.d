@@ -1,6 +1,6 @@
 ;; init-dashboard.el --- Initialize dashboard configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2025 Vincent Zhang
+;; Copyright (C) 2018-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -216,9 +216,13 @@
           (tabspaces-switch-or-create-workspace tabspaces-default-tab)))
 
       ;; Recover layout
-      (and dashboard-recover-layout-p
-           (and (bound-and-true-p winner-mode) (winner-undo))
-           (setq dashboard-recover-layout-p nil)))))
+      (when dashboard-recover-layout-p
+        (cond
+         ((bound-and-true-p tab-bar-history-mode)
+          (tab-bar-history-back))
+         ((bound-and-true-p winner-mode)
+          (winner-undo)))
+        (setq dashboard-recover-layout-p nil)))))
 
 (provide 'init-dashboard)
 

@@ -1,6 +1,6 @@
 ;; init-docker.el --- Initialize docker configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2025 Vincent Zhang
+;; Copyright (C) 2019-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -34,17 +34,25 @@
   (require 'init-const))
 
 ;; Docker
-(use-package docker
-  :defines docker-image-run-arguments
-  :bind ("C-c D" . docker)
-  :init (setq docker-image-run-arguments '("-i" "-t" "--rm")
-              docker-container-shell-file-name "/bin/bash"))
+(unless sys/win32p
+  (use-package docker
+    :custom (docker-container-shell-file-name "/bin/bash")
+    :bind ("C-c D" . docker))
 
+<<<<<<< HEAD
 ;;`tramp-container' is builtin since 29
 (unless emacs/>=29p
   (use-package tramp-container))
+=======
+  ;;`tramp-container' is builtin since 29
+  (unless emacs/>=29p
+    (use-package docker-tramp)))
+>>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 
-(use-package dockerfile-mode)
+(unless (and (centaur-treesit-available-p)
+             (fboundp 'dockerfile-ts-mode))
+  (use-package dockerfile-mode
+    :functions centaur-treesit-available-p))
 
 (provide 'init-docker)
 

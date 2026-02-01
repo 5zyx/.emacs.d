@@ -1,6 +1,6 @@
 ;; init-org.el --- Initialize Org configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -232,7 +232,7 @@ prepended to the element after the #+HEADER: tag."
 ;; Auto-toggle Org elements
 (use-package org-appear
   :diminish
-  :hook (org-mode . org-appear-mode)
+  :hook org-mode
   :custom
   (org-appear-autoentities t)
   (org-appear-autokeywords t)
@@ -245,7 +245,7 @@ prepended to the element after the #+HEADER: tag."
 ;; Table of contents
 (use-package toc-org
   :diminish
-  :hook (org-mode . toc-org-mode))
+  :hook org-mode)
 
 ;; Preview
 (use-package org-preview-html
@@ -267,6 +267,7 @@ prepended to the element after the #+HEADER: tag."
   (use-package org-tree-slide
     :after org
     :diminish
+    :defines org-tree-slide-mode-map
     :bind (:map org-mode-map
            ("s-<f7>" . org-tree-slide-mode)
            :map org-tree-slide-mode-map
@@ -274,7 +275,7 @@ prepended to the element after the #+HEADER: tag."
            ("<right>" . org-tree-slide-move-next-tree)
            ("S-SPC" . org-tree-slide-move-previous-tree)
            ("SPC" . org-tree-slide-move-next-tree))
-    :init (setq org-tree-slide-skip-outline-level 3)))
+    :custom (org-tree-slide-skip-outline-level 3)))
 
 ;; Pomodoro
 (use-package org-pomodoro
@@ -295,7 +296,7 @@ prepended to the element after the #+HEADER: tag."
 (when (and (fboundp 'sqlite-available-p) (sqlite-available-p))
   (use-package org-roam
     :diminish
-    :functions centaur-browse-url org-roam-db-autosync-enable
+    :functions centaur-browse-url org-roam-db-autosync-mode
     :defines org-roam-graph-viewer
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
@@ -312,7 +313,8 @@ prepended to the element after the #+HEADER: tag."
       (make-directory org-roam-directory))
     (add-to-list 'org-agenda-files org-roam-directory)
 
-    (org-roam-db-autosync-enable))
+    ;; Keep Org-roam session automatically synchronized
+    (org-roam-db-autosync-mode))
 
   (use-package org-roam-ui
     :bind ("C-c n u" . org-roam-ui-mode)

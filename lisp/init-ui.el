@@ -1,6 +1,6 @@
 ;; init-ui.el --- Better lookings and appearances.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -33,10 +33,6 @@
 (eval-when-compile
   (require 'init-const)
   (require 'init-custom))
-
-(declare-function childframe-completion-workable-p "init-funcs")
-(declare-function centaur-compatible-theme-p "init-funcs")
-(declare-function refresh-ns-appearance "init-ui")
 
 ;; Optimization
 (setq idle-update-delay 1.0)
@@ -91,28 +87,25 @@
     (progn
       ;; Make certain buffers grossly incandescent
       (use-package solaire-mode
-        :hook (after-init . solaire-global-mode))
+        :functions (centaur-compatible-theme-p refresh-ns-appearance)
+        :commands solaire-global-mode
+        :init (solaire-global-mode 1))
 
       ;; Excellent themes
       (use-package doom-themes
         :functions centaur-load-theme doom-themes-visual-bell-config
-        :custom
-        (doom-themes-enable-bold t)
-        (doom-themes-enable-italic t)
         :init (centaur-load-theme centaur-theme t)
-        :config
-        ;; Enable flashing mode-line on errors
-        (doom-themes-visual-bell-config)))
+        :config (doom-themes-visual-bell-config)))
   (progn
     (warn "The current theme may be incompatible!")
     (centaur-load-theme centaur-theme t)))
 
 ;; Mode-line
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :init
-  (setq doom-modeline-icon centaur-icon
-        doom-modeline-minor-modes t)
+  :custom
+  (doom-modeline-icon centaur-icon)
+  (doom-modeline-minor-modes t)
+  :hook after-init
   :bind (:map doom-modeline-mode-map
          ("C-<f6>" . doom-modeline-hydra/body))
   :pretty-hydra
@@ -125,7 +118,7 @@
       "unicode fallback" :toggle doom-modeline-unicode-fallback)
      ("m" (setq doom-modeline-major-mode-icon (not doom-modeline-major-mode-icon))
       "major mode" :toggle doom-modeline-major-mode-icon)
-     ("c" (setq doom-modeline-major-mode-color-icon (not doom-modeline-major-mode-color-icon))
+     ("l" (setq doom-modeline-major-mode-color-icon (not doom-modeline-major-mode-color-icon))
       "colorful major mode" :toggle doom-modeline-major-mode-color-icon)
      ("s" (setq doom-modeline-buffer-state-icon (not doom-modeline-buffer-state-icon))
       "buffer state" :toggle doom-modeline-buffer-state-icon)
@@ -162,10 +155,6 @@
       "irc" :toggle doom-modeline-irc)
      ("g f" (setq doom-modeline-irc-buffers (not doom-modeline-irc-buffers))
       "irc buffers" :toggle doom-modeline-irc-buffers)
-     ("g s" (progn
-              (setq doom-modeline-check-simple-format (not doom-modeline-check-simple-format))
-              (and (bound-and-true-p flycheck-mode) (flycheck-buffer)))
-      "simple check format" :toggle doom-modeline-check-simple-format)
      ("g t" (setq doom-modeline-time (not doom-modeline-time))
       "time" :toggle doom-modeline-time)
      ("g v" (setq doom-modeline-env-version (not doom-modeline-env-version))
@@ -210,7 +199,16 @@
      ("r t" (setq doom-modeline-buffer-file-name-style 'relative-to-project)
       "relative to project"
       :toggle (eq doom-modeline-buffer-file-name-style 'relative-to-project)))
-    "Project Detection"
+    "Check"
+    (("c a" (setq doom-modeline-check 'auto)
+      "auto" :toggle (eq doom-modeline-check 'auto))
+     ("c f" (setq doom-modeline-check 'full)
+      "full" :toggle (eq doom-modeline-check 'full))
+     ("c s" (setq doom-modeline-check 'simple)
+      "simple" :toggle (eq doom-modeline-check 'simple))
+     ("c d" (setq doom-modeline-check nil)
+      "disable" :toggle (eq doom-modeline-check nil)))
+    "Project"
     (("p a" (setq doom-modeline-project-detection 'auto)
       "auto"
       :toggle (eq doom-modeline-project-detection 'auto))
@@ -223,7 +221,7 @@
      ("p p" (setq doom-modeline-project-detection 'project)
       "project"
       :toggle (eq doom-modeline-project-detection 'project))
-     ("p n" (setq doom-modeline-project-detection nil)
+     ("p d" (setq doom-modeline-project-detection nil)
       "disable"
       :toggle (eq doom-modeline-project-detection nil)))
     "Misc"
@@ -232,10 +230,8 @@
             (run-with-timer 300 nil #'doom-modeline--github-fetch-notifications)
             (browse-url "https://github.com/notifications"))
       "github notifications" :exit t)
-     ("e" (cond ((bound-and-true-p flycheck-mode)
-                 (flycheck-list-errors))
-                ((bound-and-true-p flymake-mode)
-                 (flymake-show-diagnostics-buffer)))
+     ("e" (and (bound-and-true-p flymake-mode)
+               (flymake-show-diagnostics-buffer))
       "list errors" :exit t)
      ("w" (if (bound-and-true-p grip-mode)
               (grip-browse-preview)
@@ -251,7 +247,6 @@
       "set gnus interval" :exit t)))))
 
 (use-package hide-mode-line
-  :autoload turn-off-hide-mode-line-mode
   :hook (((eat-mode
            eshell-mode shell-mode
            term-mode vterm-mode
@@ -260,7 +255,7 @@
 
 ;; A minor-mode menu for mode-line
 (use-package minions
-  :hook (after-init . minions-mode))
+  :hook after-init)
 
 ;; Icons
 (use-package nerd-icons
@@ -327,16 +322,6 @@
       mouse-wheel-scroll-amount-horizontal 1
       mouse-wheel-progressive-speed nil)
 
-;; Smooth scrolling
-(when (fboundp 'pixel-scroll-precision-mode) ;; 29+
-  (use-package ultra-scroll
-    :functions (hl-todo-mode diff-hl-flydiff-mode)
-    :hook (after-init . ultra-scroll-mode)
-    :config
-    (add-hook 'ultra-scroll-hide-functions #'diff-hl-flydiff-mode)
-    (add-hook 'ultra-scroll-hide-functions #'hl-todo-mode)
-    (add-hook 'ultra-scroll-hide-functions #'jit-lock-mode)))
-
 ;; Use fixed pitch where it's sensible
 (use-package mixed-pitch :diminish)
 
@@ -353,13 +338,12 @@
   (use-package transient-posframe
     :diminish
     :defines posframe-border-width
+    :functions childframe-completion-workable-p
     :custom-face
-    (transient-posframe ((t (:inherit tooltip))))
     (transient-posframe-border ((t (:inherit posframe-border :background unspecified))))
-    :hook (after-init . transient-posframe-mode)
+    :hook after-init
     :init (setq transient-mode-line-format nil
                 transient-posframe-border-width posframe-border-width
-                transient-posframe-poshandler 'posframe-poshandler-frame-center
                 transient-posframe-parameters '((left-fringe . 8)
                                                 (right-fringe . 8)))))
 

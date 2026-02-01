@@ -1,6 +1,6 @@
 ;;; early-init.el --- Early initialization. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2025 Vincent Zhang
+;; Copyright (C) 2019-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -32,13 +32,22 @@
 ;;; Code:
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold most-positive-fixnum)
+(if noninteractive  ; in CLI sessions
+    (setq gc-cons-threshold #x8000000   ; 128MB
+          ;; Backport from 29 (see emacs-mirror/emacs@73a384a98698)
+          gc-cons-percentage 1.0)
+  (setq gc-cons-threshold most-positive-fixnum))
 
 ;; Prevent unwanted runtime compilation for gccemacs (native-comp) users;
 ;; packages are compiled ahead-of-time when they are installed and site files
 ;; are compiled when gccemacs is installed.
 (setq native-comp-deferred-compilation nil ;; obsolete since 29.1
       native-comp-jit-compilation nil)
+
+;; To speedup the Emacs windows, reducing the count on searching `load-path'
+(when (eq system-type 'windows-nt)
+  (setq load-suffixes '(".elc" ".el")) ;; to avoid searching .so/.dll
+  (setq load-file-rep-suffixes '(""))) ;; to avoid searching *.gz
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
@@ -54,72 +63,9 @@
 ;; to skip the mtime checks on every *.elc file.
 (setq load-prefer-newer noninteractive)
 
-;; Explicitly set the prefered coding systems to avoid annoying prompt
+;; Explicitly set the preferred coding systems to avoid annoying prompt
 ;; from emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)
-
-;; To speedup the Emacs windows, reducing the count on searching `load-path'
-;; is significant, there're ways to do that:
-;;  1. (setq load-suffixes '(".elc" ".el")) ;; to avoid searching .so/.dll
-;;  2. (setq load-file-rep-suffixes '(""))  ;; to avoid searching *.gz
-;;  3. Use the load-hints in https://mail.gnu.org/archive/html/bug-gnu-emacs/2024-10/msg00905.html
-;;  4. Combin the packages into one directory.
-;; This code slice can make the package.el to install packages in the package-user-dir/"all" to speedup Emacs:
-(when (eq system-type 'windows-nt)
-  (setq load-suffixes '(".elc" ".el"))
-  (setq load-file-rep-suffixes '(""))
-
-  (defun package-user-all-dir ()
-    (file-name-concat package-user-dir "all"))
-
-  (define-advice package-unpack (:around (ofun pkg-desc) ADV)
-    (let ((pkg-dir (funcall ofun pkg-desc)))
-      (when-let* (pkg-dir
-                  (pkg-file (format "%s-pkg.el" (package-desc-name pkg-desc)))
-                  (files (seq-difference (directory-files pkg-dir)
-                                         '("." "..") 'string=))
-                  (target-dir (file-name-as-directory (package-user-all-dir))))
-        (make-directory target-dir t)
-        (unless (seq-intersection files (directory-files target-dir) #'string=)
-          (with-current-buffer (find-file-noselect (file-name-concat pkg-dir pkg-file))
-            (goto-char (point-max))
-            (when (re-search-backward ")" nil t)
-              (newline-and-indent)
-              (insert (format ":files '%S" (remove pkg-file files)))
-              (save-buffer))
-            (kill-buffer))
-          (dolist (file files)
-            (rename-file (expand-file-name file pkg-dir) target-dir))
-          (delete-directory pkg-dir)
-          (setf (package-desc-dir (car (alist-get (package-desc-name pkg-desc)
-                                                  package-alist)))
-                target-dir)
-          (setq pkg-dir target-dir)))
-      pkg-dir))
-
-  (define-advice package-load-all-descriptors (:after () ADV)
-    (when-let* ((pkg-dir (package-user-all-dir))
-                ((file-directory-p pkg-dir)))
-      (dolist (pkg-file (directory-files pkg-dir t ".*-pkg.el"))
-        (cl-letf (((symbol-function 'package--description-file)
-                   (lambda (_) pkg-file)))
-          (package-load-descriptor pkg-dir)))))
-
-  (define-advice package-delete (:around (ofun pkg-desc &optional force nosave) ADV)
-    (if (string-prefix-p (package-user-all-dir)
-                         (package-desc-dir pkg-desc))
-        (cl-letf* ((default-directory (package-user-all-dir))
-                   (pkg-file (format "%s-pkg.el" (package-desc-name pkg-desc)))
-                   ((symbol-function 'package--delete-directory)
-                    (lambda (x)
-                      (with-current-buffer (find-file-noselect pkg-file)
-                        (goto-char (point-min))
-                        (when (re-search-forward ":files '\\((.*)\\)" nil t)
-                          (dolist (file (read (match-string 1)))
-                            (delete-file file))))
-                      (delete-file pkg-file))))
-          (funcall ofun pkg-desc force nosave))
-      (funcall ofun pkg-desc force nosave))))
 
 ;; Inhibit resizing frame
 (setq frame-inhibit-implied-resize t)
@@ -133,11 +79,16 @@
   (push '(ns-appearance . dark) default-frame-alist))
 
 ;; Prevent flash of unstyled mode line
-(setq mode-line-format nil)
+(setq-default mode-line-format nil)
 
-;; For LSP performance
-;; @see https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setenv "LSP_USE_PLISTS" "true")
+;; PATH and other environment variables injection
+;; To avoid loading `exec-path-from-shell' for better performance
+(when-let ((env-file (expand-file-name "env.el" user-emacs-directory))
+           (env-example-file (expand-file-name "env-example.el" user-emacs-directory)))
+  (when (and (not (file-exists-p env-file))
+             (file-exists-p env-example-file))
+    (copy-file env-example-file env-file))
+  (load env-file 'noerror))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; early-init.el ends here

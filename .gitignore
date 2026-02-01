@@ -38,6 +38,7 @@
 =======
 /custom-post.el
 /custom.el
+/env.el
 /gt-known-words.txt
 >>>>>>> update_stream/master
 /history
@@ -53,6 +54,7 @@
 /smex-items
 /tramp
 README.html
+.agent-shell/
 anaconda-mode/
 auto-save-list/
 cnfonts/
@@ -82,7 +84,11 @@ rust-playground/
 server/
 session*
 snippets/
+<<<<<<< HEAD
 site-lisp/
+=======
+tabspaces/
+>>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 templates/
 thumbs/
 tldr/

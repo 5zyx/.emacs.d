@@ -1,6 +1,6 @@
 ;; init-prog.el --- Initialize programming configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2025 Vincent Zhang
+;; Copyright (C) 2006-2026 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -34,9 +34,6 @@
   (require 'init-const)
   (require 'init-custom))
 
-(declare-function centaur-treesit-available-p "init-funcs")
-(declare-function childframe-workable-p "init-funcs")
-
 ;; ---------------------------------------------------------------------------
 ;; Code Display & Utilities
 ;; ---------------------------------------------------------------------------
@@ -53,14 +50,9 @@
 (when (centaur-treesit-available-p)
   ;; Automatic Tree-sitter grammar management
   (use-package treesit-auto
+    :functions centaur-treesit-available-p
     :hook (after-init . global-treesit-auto-mode)
-    :init (setq treesit-auto-install 'prompt))
-
-  ;; Code folding indicators using Tree-sitter
-  (use-package treesit-fold-indicators
-    :ensure treesit-fold
-    :hook (after-init . global-treesit-fold-indicators-mode)
-    :init (setq treesit-fold-indicators-priority -1)))
+    :init (setq treesit-auto-install 'prompt)))
 
 ;; Show function arglist or variable docstring
 (use-package eldoc
@@ -68,28 +60,24 @@
   :diminish
   :config
   (when (childframe-workable-p)
-    (if emacs/>=30p
-        (use-package eldoc-mouse
-          :diminish
-          :bind (:map eldoc-mouse-mode-map
-                 ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
-          :hook (eglot-managed-mode emacs-lisp-mode)
-          :init (setq eldoc-mouse-posframe-border-color (face-background 'posframe-border nil t))
-          :config (add-to-list 'eldoc-mouse-posframe-override-parameters
-                               `(background-color . ,(face-background 'tooltip nil t))))
-      (use-package eldoc-box
-        :custom
-        (eldoc-box-lighter nil)
-        (eldoc-box-only-multi-line t)
-        (eldoc-box-clear-with-C-g t)
-        :custom-face
-        (eldoc-box-border ((t (:inherit posframe-border :background unspecified))))
-        (eldoc-box-body ((t (:inherit tooltip))))
-        :hook ((eglot-managed-mode . eldoc-box-mouse-mode))
-        :config
-        ;; Prettify `eldoc-box' frame
-        (setf (alist-get 'left-fringe eldoc-box-frame-parameters) 8
-              (alist-get 'right-fringe eldoc-box-frame-parameters) 8)))))
+    (use-package eldoc-mouse
+      :diminish
+      :functions childframe-workable-p
+      :bind (:map eldoc-mouse-mode-map
+             ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
+      :hook ((eglot-managed-mode emacs-lisp-mode)
+             (after-load-theme . eldoc-mouse-set-appearance))
+      :init
+      (defun eldoc-mouse-set-appearance ()
+        "Set appearance of eldoc-mouse."
+        (setq eldoc-mouse-posframe-override-parameters
+              `((drag-internal-border . t)
+                (foreground-color . ,(face-foreground 'tooltip nil t))
+                (background-color . ,(face-background 'tooltip nil t)))
+              eldoc-mouse-posframe-border-color
+              (face-background 'posframe-border nil t)))
+      (eldoc-mouse-set-appearance)
+      :config (tooltip-mode -1))))      ; conflict with `track-mouse'
 
 ;; Cross-referencing commands
 (use-package xref
@@ -108,7 +96,12 @@
 ;; Code styles
 (use-package editorconfig
   :diminish
-  :hook (after-init . editorconfig-mode))
+  :hook after-init)
+
+;; Reformat buffer stably
+(use-package apheleia
+  :diminish
+  :hook (after-init . apheleia-global-mode))
 
 ;; Run commands quickly
 (use-package quickrun
@@ -175,15 +168,27 @@ Install the doc if it's not installed."
 (use-package csv-mode)
 (use-package cue-sheet-mode)
 (use-package dart-mode)
-(use-package julia-mode)
 (use-package lua-mode)
-(use-package mermaid-mode)
 (use-package powershell)
-(use-package scala-mode)
-(use-package swift-mode)
 (use-package v-mode)
 (use-package vimrc-mode)
-(use-package yaml-mode)
+
+(if (centaur-treesit-available-p)
+    (progn
+      (use-package julia-ts-mode)
+      (use-package mermaid-ts-mode
+        :mode ("\\.mmd\\'" . mermaid-ts-mode))
+      (use-package scala-ts-mode)
+      (use-package swift-ts-mode
+        :mode ("\\.swift\\'" . swift-ts-mode))
+      (use-package yaml-ts-mode
+        :mode ("\\.ya?ml\\'" . yaml-ts-mode)))
+  (progn
+    (use-package julia-mode)
+    (use-package mermaid-mode)
+    (use-package scala-mode)
+    (use-package swift-mode)
+    (use-package yaml-mode)))
 
 ;; Protobuf mode configuration
 (use-package protobuf-mode
