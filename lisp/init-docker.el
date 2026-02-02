@@ -39,15 +39,9 @@
     :custom (docker-container-shell-file-name "/bin/bash")
     :bind ("C-c D" . docker))
 
-<<<<<<< HEAD
-;;`tramp-container' is builtin since 29
-(unless emacs/>=29p
-  (use-package tramp-container))
-=======
   ;;`tramp-container' is builtin since 29
   (unless emacs/>=29p
     (use-package docker-tramp)))
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 
 (unless (and (centaur-treesit-available-p)
              (fboundp 'dockerfile-ts-mode))
