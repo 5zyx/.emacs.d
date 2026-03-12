@@ -36,89 +36,87 @@
 ;; Display available keybindings in popup
 (use-package which-key
   :diminish
-  :functions childframe-completion-workable-p
   :bind ("C-h M-m" . which-key-show-major-mode)
   :hook (after-init . which-key-mode)
   :init (setq which-key-max-description-length 30
               which-key-lighter nil
               which-key-show-remaining-keys t)
   :config
-  (which-key-add-key-based-replacements "M-s h" "highlight")
-  (which-key-add-key-based-replacements "M-s s" "symbol-overlay")
+  ;; Key prefix descriptions
+  (dolist (map '(("M-s h" . "highlight")
+                 ("M-s s" . "symbol-overlay")
+                 ("C-c &" . "yasnippet")
+                 ("C-c @" . "hideshow")
+                 ("C-c c" . "consult")
+                 ("C-c d" . "dict")
+                 ("C-c l" . "link-hint")
+                 ("C-c n" . "org-roam")
+                 ("C-c o" . "org")
+                 ("C-c t" . "hl-todo")
+                 ("C-c C-a" . "activities")
+                 ("C-c C-z" . "browse")
+                 ("C-x 8" . "unicode")
+                 ("C-x 8 e" . "emoji")
+                 ("C-x @" . "modifior")
+                 ("C-x a" . "abbrev")
+                 ("C-x c" . "colorful")
+                 ("C-x n" . "narrow")
+                 ("C-x p" . "project")
+                 ("C-x r" . "rect & bookmark")
+                 ("C-x t" . "tab & treemacs")
+                 ("C-x w" . "window & highlight")
+                 ("C-x w ^" . "window")
+                 ("C-x C-a" . "edebug")
+                 ("C-x RET" . "coding-system")
+                 ("C-x X" . "edebug")
+                 ("C-x v b" . "vc-branch")
+                 ("C-x v M" . "vc-mergebase")))
+    (which-key-add-key-based-replacements (car map) (cdr map)))
 
-  (which-key-add-key-based-replacements "C-c &" "yasnippet")
-  (which-key-add-key-based-replacements "C-c @" "hideshow")
-  (which-key-add-key-based-replacements "C-c c" "consult")
-  (which-key-add-key-based-replacements "C-c d" "dict")
-  (which-key-add-key-based-replacements "C-c l" "link-hint")
-  (which-key-add-key-based-replacements "C-c n" "org-roam")
-  (which-key-add-key-based-replacements "C-c t" "hl-todo")
-  (which-key-add-key-based-replacements "C-c C-z" "browse")
+  ;; Mode-specific key replacements
+  (dolist (mode-map '((org-mode
+                       ("C-c \"" . "org-plot")
+                       ("C-c C-v" . "org-babel")
+                       ("C-c C-x" . "org-misc"))
+                      (python-mode
+                       ("C-c C-t" . "python-skeleton"))
+                      (markdown-mode
+                       ("C-c C-a" . "markdown-link")
+                       ("C-c C-c" . "markdown-command")
+                       ("C-c C-s" . "markdown-style")
+                       ("C-c C-t" . "markdown-header")
+                       ("C-c C-x" . "markdown-toggle"))
+                      (gfm-mode
+                       ("C-c C-a" . "markdown-link")
+                       ("C-c C-c" . "markdown-command")
+                       ("C-c C-s" . "markdown-style")
+                       ("C-c C-t" . "markdown-header")
+                       ("C-c C-x" . "markdown-toggle"))))
+    (let ((mode (car mode-map))
+          (maps (cdr mode-map)))
+      (dolist (map maps)
+        (which-key-add-major-mode-key-based-replacements
+          mode (car map) (cdr map))))))
 
-  (which-key-add-key-based-replacements "C-x 8" "unicode")
-  (which-key-add-key-based-replacements "C-x 8 e" "emoji")
-  (which-key-add-key-based-replacements "C-x @" "modifior")
-  (which-key-add-key-based-replacements "C-x a" "abbrev")
-  (which-key-add-key-based-replacements "C-x c" "colorful")
-  (which-key-add-key-based-replacements "C-x n" "narrow")
-  (which-key-add-key-based-replacements "C-x p" "project")
-  (which-key-add-key-based-replacements "C-x r" "rect & bookmark")
-  (which-key-add-key-based-replacements "C-x t" "tab & treemacs")
-  (which-key-add-key-based-replacements "C-x w" "window & highlight")
-  (which-key-add-key-based-replacements "C-x w ^" "window")
-
-  (which-key-add-key-based-replacements "C-x C-a" "edebug")
-  (which-key-add-key-based-replacements "C-x RET" "coding-system")
-  (which-key-add-key-based-replacements "C-x X" "edebug")
-  (which-key-add-key-based-replacements "C-x v b" "vc-branch")
-  (which-key-add-key-based-replacements "C-x v M" "vc-mergebase")
-
-  (which-key-add-major-mode-key-based-replacements 'org-mode
-    "C-c \"" "org-plot")
-  (which-key-add-major-mode-key-based-replacements 'org-mode
-    "C-c C-v" "org-babel")
-  (which-key-add-major-mode-key-based-replacements 'org-mode
-    "C-c C-x" "org-misc")
-
-  (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode
-    "C-c ," "overseer")
-  (which-key-add-major-mode-key-based-replacements 'python-mode
-    "C-c C-t" "python-skeleton")
-
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c C-a" "markdown-link")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c C-c" "markdown-command")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c C-s" "markdown-style")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c C-t" "markdown-header")
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c C-x" "markdown-toggle")
-
-  (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-a" "markdown-link")
-  (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-c" "markdown-command")
-  (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-s" "markdown-style")
-  (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-t" "markdown-header")
-  (which-key-add-major-mode-key-based-replacements 'gfm-mode
-    "C-c C-x" "markdown-toggle"))
-
-(when (childframe-completion-workable-p)
-  (use-package which-key-posframe
-    :diminish
-    :defines posframe-border-width
-    :custom-face
-    (which-key-posframe-border ((t (:inherit posframe-border :background unspecified))))
-    :hook which-key-mode
-    :init
-    (setq which-key-posframe-border-width posframe-border-width
-          which-key-posframe-poshandler 'posframe-poshandler-frame-center-near-bottom
-          which-key-posframe-parameters '((left-fringe . 8)
-                                          (right-fringe . 8)))))
+;; Show 'which-key' in child frame
+(use-package which-key-posframe
+  :diminish
+  :defines posframe-border-width
+  :functions childframe-completion-workable-p
+  :commands which-key-posframe-mode
+  :custom-face
+  (which-key-posframe-border ((t (:inherit posframe-border :background unspecified))))
+  :hook ((which-key-mode server-after-make-frame)
+         .
+         (lambda ()
+           (if (childframe-completion-workable-p)
+               (which-key-posframe-mode 1)
+             (which-key-posframe-mode -1))))
+  :init
+  (setq which-key-posframe-border-width posframe-border-width
+        which-key-posframe-poshandler 'posframe-poshandler-frame-center-near-bottom
+        which-key-posframe-parameters '((left-fringe . 8)
+                                        (right-fringe . 8))))
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch

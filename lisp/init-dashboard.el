@@ -36,45 +36,20 @@
 ;; Dashboard
 (when centaur-dashboard
   (use-package dashboard
-    :diminish dashboard-mode
+    :diminish
+    :autoload dashboard-setup-startup-hook
+    :functions icons-displayable-p nerd-icons-mdicon nerd-icons-octicon
     :custom-face
     (dashboard-heading ((t (:inherit (font-lock-string-face bold)))))
     (dashboard-items-face ((t (:weight normal))))
     (dashboard-no-items-face ((t (:weight normal))))
-    :pretty-hydra
-    ((:title (pretty-hydra-title "Dashboard" 'mdicon "nf-md-view_dashboard")
-      :color pink :quit-key ("q" "C-g"))
-     ("Navigator"
-      (("U" update-config-and-packages "update" :exit t)
-       ("H" browse-homepage "homepage" :exit t)
-       ("R" restore-session "recover session" :exit t)
-       ("S" find-custom-file "settings" :exit t))
-      "Section"
-      (("}" dashboard-next-section "next")
-       ("{" dashboard-previous-section "previous")
-       ("r" dashboard-goto-recent-files "recent files")
-       ("m" dashboard-goto-bookmarks "bookmarks")
-       ("p" dashboard-goto-projects "projects"))
-      "Item"
-      (("RET" widget-button-press "open" :exit t)
-       ("<tab>" widget-forward "next")
-       ("C-i" widget-forward "next")
-       ("<backtab>" widget-backward "previous")
-       ("C-n" next-line "next line")
-       ("C-p" previous-line "previous  line"))
-      "Misc"
-      (("<f2>" open-dashboard "open" :exit t)
-       ("g" dashboard-refresh-buffer "refresh" :exit t)
-       ("Q" quit-dashboard "quit" :exit t))))
     :bind (("<f2>" . open-dashboard)
            :map dashboard-mode-map
            ("H" . browse-homepage)
            ("R" . restore-session)
            ("S" . find-custom-file)
            ("U" . update-config-and-packages)
-           ("q" . quit-dashboard)
-           ("h" . dashboard-hydra/body)
-           ("?" . dashboard-hydra/body))
+           ("q" . quit-dashboard))
     :hook (dashboard-mode . (lambda () (setq-local frame-title-format nil)))
     :init
     (setq dashboard-banner-logo-title "CENTAUR EMACS - Enjoy Programming & Writing"
@@ -140,89 +115,46 @@
 
     (dashboard-setup-startup-hook)
     :config
-    ;; Insert copyright
-    ;; @see https://github.com/emacs-dashboard/emacs-dashboard/issues/219
-    (defun my-dashboard-insert-copyright ()
-      "Insert copyright in the footer."
-      (dashboard-insert-center
-       (propertize (format "\nPowered by Vincent Zhang, %s\n" (format-time-string "%Y"))
-                   'face 'font-lock-comment-face)))
-    (advice-add #'dashboard-insert-footer :after #'my-dashboard-insert-copyright)
+    (with-no-warnings
+      ;; Insert copyright
+      ;; @see https://github.com/emacs-dashboard/emacs-dashboard/issues/219
+      (defun my/dashboard-insert-copyright ()
+        "Insert copyright in the footer."
+        (dashboard-insert-center
+         (propertize (format "\nPowered by Centaur Studio, %s\n" (format-time-string "%Y"))
+                     'face 'font-lock-comment-face)))
+      (advice-add #'dashboard-insert-footer :after #'my/dashboard-insert-copyright)
 
-    (defun restore-session ()
-      "Restore the previous session."
-      (interactive)
-      (message "Restoring previous session...")
-      (quit-window t)
+      (defun restore-session ()
+        "Restore the previous session."
+        (interactive)
+        (quit-dashboard)
+        (when (bound-and-true-p tabspaces-mode)
+          (tabspaces-restore-session)))
 
-      (when (fboundp 'tabspaces-mode)
-        (unless tabspaces-mode
-          (tabspaces-mode t))
-        (tabspaces-restore-session))
+      (defvar dashboard-recover-layout-p nil
+        "Wether recovers the layout.")
 
-      (message "Restoring previous session...done"))
+      (defun open-dashboard ()
+        "Display dashboard in maximized window."
+        (interactive)
+        (dashboard-open)
+        (delete-other-windows))
 
-    (defun dashboard-goto-recent-files ()
-      "Go to recent files."
-      (interactive)
-      (let ((func (local-key-binding "r")))
-        (and func (funcall func))))
+      (defun quit-dashboard ()
+        "Quit dashboard."
+        (interactive)
+        (when (buffer-live-p (get-buffer dashboard-buffer-name))
+          (kill-buffer dashboard-buffer-name))
 
-    (defun dashboard-goto-projects ()
-      "Go to projects."
-      (interactive)
-      (let ((func (local-key-binding "p")))
-        (and func (funcall func))))
+        ;; Create workspace if necessary
+        (unless (bound-and-true-p tabspaces-session)
+          (setq tabspaces-session t)
+          (tabspaces-switch-or-create-workspace tabspaces-default-tab))
 
-    (defun dashboard-goto-bookmarks ()
-      "Go to bookmarks."
-      (interactive)
-      (let ((func (local-key-binding "m")))
-        (and func (funcall func))))
-
-    (defvar dashboard-recover-layout-p nil
-      "Wether recovers the layout.")
-
-    (defun open-dashboard ()
-      "Open the *dashboard* buffer and jump to the first widget."
-      (interactive)
-      ;; Check if need to recover layout
-      (if (length> (window-list-1)
-                   ;; exclude `treemacs' window
-                   (if (and (fboundp 'treemacs-current-visibility)
-                            (eq (treemacs-current-visibility) 'visible))
-                       2
-                     1))
-          (setq dashboard-recover-layout-p t))
-
-      ;; Display dashboard in maximized window
-      (delete-other-windows)
-
-      ;; Refresh dashboard buffer
-      (dashboard-refresh-buffer)
-
-      ;; Jump to the first section
-      (dashboard-goto-recent-files))
-
-    (defun quit-dashboard ()
-      "Quit dashboard window."
-      (interactive)
-      (quit-window t)
-
-      ;; Create workspace
-      (when (fboundp 'tabspaces-mode)
-        (unless tabspaces-mode
-          (tabspaces-mode t)
-          (tabspaces-switch-or-create-workspace tabspaces-default-tab)))
-
-      ;; Recover layout
-      (when dashboard-recover-layout-p
-        (cond
-         ((bound-and-true-p tab-bar-history-mode)
-          (tab-bar-history-back))
-         ((bound-and-true-p winner-mode)
-          (winner-undo)))
-        (setq dashboard-recover-layout-p nil)))))
+        ;; Recover layout
+        (when (bound-and-true-p tab-bar-history-mode)
+          (tab-bar-history-back))))))
 
 (provide 'init-dashboard)
 

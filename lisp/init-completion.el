@@ -65,8 +65,15 @@
 
   ;; Display vertico in the child frame
   (use-package vertico-posframe
-    :functions posframe-poshandler-frame-center-near-bottom
-    :hook (vertico-mode . vertico-posframe-mode)
+    :functions (childframe-completion-workable-p
+                posframe-poshandler-frame-center-near-bottom)
+    :commands vertico-posframe-mode
+    :hook ((server-after-make-frame vertico-mode)
+           .
+           (lambda ()
+             "Handle vertico child frame."
+             (and (childframe-completion-workable-p)
+                  (vertico-posframe-mode 1))))
     :init (setq vertico-posframe-poshandler
                 #'posframe-poshandler-frame-center-near-bottom
                 vertico-posframe-parameters
@@ -253,13 +260,13 @@ value of the selected COLOR."
            ("M-."   . embark-dwim)        ; overrides `xref-find-definitions'
            ([remap describe-bindings] . embark-bindings)
            :map minibuffer-local-map
-           ("M-." . my-embark-preview))
+           ("M-." . my/embark-preview))
     :init
     ;; Optionally replace the key help with a completing-read interface
     (setq prefix-help-command #'embark-prefix-help-command)
     :config
     ;; Manual preview for non-Consult commands using Embark
-    (defun my-embark-preview ()
+    (defun my/embark-preview ()
       "Previews candidate in vertico buffer, unless it's a consult command."
       (interactive)
       (unless (bound-and-true-p consult--preview-function)
@@ -357,7 +364,8 @@ targets."
     (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
     (add-to-list 'corfu-continue-commands #'corfu-move-to-minibuffer))
 
-  (unless (or (display-graphic-p) (featurep 'tty-child-frames))
+  (unless (or (display-graphic-p)
+              (featurep 'tty-child-frames))
     (use-package corfu-terminal
       :hook (global-corfu-mode . corfu-terminal-mode)))
 

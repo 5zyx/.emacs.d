@@ -157,6 +157,26 @@ FACE defaults to inheriting from default and highlight."
          ("M-p" . region-occurrences-highlighter-prev))
   :hook (after-init . global-region-occurrences-highlighter-mode))
 
+;; Display fill-column indicator
+(use-package display-fill-column-indicator
+  :ensure nil
+  :functions adjust-fill-column-indicator-stipple
+  :hook (prog-mode . display-fill-column-indicator-mode)
+  :config
+  ;; Setup fill column indicator with stipple
+  (when (or (and sys/mac-x-p emacs/>=31p)
+            (and sys/linux-x-p sys/win32p emacs/>=30p))
+    (setq-default display-fill-column-indicator-character ?\s)
+    (defun adjust-fill-column-indicator-stipple ()
+      "Adjust the fill-column-indicator face with stipple using `set-face-attribute'."
+      (let* ((w (window-font-width))
+             (stipple `(,w 1 ,(apply #'unibyte-string
+                                     (append (make-list (1- (/ (+ w 7) 8)) ?\0)
+                                             '(1))))))
+        (set-face-attribute 'fill-column-indicator nil :stipple stipple)))
+    (add-hook 'emacs-startup-hook #'adjust-fill-column-indicator-stipple)
+    (add-hook 'text-scale-mode-hook #'adjust-fill-column-indicator-stipple)))
+
 ;; Highlight indentions
 (use-package indent-bars
   :custom
@@ -236,7 +256,7 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
-  :defines diff-hl-show-hunk-posframe-internal-border-color
+  :defines diff-hl-show-hunk-function diff-hl-show-hunk-posframe-internal-border-color
   :commands (diff-hl-flydiff-mode diff-hl-margin-mode)
   :custom-face
   (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
@@ -248,81 +268,41 @@ FACE defaults to inheriting from default and highlight."
          (after-init . global-diff-hl-show-hunk-mouse-mode)
          (dired-mode . diff-hl-dired-mode)
          (magit-post-refresh . diff-hl-magit-post-refresh)
-         (after-load-theme . diff-hl-set-posframe-appearance))
+         ((after-init after-load-theme server-after-make-frame) . diff-hl-set-posframe))
   :custom
   (diff-hl-draw-borders nil)
   (diff-hl-update-async t)
   (diff-hl-global-modes '(not image-mode pdf-view-mode))
-  (diff-hl-show-hunk-function (if (childframe-workable-p)
-                                  'diff-hl-show-hunk-posframe
-                                'diff-hl-show-hunk-inline))
   :init
-  (defun diff-hl-set-posframe-appearance ()
-    "Set appearance of diff-hl-posframe."
-    (setq diff-hl-show-hunk-posframe-internal-border-color
+  (defun diff-hl-set-posframe ()
+    "Set display type and appearance of `diff-hl.'"
+    (setq diff-hl-show-hunk-function (if (childframe-workable-p)
+                                         'diff-hl-show-hunk-posframe
+                                       'diff-hl-show-hunk-inline)
+          diff-hl-show-hunk-posframe-internal-border-color
           (face-background 'posframe-border nil t)))
-  (diff-hl-set-posframe-appearance)
   :config
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
 
   ;; Thin indicators on fringe
-  (defun my-diff-hl-fringe-bmp-function (_type _pos)
+  (defun my/diff-hl-fringe-bmp-function (_type _pos)
     "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
-    (define-fringe-bitmap 'my-diff-hl-bmp
+    (define-fringe-bitmap 'my/diff-hl-bmp
       (vector (if sys/linuxp #b11111100 #b11100000))
       1 8
       '(center t)))
-  (setq diff-hl-fringe-bmp-function 'my-diff-hl-fringe-bmp-function)
+  (setq diff-hl-fringe-bmp-function 'my/diff-hl-fringe-bmp-function)
 
   ;; Highlight on-the-fly
-  (diff-hl-flydiff-mode 1)
+  (diff-hl-flydiff-mode 1))
 
-  ;; Fall back to the display margin since the fringe is unavailable in tty
-  (unless (display-graphic-p) (diff-hl-margin-mode 1)))
-
-;; Pulse current line
-(use-package pulse
-  :ensure nil
+;; Pulse highlight on selection
+(use-package pulsar
   :custom-face
-  (pulse-highlight-start-face ((t (:inherit region :background unspecified))))
-  (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
-  :hook (((dumb-jump-after-jump imenu-after-jump) . my-recenter-and-pulse)
-         ((bookmark-after-jump magit-diff-visit-file next-error) . my-recenter-and-pulse-line))
-  :init
-  (with-no-warnings
-    (defun my-pulse-momentary-line (&rest _)
-      "Pulse the current line."
-      (pulse-momentary-highlight-one-line (point)))
-
-    (defun my-pulse-momentary (&rest _)
-      "Pulse the region or the current line."
-      (if (fboundp 'xref-pulse-momentarily)
-          (xref-pulse-momentarily)
-        (my-pulse-momentary-line)))
-
-    (defun my-recenter-and-pulse(&rest _)
-      "Recenter and pulse the region or the current line."
-      (recenter)
-      (my-pulse-momentary))
-
-    (defun my-recenter-and-pulse-line (&rest _)
-      "Recenter and pulse the current line."
-      (recenter)
-      (my-pulse-momentary-line))
-
-    (dolist (cmd '(recenter-top-bottom
-                   other-window switch-to-buffer
-                   aw-select toggle-window-split
-                   windmove-do-window-select
-                   pager-page-down pager-page-up
-                   treemacs-select-window))
-      (advice-add cmd :after #'my-pulse-momentary-line))
-
-    (dolist (cmd '(pop-to-mark-command
-                   pop-global-mark
-                   goto-last-change))
-      (advice-add cmd :after #'my-recenter-and-pulse))))
+  (pulsar-generic ((t :inherit region :extend t)))
+  :custom (pulsar-delay pulse-delay)
+  :hook (emacs-startup . pulsar-global-mode))
 
 ;; Pulse modified region
 (use-package goggles

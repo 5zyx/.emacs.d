@@ -264,7 +264,7 @@ For advanced users, you can directly edit configuration settings in your `custom
 =======
 
 ;; System settings
-(setq centaur-server t)                        ; Enable server-mode
+
 (setq centaur-use-exec-path-from-shell t)      ; Use shell environment (set to nil for emacs-plus)
 
 ;; Visual settings
@@ -299,6 +299,7 @@ For advanced users, you can directly edit configuration settings in your `custom
 
 Centaur Emacs comes with several Hydra interfaces for efficient workflows. Here are the available hydras and their keybindings:
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 | Name                     | Scope                 | Keybinding        | Description                          |
 |--------------------------|-----------------------|-------------------|--------------------------------------|
@@ -346,6 +347,25 @@ Centaur Emacs comes with several Hydra interfaces for efficient workflows. Here 
 | `xwidget-hydra`            | XWidget Webkit Mode  | `?`               | Embedded browser controls            |
 | `ztreediff-hydra`          | Ztree Diff Mode      | `C-<f5>`          | Directory comparison operations      |
 >>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
+=======
+| Hydra Name               | Scope               | Keybinding(s)       | Description                     |
+|:-------------------------|:--------------------|:--------------------|:--------------------------------|
+| `dape-hydra`             | Global              | `M-<f5>`            | Debug adapter protocol actions  |
+| `doom-modeline-hydra`    | Modeline Mode       | `C-<f6>`            | Modeline customization options  |
+| `elfeed-hydra`           | Elfeed Search Mode  | `?`                 | RSS feed reader commands        |
+| `git-messenger-hydra`    | Global              | `C-x v p`           | Git commit message inspection   |
+| `hideshow-hydra`         | Programming Modes   | `C-~`               | Code folding/unfolding actions  |
+| `hydra-dired-quick-sort` | Dired Mode          | `S`                 | File sorting options            |
+| `lsp-ui-hydra`           | LSP UI Mode         | `M-<f6>`            | LSP UI interface commands       |
+| `org-hydra`              | Org Mode            | `<`                 | Org template insertion          |
+| `rect-hydra`             | Org Mode            | `S-<return>`        | Rectangle selection operations  |
+| `rect-hydra`             | Text/Programming    | `C-<return>`        | Rectangle selection operations  |
+| `smerge-mode-hydra`      | Smerge Mode         | `C-c m`             | Merge conflict resolution       |
+| `toggles-hydra`          | Global              | `<f6>`              | Global option toggles           |
+| `window-hydra`           | Global              | `C-c w` / `C-x o w` | Window management               |
+| `xwidget-hydra`          | XWidget Webkit Mode | `?`                 | Embedded browser controls       |
+| `ztreediff-hydra`        | Ztree Diff Mode     | `C-<f5>`            | Directory comparison operations |
+>>>>>>> update_stream/master
 
 ## 📸 Screenshots
 

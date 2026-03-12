@@ -32,13 +32,13 @@
 
 (use-package shell
   :ensure nil
-  :hook ((shell-mode . my-shell-mode-hook)
+  :hook ((shell-mode . my/shell-mode-hook)
          (comint-output-filter-functions . comint-strip-ctrl-m))
   :init
   (setq system-uses-terminfo nil)
 
   (with-no-warnings
-    (defun my-shell-simple-send (proc command)
+    (defun my/shell-simple-send (proc command)
       "Various PROC COMMANDs pre-processing before sending to shell."
       (cond
        ;; Checking for clear command and execute it.
@@ -55,21 +55,21 @@
        ;; Send other commands to the default handler.
        (t (comint-simple-send proc command))))
 
-    (defun my-shell-mode-hook ()
+    (defun my/shell-mode-hook ()
       "Shell mode customization."
       (local-set-key '[up] 'comint-previous-input)
       (local-set-key '[down] 'comint-next-input)
       (local-set-key '[(shift tab)] 'comint-next-matching-input-from-input)
 
       (ansi-color-for-comint-mode-on)
-      (setq comint-input-sender 'my-shell-simple-send))))
+      (setq comint-input-sender 'my/shell-simple-send))))
 
 ;; ANSI & XTERM 256 color support
 (use-package xterm-color
   :defines (compilation-environment
             eshell-preoutput-filter-functions
             eshell-output-filter-functions)
-  :functions (compilation-filter my-advice-compilation-filter xterm-color-filter)
+  :functions (compilation-filter my/advice-compilation-filter xterm-color-filter)
   :init
   ;; For shell and interpreters
   (setenv "TERM" "xterm-256color")
@@ -95,21 +95,21 @@
 
   ;; For compilation buffers
   (setq compilation-environment '("TERM=xterm-256color"))
-  (defun my-advice-compilation-filter (f proc string)
+  (defun my/advice-compilation-filter (f proc string)
     (funcall f proc
              (if (eq major-mode 'rg-mode) ; compatible with `rg'
                  string
                (xterm-color-filter string))))
-  (advice-add 'compilation-filter :around #'my-advice-compilation-filter)
-  (advice-add 'gud-filter :around #'my-advice-compilation-filter))
+  (advice-add 'compilation-filter :around #'my/advice-compilation-filter)
+  (advice-add 'gud-filter :around #'my/advice-compilation-filter))
 
 ;; Better terminal emulator
 (use-package eat
   :hook ((eshell-load . eat-eshell-mode)
          (eshell-load . eat-eshell-visual-command-mode)))
 
-;; Shell Pop: leverage `popper'
 (with-no-warnings
+  ;; Shell Pop: leverage `popper'
   (defvar shell-pop--frame nil)
   (defvar shell-pop--window nil)
 
@@ -122,15 +122,14 @@
 
   (defun shell-pop--hide-frame ()
     "Hide child frame and refocus in parent frame."
-    (when (and (childframe-workable-p)
-               (frame-live-p shell-pop--frame)
+    (when (and (frame-live-p shell-pop--frame)
                (frame-visible-p shell-pop--frame))
       (make-frame-invisible shell-pop--frame)
       (select-frame-set-input-focus (frame-parent shell-pop--frame))
       (setq shell-pop--frame nil)))
 
-  (defun shell-pop-toggle ()
-    "Toggle shell."
+  (defun shell-pop-window-toggle ()
+    "Toggle shell in a split window."
     (interactive)
     (shell-pop--hide-frame)
     (if (window-live-p shell-pop--window)
@@ -139,61 +138,70 @@
           (setq shell-pop--window nil))
       (setq shell-pop--window
             (get-buffer-window (shell-pop--shell)))))
-  (bind-keys ([f9]  . shell-pop-toggle)
-             ("C-`" . shell-pop-toggle))
 
-  (when (childframe-workable-p)
-    (defun shell-pop-posframe-hidehandler (_)
-      "Hidehandler used by `shell-pop-posframe-toggle'."
-      (not (eq (selected-frame) shell-pop--frame)))
+  ;; Shell Pop in a child frame
+  (defun shell-pop-posframe-hidehandler (_)
+    "Hidehandler used by `shell-pop-posframe-toggle'."
+    (not (eq (selected-frame) shell-pop--frame)))
 
-    (defun shell-pop-posframe-toggle ()
-      "Toggle shell in child frame."
-      (interactive)
-      (let* ((buffer (shell-pop--shell))
-             (window (get-buffer-window buffer)))
-        ;; Hide window: for `popper'
-        (when (window-live-p window)
-          (delete-window window))
+  (defun shell-pop-posframe-toggle ()
+    "Toggle shell in child frame."
+    (interactive)
 
-        (if (and (frame-live-p shell-pop--frame)
-                 (frame-visible-p shell-pop--frame))
-            (progn
-              ;; Hide child frame and refocus in parent frame
-              (make-frame-invisible shell-pop--frame)
-              (select-frame-set-input-focus (frame-parent shell-pop--frame))
-              (setq shell-pop--frame nil))
-          (let ((width  (max 100 (round (* (frame-width) 0.62))))
-                (height (round (* (frame-height) 0.62))))
-            ;; Shell pop in child frame
-            (setq shell-pop--frame
-                  (posframe-show
-                   buffer
-                   :poshandler #'posframe-poshandler-frame-center
-                   :hidehandler #'shell-pop-posframe-hidehandler
-                   :left-fringe 8
-                   :right-fringe 8
-                   :width width
-                   :height height
-                   :min-width width
-                   :min-height height
-                   :internal-border-width 3
-                   :internal-border-color (face-background 'region nil t)
-                   :background-color (face-background 'default nil t)
-                   :foreground-color (face-foreground 'default nil t)
-                   :override-parameters '((cursor-type . t))
-                   :respect-mode-line t
-                   :accept-focus t))
+    (let* ((buffer (shell-pop--shell))
+           (window (get-buffer-window buffer)))
+      ;; Hide window: for `popper'
+      (when (window-live-p window)
+        (delete-window window))
 
-            ;; Focus in child frame
-            (select-frame-set-input-focus shell-pop--frame)
+      (if (and (frame-live-p shell-pop--frame)
+               (frame-visible-p shell-pop--frame))
+          (progn
+            ;; Hide child frame and refocus in parent frame
+            (make-frame-invisible shell-pop--frame)
+            (select-frame-set-input-focus (frame-parent shell-pop--frame))
+            (setq shell-pop--frame nil))
+        (let ((width  (max 100 (round (* (frame-width) 0.62))))
+              (height (round (* (frame-height) 0.62))))
+          ;; Shell pop in child frame
+          (setq shell-pop--frame
+                (posframe-show
+                 buffer
+                 :poshandler #'posframe-poshandler-frame-center
+                 :hidehandler #'shell-pop-posframe-hidehandler
+                 :left-fringe 8
+                 :right-fringe 8
+                 :width width
+                 :height height
+                 :min-width width
+                 :min-height height
+                 :internal-border-width 3
+                 :internal-border-color (face-background 'region nil t)
+                 :background-color (face-background 'default nil t)
+                 :foreground-color (face-foreground 'default nil t)
+                 :override-parameters '((cursor-type . t))
+                 :respect-mode-line t
+                 :accept-focus t))
 
-            (with-current-buffer buffer
-              (setq-local cursor-type 'box) ; blink cursor
-              (goto-char (point-max))
-              (when (fboundp 'vterm-reset-cursor-point)
-                (vterm-reset-cursor-point)))))))
-    (bind-key "C-`" #'shell-pop-posframe-toggle)))
+          ;; Focus in child frame
+          (select-frame-set-input-focus shell-pop--frame)
+
+          (with-current-buffer buffer
+            (setq-local cursor-type 'box) ; blink cursor
+            (goto-char (point-max))
+            (when (fboundp 'vterm-reset-cursor-point)
+              (vterm-reset-cursor-point)))))))
+
+  (defun shell-pop-toggle ()
+    "Toggle shell in a split window or child frame."
+    (interactive)
+    (if (or (display-graphic-p)
+            (featurep 'tty-child-frames))
+        (shell-pop-posframe-toggle)
+      (shell-pop-window-toggle)))
+
+  (bind-keys ([f9]  . shell-pop-window-toggle)
+             ("C-`" . shell-pop-toggle)))
 
 (provide 'init-shell)
 
