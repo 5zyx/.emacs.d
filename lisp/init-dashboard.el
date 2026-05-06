@@ -31,6 +31,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'init-const)
   (require 'init-custom))
 
 ;; Dashboard
@@ -46,7 +47,7 @@
     :bind (("<f2>" . open-dashboard)
            :map dashboard-mode-map
            ("H" . browse-homepage)
-           ("R" . restore-session)
+           ("O" . restore-session)
            ("S" . find-custom-file)
            ("U" . update-config-and-packages)
            ("q" . quit-dashboard))
@@ -88,24 +89,24 @@
           dashboard-navigator-buttons
           `(((,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-github" :height 1.4))
-              "Homepage" "Browse homepage"
+              "Homepage" "Visit homepage (H)"
               (lambda (&rest _) (browse-url centaur-homepage)))
              (,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-backup_restore" :height 1.5))
-              "Restore" "Restore previous session"
+              "Restore" "Restore previous session (O)"
               (lambda (&rest _) (restore-session)))
              (,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-tools" :height 1.3))
-              "Settings" "Open custom file"
-              (lambda (&rest _) (find-file custom-file)))
+              "Settings" "Open setting files (S)"
+              (lambda (&rest _) (find-custom-file)))
              (,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-update" :height 1.3))
-              "Update" "Update Centaur Emacs"
+              "Update" "Update Centaur Emacs (U)"
               (lambda (&rest _) (centaur-update)))
              (,(if (icons-displayable-p)
                    (nerd-icons-mdicon "nf-md-help" :height 1.2)
                  "?")
-              "" "Help (?/h)"
+              "" "Ask for help (?/h)"
               (lambda (&rest _) (dashboard-hydra/body)))))
 
           dashboard-footer-icon
@@ -131,9 +132,6 @@
         (quit-dashboard)
         (when (bound-and-true-p tabspaces-mode)
           (tabspaces-restore-session)))
-
-      (defvar dashboard-recover-layout-p nil
-        "Wether recovers the layout.")
 
       (defun open-dashboard ()
         "Display dashboard in maximized window."
