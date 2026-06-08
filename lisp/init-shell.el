@@ -116,23 +116,12 @@
   (use-package popterm
     :functions childframe-workable-p
     :bind (("C-`"   . popterm-toggle)
-           ("C-~"   . popterm-toggle-cd)
+           ("C-M-`" . popterm-toggle-cd)
            ([f9]    . popterm-window-toggle))
     :hook (after-init . popterm-global-mode)
     :init
     (setq popterm-backend (if sys/win32p 'eshell 'ghostel)
-          popterm-display-method (if (childframe-workable-p)
-                                     'posframe
-                                   'window)
-          popterm-scope 'project)
-    :config
-    (with-no-warnings
-      (defun popterm--reset-cursor-point (buffer)
-        "Reset cursor point."
-        (with-current-buffer buffer
-          (when (derived-mode-p 'ghostel-mode)
-            (ghostel-send-key "down"))))
-      (advice-add #'popterm--posframe-show :after #'popterm--reset-cursor-point))))
+          popterm-scope 'project)))
 
 (provide 'init-shell)
 
