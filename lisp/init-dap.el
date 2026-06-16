@@ -72,6 +72,11 @@
                 (save-some-buffers t t)))
     ;; Display hydra on startup
     (add-hook 'dape-on-start-hooks #'dape-hydra/body)))
+;; For a more ergonomic Emacs and `dape' experience
+(use-package repeat
+  :custom
+  (repeat-mode +1))
+
 
 (provide 'init-dap)
 

@@ -95,6 +95,7 @@
            ("C-c t c" . go-test-current-coverage)
            ("C-c t x" . go-run))))
 
+
 ;; Golang
 (if (centaur-treesit-available-p)
     (use-package go-ts-mode
@@ -106,6 +107,8 @@
       (go-auto-config)
 
       (use-package gotest-ts
+        :load-path "~/.emacs.d/site-lisp/gotest-ts"
+        :ensure nil
         :hook (go-ts-mode . gotest-ts-setup)))
   (use-package go-mode
     :defines go-mode-map
