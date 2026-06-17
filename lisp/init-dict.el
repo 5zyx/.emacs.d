@@ -47,7 +47,8 @@
          ("C-c d G" . gt-translate-prompt)
          ("C-c d p" . gt-speak)
          ("C-c d s" . gt-setup)
-         ("C-c d u" . gt-use-text-utility))
+         ("C-c d u" . gt-use-text-utility)
+         ("C-c d z" . gt-translate-zhipu))
   :hook (after-load-theme . gt-configure)
   :init
   (setq gt-langs '(en zh)
@@ -109,6 +110,13 @@
                                              (gt-youdao-suggest-engine :if 'word)
                                              (gt-google-engine))
                               :render (gt-buffer-render)))
+              (Zhipu . ,(gt-translator
+                         :taker (gt-taker :langs '(en zh) :pick nil :prompt t)
+                         :engines (gt-chatgpt-engine
+                                   :host "https://open.bigmodel.cn/api/paas/v4"
+                                   :path "/chat/completions"
+                                   :model "glm-4-flash")
+                         :render (gt-buffer-render)))
               (Text-Utility . ,(gt-text-utility
                                 :taker (gt-taker :pick nil)
                                 :render (gt-buffer-render))))))
@@ -127,7 +135,12 @@
     (defun gt-use-text-utility ()
       "Handle the texts with the utilities."
       (interactive)
-      (gt--translate 'Text-Utility))))
+      (gt--translate 'Text-Utility))
+
+    (defun gt-translate-zhipu ()
+      "Translate using Zhipu AI (glm-4-flash)."
+      (interactive)
+      (gt--translate 'Zhipu))))
 
 ;; OSX dictionary
 (when sys/macp
