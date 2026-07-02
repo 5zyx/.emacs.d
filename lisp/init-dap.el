@@ -37,7 +37,7 @@
   (use-package dape
     :bind (("<f5>" . dape)
            ("M-<f5>" . dape-hydra/body))
-    :custom (dape-buffer-window-arrangment 'right)
+    :custom (dape-buffer-window-arrangement 'right)
     :pretty-hydra
     ((:title (pretty-hydra-title "Debug" 'codicon "nf-cod-debug")
       :color pink :quit-key ("q" "C-g"))
@@ -67,8 +67,9 @@
        ("Q" dape-quit "quit" :exit t))))
     :config
     ;; Save buffers on startup, useful for interpreted languages
-    (add-hook 'dape-on-start-hooks
+    (add-hook 'dape-start-hook
               (defun dape--save-on-start ()
+<<<<<<< HEAD
                 (save-some-buffers t t)))
     ;; Display hydra on startup
     (add-hook 'dape-on-start-hooks #'dape-hydra/body)))
@@ -77,6 +78,9 @@
   :custom
   (repeat-mode +1))
 
+=======
+                (save-some-buffers t t)))))
+>>>>>>> update_stream/master
 
 (provide 'init-dap)
 

@@ -73,7 +73,11 @@ latest stable release - currently **29.2**.
 It is able to run on Windows, GNU Linux and macOS. It is compatible **ONLY with
 >>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 GNU Emacs 28.1 and above**. In general you're advised to always run with the
+<<<<<<< HEAD
 latest stable release - currently **30.1**.
+>>>>>>> update_stream/master
+=======
+latest stable release - currently **30.2**.
 >>>>>>> update_stream/master
 
 ## ✨ Features
