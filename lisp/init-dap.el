@@ -69,18 +69,7 @@
     ;; Save buffers on startup, useful for interpreted languages
     (add-hook 'dape-start-hook
               (defun dape--save-on-start ()
-<<<<<<< HEAD
-                (save-some-buffers t t)))
-    ;; Display hydra on startup
-    (add-hook 'dape-on-start-hooks #'dape-hydra/body)))
-;; For a more ergonomic Emacs and `dape' experience
-(use-package repeat
-  :custom
-  (repeat-mode +1))
-
-=======
                 (save-some-buffers t t)))))
->>>>>>> update_stream/master
 
 (provide 'init-dap)
 
