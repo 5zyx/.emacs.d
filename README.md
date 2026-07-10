@@ -1,17 +1,10 @@
-<<<<<<< HEAD
-# Centaur Emacs
-<<<<<<< HEAD
-centaur的备份分支，添加了自己需要的插件及配置
-[![Build Status](https://github.com/seagle0128/.emacs.d/workflows/CI/badge.svg?branch=master)](https://github.com/seagle0128/.emacs.d/actions)
-=======
-=======
 # 🧙‍♂️ Centaur Emacs
 
+centaur的备份分支，添加了自己需要的插件及配置
+
 <div align="center">
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 
 [![CI](https://github.com/seagle0128/.emacs.d/actions/workflows/ci.yml/badge.svg)](https://github.com/seagle0128/.emacs.d/actions/workflows/ci.yml)
->>>>>>> update_stream/master
 [![Release Tag](https://img.shields.io/github/tag/seagle0128/.emacs.d.svg?label=Release)](https://github.com/seagle0128/.emacs.d/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GNU Emacs](https://img.shields.io/badge/Emacs-28.1%2B-7F5AB6?logo=gnu&logoColor=white)](https://www.gnu.org/software/emacs/)
@@ -58,27 +51,9 @@ packages and adds its own core library to the mix. The final product offers
 an easy to use Emacs configuration for Emacs newcomers and lots of additional
 power for Emacs power users.
 
-<<<<<<< HEAD
-It's able to run on Windows, GNU Linux and macOS. It is compatible **ONLY with
-<<<<<<< HEAD
-<<<<<<< HEAD
-GNU Emacs 26.1 and above**. In general you're advised to always run with the
-latest stable release - currently **28.2**.
-=======
-GNU Emacs 27.1 and above**. In general you're advised to always run with the
-latest stable release - currently **29.2**.
->>>>>>> update_stream/master
-=======
-=======
 It is able to run on Windows, GNU Linux and macOS. It is compatible **ONLY with
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 GNU Emacs 28.1 and above**. In general you're advised to always run with the
-<<<<<<< HEAD
-latest stable release - currently **30.1**.
->>>>>>> update_stream/master
-=======
 latest stable release - currently **30.2**.
->>>>>>> update_stream/master
 
 ## ✨ Features
 
@@ -188,7 +163,6 @@ M-x centaur-update-packages
 M-x centaur-update-all
 ```
 
-<<<<<<< HEAD
 **Trick**: Update configurations and packages in shell.
 
 ```shell
@@ -196,10 +170,7 @@ alias upgrade_emacs='emacs -Q --batch -L "$HOME/.emacs.d/lisp/" -l "init-funcs.e
 
 ```
 
-### Docker
-=======
 ### Docker Support
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 
 Run Centaur Emacs in a containerized environment:
 
@@ -243,29 +214,6 @@ For advanced users, you can directly edit configuration settings in your `custom
 ;; Proxy settings
 (setq centaur-proxy "127.0.0.1:1087")          ; HTTP/HTTPS proxy
 (setq centaur-socks-proxy "127.0.0.1:1086")    ; SOCKS proxy
-<<<<<<< HEAD
-(setq centaur-server t)                        ; Enable `server-mode' or not: t or nil
-(setq centaur-use-exec-path-from-shell t)      ; Use `exec-path-from-shell' or not. If using emacs-plus with path ejection, set to nil
-(setq centaur-icon t)                          ; Display icons or not: t or nil
-(setq centaur-package-archives 'melpa)         ; Package repo: melpa, bfsu, iscas, netease, sjtu, tencent, tuna or ustc
-(setq centaur-theme 'auto)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
-(setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
-(setq centaur-frame-maximized-on-startup t)    ; Maximize frame on startup or not
-(setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
-<<<<<<< HEAD
-(setq centaur-restore-frame-geometry nil)      ; Restore the frame's geometry at startup: t or nil
-(setq centaur-lsp 'eglot)                      ; Set LSP client: lsp-mode, eglot or nil
-=======
-(setq centaur-lsp 'lsp-mode)                   ; Set LSP client: lsp-mode, eglot or nil
->>>>>>> update_stream/master
-(setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
-(setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
-(setq centaur-tree-sitter nil)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
-(setq centaur-chinese-calendar nil)            ; Support Chinese calendar or not: t or nil
-(setq centaur-player t)                        ; Enable players or not: t or nil
-(setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
-(setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
-=======
 
 ;; System settings
 
@@ -292,7 +240,6 @@ For advanced users, you can directly edit configuration settings in your `custom
 (setq centaur-chinese-calendar nil)            ; Enable Chinese calendar support
 (setq centaur-player t)                        ; Enable media player controls
 (setq centaur-prettify-symbols-alist nil)      ; Symbol prettification (nil to use font ligatures)
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 ```
 
 **:information_source: Notes**:
@@ -303,55 +250,6 @@ For advanced users, you can directly edit configuration settings in your `custom
 
 Centaur Emacs comes with several Hydra interfaces for efficient workflows. Here are the available hydras and their keybindings:
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-| Name                     | Scope                 | Keybinding        | Description                          |
-|--------------------------|-----------------------|-------------------|--------------------------------------|
-| `toggles-hydra`          | global                | `<f6>`            | Global option toggles                |
-| `window-hydra`           | global                | `C-c w`/`C-x o w` | Window management                    |
-| `doom-modeline-hydra`    | doom-modeline-mode    | `C-<f6>`          | Mode-line options and actions        |
-<<<<<<< HEAD
-| `hydra-ivy`              | minibuffer, ivy-mode  | `C-o`             | Additional key bindings for Ivy      |
-| `ivy-hydra-read-action`  | minibuffer, ivy-mode  | `M-o`             | Actions for`ivy-dispatching-done`    |
-| `hydra-dired-qick-sort`  | dired                 | `S`               | Options for `dired-quick-sort`       |
-=======
-| `hydra-dired-qick-sort`  | dired-mode            | `S`               | Options for `dired-quick-sort`       |
->>>>>>> update_stream/master
-| `org-hydra`              | org-mode              | `<`               | Org template                         |
-| `dashboard-hydra`        | dashboard-mode        | `h`/`?`           | Actions for the dashboard            |
-| `dumb-jump-hydra`        | global                | `C-M-j`           | Jump to definition                   |
-| `youdao-dictionay-hydra` | youdao-dictionay-mode | `h`/`?`           | Actions for `youdao-dictionary`      |
-| `ztreediff-hydra`        | zreediff-mode         | `C-<f5>`          | Actions for text mode directory tree |
-| `git-messenger-hydra`    | global                | `C-x v p`         | Actions for `git-messenger`          |
-| `smerge-mode-hydra`      | smerge-mode           | `C-c m`           | Actions for `smerge-mode`            |
-| `rect-hydra`             | text-mode, prog-mode  | `C-<return>`      | Actions for Rectangle                |
-| `rect-hydra`             | org-mode              | `S-<return>`      | Actions for Rectangle                |
-| `hideshow-hydra`         | prog-mode             | `C-~`             | Actions for `hideshow`               |
-| `lsp-ui-hydra`           | lsp-ui-mode           | `M-<f6>`          | Actions for `lsp-ui`                 |
-| `dap-hydra`              | dap-mode              | `M-<f5>`          | Actions for `dap-debug`              |
-| `elfeed-hydra`           | elfeed-search-mode    | `?`               | Actions for RSS reader `elfeed`      |
-| `xwidget-hydra`          | xwidget-webkit-mode   | `?`               | Actions for embedded webkit browser  |
-=======
-| Hydra Name                  | Scope                | Keybinding(s)     | Description                          |
-|:---------------------------|:--------------------|:------------------|:-------------------------------------|
-| `dape-hydra`               | Global               | `M-<f5>`          | Debug adapter protocol actions       |
-| `dashboard-hydra`          | Dashboard Mode       | `h` / `?`         | Dashboard navigation and actions     |
-| `doom-modeline-hydra`      | Modeline Mode        | `C-<f6>`          | Modeline customization options       |
-| `elfeed-hydra`             | Elfeed Search Mode   | `?`               | RSS feed reader commands             |
-| `git-messenger-hydra`      | Global               | `C-x v p`         | Git commit message inspection        |
-| `hideshow-hydra`           | Programming Modes    | `C-~`             | Code folding/unfolding actions       |
-| `hydra-dired-quick-sort`   | Dired Mode           | `S`               | File sorting options                 |
-| `lsp-ui-hydra`             | LSP UI Mode          | `M-<f6>`          | LSP UI interface commands            |
-| `org-hydra`                | Org Mode             | `<`               | Org template insertion               |
-| `rect-hydra`               | Org Mode             | `S-<return>`      | Rectangle selection operations       |
-| `rect-hydra`               | Text/Programming     | `C-<return>`      | Rectangle selection operations       |
-| `smerge-mode-hydra`        | Smerge Mode          | `C-c m`           | Merge conflict resolution            |
-| `toggles-hydra`            | Global               | `<f6>`            | Global option toggles                |
-| `window-hydra`             | Global               | `C-c w` / `C-x o w`| Window management                  |
-| `xwidget-hydra`            | XWidget Webkit Mode  | `?`               | Embedded browser controls            |
-| `ztreediff-hydra`          | Ztree Diff Mode      | `C-<f5>`          | Directory comparison operations      |
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
-=======
 | Hydra Name               | Scope               | Keybinding(s)       | Description                     |
 |:-------------------------|:--------------------|:--------------------|:--------------------------------|
 | `dape-hydra`             | Global              | `M-<f5>`            | Debug adapter protocol actions  |
@@ -369,7 +267,6 @@ Centaur Emacs comes with several Hydra interfaces for efficient workflows. Here 
 | `window-hydra`           | Global              | `C-c w` / `C-x o w` | Window management               |
 | `xwidget-hydra`          | XWidget Webkit Mode | `?`                 | Embedded browser controls       |
 | `ztreediff-hydra`        | Ztree Diff Mode     | `C-<f5>`            | Directory comparison operations |
->>>>>>> update_stream/master
 
 ## 📸 Screenshots
 

@@ -4,11 +4,7 @@
 # Command format: Instruction [arguments / command] ..
 
 # Base image to use
-<<<<<<< HEAD:Dockerfile/Dockerfile.26
-FROM ubuntu:20.04
-=======
 FROM ubuntu:24.04
->>>>>>> update_stream/master:Dockerfile/Dockerfile.29
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Commands to update the image
@@ -18,16 +14,7 @@ RUN apt-get update
 RUN apt-get upgrade -y
 
 # Install Centaur Emacs
-<<<<<<< HEAD:Dockerfile/Dockerfile.26
-RUN apt-get install -y git emacs-nox
-=======
-RUN apt-get update
-<<<<<<< HEAD:Dockerfile/Dockerfile.26
-RUN apt-get install -y emacs-nox
->>>>>>> update_stream/master:Dockerfile/Dockerfile.29
-=======
-RUN apt-get install -y emacs29-nox
->>>>>>> update_stream/master:Dockerfile/Dockerfile.29
+RUN apt-get install -y git emacs29-nox
 RUN git clone --depth 1 https://github.com/seagle0128/.emacs.d.git ~/.emacs.d
 
 ENV TERM xterm-256color

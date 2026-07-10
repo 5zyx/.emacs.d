@@ -46,19 +46,12 @@
 ;;
 (use-package gptel
   :diminish
-<<<<<<< HEAD
   :functions (gptel-make-openai gptel-make-anthropic)
-=======
-  :functions (gptel-make-openai gptel-make-anthropic
-               gptel-make-deepseek gptel-make-gemini
-               gptel-make-ollama)
->>>>>>> update_stream/master
   :bind (("C-<f12>"   . gptel)
          ("C-M-<f12>" . gptel-menu))
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
-<<<<<<< HEAD
   (setq gptel-model 'qwen3.7-max
         gptel-backend
         (gptel-make-anthropic "Bailian"
@@ -79,61 +72,17 @@
     :stream t
     :key #'gptel-api-key-from-auth-source
     :models '(gpt-4o))
-=======
-  ;; GitHub Models (free with GH Copilot subscription)
-  (setq gptel-model 'gpt-4.1
-        gptel-backend
-        (gptel-make-openai "Github Models"
-          :host "models.inference.ai.azure.com"
-          :endpoint "/chat/completions?api-version=2024-05-01-preview"
-          :stream t
-          :key 'gptel-api-key
-          :models '(gpt-4o gpt-4.1)))
-
-  ;; GLM
-  (gptel-make-openai "GLM"
-    :host "open.bigmodel.cn"
-    :endpoint "/api/paas/v4/chat/completions"
-    :stream t
-    :key 'gptel-api-key
-    :models '(glm-5.2 glm-5.2-flash glm-4.7 glm-4.7-flash))
->>>>>>> update_stream/master
 
   (gptel-make-openai "Nvidia"
     :host "integrate.api.nvidia.com"
     :endpoint "/v1/chat/completions"
     :stream t
-<<<<<<< HEAD
     :key #'gptel-api-key-from-auth-source
     :models '(z-ai/glm4.7 minimaxai/minimax-m2.1 deepseek-ai/deepseek-v3.1-terminus))
 
   (gptel-make-anthropic "Claude"
     :stream t
     :key #'gptel-api-key-from-auth-source))
-=======
-    :key 'gptel-api-key
-    :models '(deepseek-chat deepseek-reasoner))
-
-  ;; Qwen (Alibaba Cloud)
-  (gptel-make-openai "Qwen"
-    :host "dashscope.aliyuncs.com"
-    :endpoint "/compatible-mode/v1/chat/completions"
-    :stream t
-    :key 'gptel-api-key
-    :models '(qwen-plus qwen-turbo-latest qwen-max))
-
-  ;; Gemini (Google)
-  (gptel-make-gemini "Gemini"
-    :key 'gptel-api-key
-    :stream t
-    :models '(gemini-2.5-flash gemini-2.5-pro))
-
-  ;; Claude (Anthropic)
-  (gptel-make-anthropic "Claude"
-    :stream t
-    :key 'gptel-api-key
-    :models '(claude-sonnet-4-20250514 claude-haiku-3-5-20241022)))
->>>>>>> update_stream/master
 
 ;; Generate commit messages for magit
 (use-package gptel-magit

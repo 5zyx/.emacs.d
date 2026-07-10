@@ -33,14 +33,11 @@
 /ac-comphist.dat
 /amx-items
 /bookmarks
-<<<<<<< HEAD
 /company-statistics-cache.el
-=======
 /custom-post.el
 /custom.el
 /env.el
 /gt-known-words.txt
->>>>>>> update_stream/master
 /history
 /nov-places
 /package-quickstart.el
@@ -85,11 +82,8 @@ rust-playground/
 server/
 session*
 snippets/
-<<<<<<< HEAD
 site-lisp/
-=======
 tabspaces/
->>>>>>> 70b82c8113ef8c9000abef54f41ab6a7ca872f30
 templates/
 thumbs/
 tldr/
