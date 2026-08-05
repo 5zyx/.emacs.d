@@ -52,6 +52,7 @@
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
+<<<<<<< HEAD
   (setq gptel-model 'qwen3.7-max
         gptel-backend
         (gptel-make-anthropic "Bailian"
@@ -69,10 +70,17 @@
   (gptel-make-openai "Github Models"
     :host "models.inference.ai.azure.com"
     :endpoint "/chat/completions?api-version=2024-05-01-preview"
+=======
+  ;; GLM
+  (gptel-make-openai "GLM"
+    :host "open.bigmodel.cn"
+    :endpoint "/api/paas/v4/chat/completions"
+>>>>>>> update_stream/master
     :stream t
     :key #'gptel-api-key-from-auth-source
     :models '(gpt-4o))
 
+<<<<<<< HEAD
   (gptel-make-openai "Nvidia"
     :host "integrate.api.nvidia.com"
     :endpoint "/v1/chat/completions"
@@ -83,6 +91,41 @@
   (gptel-make-anthropic "Claude"
     :stream t
     :key #'gptel-api-key-from-auth-source))
+=======
+  ;; DeepSeek
+  (gptel-make-deepseek "DeepSeek"
+    :stream t
+    :key 'gptel-api-key)
+
+  ;; Qwen (Alibaba Cloud)
+  (gptel-make-openai "Qwen"
+    :host "dashscope.aliyuncs.com"
+    :endpoint "/compatible-mode/v1/chat/completions"
+    :stream t
+    :key 'gptel-api-key
+    :models '(qwen-plus qwen-turbo qwen-max))
+
+  (gptel-make-openai "Moonshot"
+    :host "api.moonshot.cn" ;; or "api.moonshot.ai" for the global site
+    :key 'gptel-api-key
+    :stream t
+    :models '(kimi-latest kimi-k2-0711-preview))
+
+  ;; Gemini (Google)
+  (gptel-make-gemini "Gemini"
+    :key 'gptel-api-key
+    :stream t
+    :models '(gemini-2.5-flash gemini-2.5-pro))
+
+  ;; Claude (Anthropic)
+  (gptel-make-anthropic "Claude"
+    :stream t
+    :key 'gptel-api-key
+    :models '(claude-sonnet-4-20250514 claude-haiku-3-5-20241022))
+
+  (setq gptel-model 'deepseek-v4-flash
+        gptel-backend (gptel-get-backend "DeepSeek")))
+>>>>>>> update_stream/master
 
 ;; Generate commit messages for magit
 (use-package gptel-magit
