@@ -46,52 +46,22 @@
 ;;
 (use-package gptel
   :diminish
-  :functions (gptel-make-openai gptel-make-anthropic)
+  :functions (gptel-make-openai gptel-make-anthropic
+               gptel-make-deepseek gptel-make-gemini
+               gptel-get-backend)
   :bind (("C-<f12>"   . gptel)
          ("C-M-<f12>" . gptel-menu))
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
-<<<<<<< HEAD
-  (setq gptel-model 'qwen3.7-max
-        gptel-backend
-        (gptel-make-anthropic "Bailian"
-          :host "token-plan.cn-beijing.maas.aliyuncs.com"
-          :endpoint "/apps/anthropic/v1/messages"
-          :stream nil
-          :key #'gptel-api-key-from-auth-source
-          :request-params '(:thinking (:type "disabled"))
-          :models '(qwen3.7-max qwen3.6-plus qwen3.6-flash
-                    deepseek-v4-pro deepseek-v4-flash deepseek-v3.2
-                    kimi-k2.6 kimi-k2.5
-                    glm-5.1 glm-5
-                    MiniMax-M2.5)))
-
-  (gptel-make-openai "Github Models"
-    :host "models.inference.ai.azure.com"
-    :endpoint "/chat/completions?api-version=2024-05-01-preview"
-=======
   ;; GLM
   (gptel-make-openai "GLM"
     :host "open.bigmodel.cn"
     :endpoint "/api/paas/v4/chat/completions"
->>>>>>> update_stream/master
     :stream t
-    :key #'gptel-api-key-from-auth-source
-    :models '(gpt-4o))
+    :key 'gptel-api-key
+    :models '(glm-5.2 glm-5.2-flash glm-4.7 glm-4.7-flash))
 
-<<<<<<< HEAD
-  (gptel-make-openai "Nvidia"
-    :host "integrate.api.nvidia.com"
-    :endpoint "/v1/chat/completions"
-    :stream t
-    :key #'gptel-api-key-from-auth-source
-    :models '(z-ai/glm4.7 minimaxai/minimax-m2.1 deepseek-ai/deepseek-v3.1-terminus))
-
-  (gptel-make-anthropic "Claude"
-    :stream t
-    :key #'gptel-api-key-from-auth-source))
-=======
   ;; DeepSeek
   (gptel-make-deepseek "DeepSeek"
     :stream t
@@ -123,9 +93,9 @@
     :key 'gptel-api-key
     :models '(claude-sonnet-4-20250514 claude-haiku-3-5-20241022))
 
+  ;; Set default model and backend
   (setq gptel-model 'deepseek-v4-flash
         gptel-backend (gptel-get-backend "DeepSeek")))
->>>>>>> update_stream/master
 
 ;; Generate commit messages for magit
 (use-package gptel-magit
