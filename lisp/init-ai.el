@@ -188,7 +188,7 @@
 
 (defun centaur-bailian--handle-image-response (resp)
   "Process image response RESP: extract URL, download, display."
-  (if-let ((url (centaur-bailian--extract-image-url resp)))
+  (if-let* ((url (centaur-bailian--extract-image-url resp)))
       (let ((fp (centaur-bailian--download-image url)))
         (message "Image saved: %s" fp)
         (find-file fp)
