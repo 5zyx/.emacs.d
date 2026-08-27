@@ -49,7 +49,7 @@
   :custom (gptel-use-curl nil)
   :config
   ;; Set default model and backend
-  (setq gptel-model 'x-preview-f-free
+  (setq gptel-model 'big-pickle
         gptel-backend
         (gptel-make-openai "OpenCode Zen"
           :host "opencode.ai"
@@ -106,9 +106,6 @@
 (when emacs/>=30p
   (use-package gptel-magit
     :vc (:url "https://github.com/roife/gptel-magit" :rev :newest)
-    :custom
-    (gptel-magit-model 'x-preview-f-free)
-    (gptel-magit-backend (gptel-get-backend "OpenCode Zen"))
     :hook (magit-mode . gptel-magit-install)))
 
 ;; A native shell experience to interact with ACP agents

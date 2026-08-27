@@ -48,7 +48,7 @@ M-x set-package-archives        ; Switch mirrors
 
 ### Package Archives
 
-Options: `melpa`, `bfsu`, `iscas`, `netease`, `sjtu`, `tencent`, `tuna`, `ustc` (China mirrors)
+Options: `melpa`, `bfsu`, `iscas`, `netease`, `sjtu`, `tencent`, `tuna`, `ustc` (all except `melpa` are China mirrors)
 
 Set in `custom.el`:
 ```elisp
@@ -87,6 +87,7 @@ init-hydra, init-ui, init-edit, ...       ← Layer 5+: Features
 - `load-suffixes` → `(".elc" ".el")` only (skip .so/.dll/.gz)
 - `native-comp-jit-compilation` → `nil` (defer runtime compilation)
 - UI disabled via `default-frame-alist` (before frame creation)
+- `load-path-filter-function` → `load-path-filter-cache-directory-files` on Emacs 31+ (~15% startup improvement)
 
 **init-base.el**:
 - `gcmh-mode` restores GC to ~64MB after startup — never disable
@@ -111,11 +112,14 @@ sys/macp         ; macOS
 sys/linuxp       ; Linux
 sys/mac-port-p   ; Emacs Mac port build
 sys/mac-ns-p     ; macOS Cocoa (NextStep)
+sys/mac-cocoa-p  ; macOS with Cocoa feature
 sys/mac-x-p      ; macOS with GUI
 sys/linux-x-p    ; Linux with GUI
 sys/cygwinp      ; Cygwin
+sys/rootp        ; Running as root
 daemonp          ; Daemon mode
 emacs/>=29p      ; Version checks
+emacs/>=29.2p
 emacs/>=30p
 emacs/>=31p
 emacs/>=32p
@@ -132,7 +136,7 @@ emacs/>=32p
 ;; <filename> --- <description>	-*- lexical-binding: t -*-
 ```
 
-**User-editable and entry point files** (`custom.el`, `env.el`, `early-init.el`, `init.el`, `init-mini.el`):
+**User-editable and entry point files** (`custom.el`, ``early-init.el`, `init.el`, `init-mini.el`):
 ```elisp
 ;;; <filename> --- <description> -*- lexical-binding: t no-byte-compile: t -*-
 ```
@@ -193,12 +197,10 @@ Set in `init-package.el`:
 | `custom-example.el` | ✓ | Template for custom.el |
 | `custom.el` | ✗ | User customizations (auto-copied on first startup) |
 | `custom-post.el` | ✗ | Post-init overrides (loaded via after-init-hook) |
-| `env-example.el` | ✓ | Template for env.el |
-| `env.el` | ✗ | Environment variables (loaded in early-init.el) |
 
 ### Loading Sequence
 
-1. `early-init.el` → Loads `env.el`
+1. `early-init.el`
 2. `init.el` → Loads init-const, init-custom, init-funcs
 3. `init-package.el` → Copies `custom-example.el` to `custom.el`, loads `custom.el`
 4. `after-init-hook` → Loads `custom-post.el` (or `custom-post.org`)
@@ -236,7 +238,6 @@ centaur-org-directory
 
 - `custom.el` - Centaur variable settings, fonts, proxy
 - `custom-post.el` - Advanced customizations, use-package configs, hooks
-- `env.el` - Environment variables (PATH)
 
 ### What Users SHOULD NOT Modify
 
@@ -266,32 +267,26 @@ centaur-org-directory
 
 ### 3. no-byte-compile is NOT Universal
 
-Only **user-editable and entry point files** need `no-byte-compile: t`: `custom.el`, `env.el`, `early-init.el`, `init.el`, `init-mini.el`. Core init files in `lisp/init-*.el` do NOT have this flag and should not get it.
+Only **user-editable and entry point files** need `no-byte-compile: t`: `custom.el`, `early-init.el`, `init.el`, `init-mini.el`. Core init files in `lisp/init-*.el` do NOT have this flag and should not get it.
 
-### 4. env.el Timing
-
-`env.el` is loaded in `early-init.el` (before package init). Critical for PATH setup and LSP performance variables.
-
-**For emacs-plus users**: Set `centaur-use-exec-path-from-shell` to `nil` and use `env.el` instead (avoid spawning shell).
-
-### 5. custom-post.el Loading Order
+### 4. custom-post.el Loading Order
 
 Loaded via `after-init-hook` after all packages initialized. Use this for package-dependent customizations.
 
-### 6. Windows Package Optimization
+### 5. Windows Package Optimization
 
 On Windows, all packages are consolidated into `elpa/all` to reduce `load-path` entries (performance hack in `init-package.el:90-145`).
 
-### 7. Daemon-Specific Handling
+### 6. Daemon-Specific Handling
 
 - `centaur-dashboard` defaults to `nil` in daemon mode
 - No GUI features (PDF, xwidget) work in daemon
 
-### 8. No Automated Tests
+### 7. No Automated Tests
 
 CI only validates that config loads. No unit tests, integration tests, or ERT tests exist.
 
-### 9. emacsclient Only
+### 8. emacsclient Only
 
 Always use `emacsclient` for operations (byte compilation, evaluation, testing). Never `emacs` or `--batch`.
 
