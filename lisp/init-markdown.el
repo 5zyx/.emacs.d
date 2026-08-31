@@ -84,6 +84,9 @@ mermaid.initialize({
   :config
   ;; Support `mermaid'
   (add-to-list 'markdown-code-lang-modes '("mermaid" . mermaid-mode))
+  (use-package markdown-mermaid
+    :bind (:map markdown-mode-map
+           ("C-c M" . markdown-mermaid-preview)))
 
   (with-no-warnings
     ;; Use `which-key' instead
@@ -94,32 +97,32 @@ mermaid.initialize({
     (defun my/markdown-export-and-preview ()
       "Preview with `xwidget' if applicable, otherwise with the default browser."
       (centaur-browse-url-of-file (markdown-export)))
-    (advice-add #'markdown-export-and-preview :override #'my/markdown-export-and-preview)))
+    (advice-add #'markdown-export-and-preview :override #'my/markdown-export-and-preview))
 
-;; Table of contents
-(use-package markdown-toc
-  :diminish
-  :bind (:map markdown-mode-command-map
-         ("r" . markdown-toc-generate-or-refresh-toc))
-  :hook markdown-mode
-  :init (setq markdown-toc-indentation-space 2
-              markdown-toc-header-toc-title "\n## Table of Contents"
-              markdown-toc-user-toc-structure-manipulation-fn 'cdr)
-  :config
-  (with-no-warnings
-    (define-advice markdown-toc-generate-toc (:around (fn &rest args) lsp)
-      "Generate or refresh toc after disabling lsp."
-      (cond
-       ((bound-and-true-p eglot--manage-mode)
-        (eglot--manage-mode -1)
-        (apply fn args)
-        (eglot--manage-mode 1))
-       ((bound-and-true-p lsp-managed-mode)
-        (lsp-managed-mode -1)
-        (apply fn args)
-        (lsp-managed-mode 1))
-       (t
-        (apply fn args))))))
+  ;; Table of contents
+  (use-package markdown-toc
+    :diminish
+    :bind (:map markdown-mode-command-map
+           ("r" . markdown-toc-generate-or-refresh-toc))
+    :hook markdown-mode
+    :init (setq markdown-toc-indentation-space 2
+                markdown-toc-header-toc-title "\n## Table of Contents"
+                markdown-toc-user-toc-structure-manipulation-fn 'cdr)
+    :config
+    (with-no-warnings
+      (define-advice markdown-toc-generate-toc (:around (fn &rest args) lsp)
+        "Generate or refresh toc after disabling lsp."
+        (cond
+         ((bound-and-true-p eglot--manage-mode)
+          (eglot--manage-mode -1)
+          (apply fn args)
+          (eglot--manage-mode 1))
+         ((bound-and-true-p lsp-managed-mode)
+          (lsp-managed-mode -1)
+          (apply fn args)
+          (lsp-managed-mode 1))
+         (t
+          (apply fn args)))))))
 
 ;; Preview markdown files
 ;; @see https://github.com/seagle0128/grip-mode?tab=readme-ov-file#prerequisite
@@ -129,7 +132,10 @@ mermaid.initialize({
   :autoload grip-mode
   :init
   (with-eval-after-load 'markdown-mode
-    (bind-key "g" #'grip-mode markdown-mode-command-map))
+    (bind-key "C-g" #'grip-mode markdown-mode-command-map))
+
+  (with-eval-after-load 'markdown-ts-mode
+    (bind-key "C-c C-g" #'grip-mode markdown-ts-mode-map))
 
   (with-eval-after-load 'org
     (bind-key "C-c C-g" #'grip-mode org-mode-map))

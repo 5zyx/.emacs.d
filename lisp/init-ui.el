@@ -151,6 +151,8 @@
       "lsp" :toggle doom-modeline-lsp)
      ("g k" (setq doom-modeline-workspace-name (not doom-modeline-workspace-name))
       "workspace" :toggle doom-modeline-workspace-name)
+     ("g s" (setq doom-modeline-spell (not doom-modeline-spell))
+      "spell" :toggle doom-modeline-spell)
      ("g g" (setq doom-modeline-github (not doom-modeline-github))
       "github" :toggle doom-modeline-github)
      ("g n" (setq doom-modeline-gnus (not doom-modeline-gnus))
@@ -268,6 +270,8 @@
 
 ;; A minor-mode menu for mode-line
 (use-package minions
+  :custom (minions-prominent-modes '(markdown-ts-code-block-in-context-mode
+                                     markdown-ts-in-table-mode))
   :hook after-init)
 
 ;; Icons
@@ -338,8 +342,9 @@
 ;; Smooth Scroll
 (when emacs/>=29p
   (use-package ultra-scroll
-    :init (setq scroll-conservatively 3
-                scroll-margin 0)
+    :custom
+    (scroll-conservatively 3)
+    (scroll-margin 0)
     :hook window-setup))
 
 ;; Use fixed pitch where it's sensible
@@ -355,9 +360,13 @@
 ;; Display transient in the child frame
 (use-package transient-posframe
   :diminish
-  :defines posframe-border-width
   :functions childframe-completion-workable-p
   :commands transient-posframe-mode
+  :custom
+  (transient-mode-line-format nil)
+  (transient-posframe-border-width posframe-border-width)
+  (transient-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
+  (transient-posframe-poshandler #'posframe-poshandler-frame-center)
   :custom-face
   (transient-posframe-border ((t (:inherit posframe-border :background unspecified))))
   :hook ((after-init server-after-make-frame)
@@ -366,11 +375,7 @@
            "Display transient in the child frame if applicable."
            (if (childframe-completion-workable-p)
                (transient-posframe-mode 1)
-             (transient-posframe-mode -1))))
-  :init (setq transient-mode-line-format nil
-              transient-posframe-border-width posframe-border-width
-              transient-posframe-parameters '((left-fringe . 8)
-                                              (right-fringe . 8))))
+             (transient-posframe-mode -1)))))
 
 ;; For macOS
 (with-no-warnings
@@ -386,7 +391,7 @@
     :ensure nil
     :init (defvar composition-ligature-table (make-char-table nil))
     :hook (((prog-mode
-             conf-mode nxml-mode markdown-mode help-mode
+             conf-mode nxml-mode markdown-mode markdown-ts-mode help-mode
              eshell-mode ghostel-mode shell-mode term-mode)
             . (lambda () (setq-local composition-function-table composition-ligature-table))))
     :config
