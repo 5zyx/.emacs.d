@@ -185,9 +185,10 @@ interactively.  Turn the filename into a URL with function
 (defun reload-init-file ()
   "Reload Emacs configurations."
   (interactive)
-  (load early-init-file)
-  (load user-init-file)
-  (run-hooks 'after-init-hook 'window-setup-hook 'emacs-startup-hook))
+  (when (yes-or-no-p "Really reload Emacs configurations?")
+    (load early-init-file)
+    (load user-init-file)
+    (run-hooks 'after-init-hook 'window-setup-hook 'emacs-startup-hook)))
 (defalias 'centaur-reload-init-file #'reload-init-file)
 
 ;; Browse the homepage
@@ -384,12 +385,13 @@ Return the fastest package archive."
 (defun update-config ()
   "Update Centaur Emacs configurations to the latest version."
   (interactive)
-  (let ((default-directory (expand-file-name user-emacs-directory)))
-    (if (file-exists-p default-directory)
+  (let ((dir (expand-file-name user-emacs-directory)))
+    (if (file-exists-p dir)
         (progn
           (message "Updating configurations...")
+          (vc-dir dir)
           (vc-update))
-      (warn "\"%s\" doesn't exist" default-directory))))
+      (warn "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -410,23 +412,25 @@ Return the fastest package archive."
 (defun update-dotfiles ()
   "Update the dotfiles to the latest version."
   (interactive)
-  (let ((default-directory (expand-file-name "~/.dotfiles/")))
-    (if (file-exists-p default-directory)
+  (let ((dir (expand-file-name "~/.dotfiles/")))
+    (if (file-exists-p dir)
         (progn
           (message "Updating dotfiles...")
+          (vc-dir dir)
           (vc-update))
-      (warn "\"%s\" doesn't exist" default-directory))))
+      (warn "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
-  (let ((default-directory (expand-file-name "~/org/")))
-    (if (file-exists-p default-directory)
+  (let ((dir (expand-file-name "~/org/")))
+    (if (file-exists-p dir)
         (progn
-          (message "Updating org files...")
+          (message "Updating org files %s..." dir)
+          (vc-dir dir)
           (vc-update))
-      (warn "\"%s\" doesn't exist" default-directory))))
+      (warn "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
