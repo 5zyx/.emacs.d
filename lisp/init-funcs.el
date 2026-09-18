@@ -389,15 +389,8 @@ Return the fastest package archive."
     (if (file-exists-p default-directory)
         (progn
           (message "Updating configurations...")
-<<<<<<< HEAD
-          (with-temp-buffer
-            (let ((default-directory dir))
-              (vc-pull))))
-      (warn "\"%s\" doesn't exist" dir))))
-=======
           (vc-update))
       (warn "\"%s\" doesn't exist" default-directory))))
->>>>>>> update_stream/master
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -422,15 +415,8 @@ Return the fastest package archive."
     (if (file-exists-p default-directory)
         (progn
           (message "Updating dotfiles...")
-<<<<<<< HEAD
-          (with-temp-buffer
-            (let ((default-directory dir))
-              (vc-pull))))
-      (warn "\"%s\" doesn't exist" dir))))
-=======
           (vc-update))
       (warn "\"%s\" doesn't exist" default-directory))))
->>>>>>> update_stream/master
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
@@ -439,17 +425,9 @@ Return the fastest package archive."
   (let ((default-directory "~/org/"))
     (if (file-exists-p default-directory)
         (progn
-<<<<<<< HEAD
-          (message "Updating org files %s..." dir)
-          (with-temp-buffer
-            (let ((default-directory dir))
-              (vc-pull))))
-      (warn "\"%s\" doesn't exist" dir))))
-=======
           (message "Updating org files %s..." default-directory)
           (vc-update))
       (warn "\"%s\" doesn't exist" default-directory))))
->>>>>>> update_stream/master
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
