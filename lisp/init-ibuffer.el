@@ -1,4 +1,4 @@
-;; init-buffer.el --- Initialize ibuffer configurations.	-*- lexical-binding: t -*-
+;; init-ibuffer.el --- Initialize ibuffer configurations.	-*- lexical-binding: t -*-
 
 ;; Copyright (C) 2006-2026 Vincent Zhang
 
