@@ -36,8 +36,11 @@
 ;; Interact with ChatGPT or other LLMs
 ;;
 ;; API Key management via authinfo (no plain-text secrets):
-;;   machine api.deepseek.com               login api-key password <ds_key>
-;;   machine api.anthropic.com              login api-key password <claude_key>
+;; Each gptel backend looks up its own host with login `apikey':
+;;   machine token-plan.verystar.dev       login apikey password <vs_key>
+;;   machine opencode.ai                    login apikey password <zen_key>
+;;   machine api.deepseek.com               login apikey password <ds_key>
+;;   machine api.anthropic.com              login apikey password <claude_key>
 ;;
 (use-package gptel
   :functions (gptel-make-openai gptel-make-deepseek
@@ -49,17 +52,30 @@
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
-  ;; Set default model and backend
-  (setq gptel-model 'big-pickle
-        gptel-backend (gptel-make-openai "OpenCode Zen"
-                        :host "opencode.ai"
-                        :endpoint "/zen/v1/chat/completions"
+  ;; Set default model and backend (Verystar internal gateway)
+  (setq gptel-model 'glm-5.3
+        gptel-backend (gptel-make-openai "Verystar Token Plan"
+                        :host "token-plan.verystar.dev"
+                        :endpoint "/v1/chat/completions"
                         :stream t
                         :key 'gptel-api-key
-                        :models '(big-pickle
-                                  mimo-v2.5-free
-                                  muse-spark-1.2-free
-                                  laguna-s-2.1-free)))
+                        :models '(glm-5.3 glm-5.2 qwen3.8-max-preview
+                                  deepseek-v4.1-flash deepseek-v4-pro
+                                  deepseek-v4-flash deepseek-v4-flash-0731)))
+
+  ;; OpenCode Zen (free models; signup at https://opencode.ai/auth)
+  (gptel-make-openai "OpenCode Zen"
+    :host "opencode.ai"
+    :endpoint "/zen/v1/chat/completions"
+    :stream t
+    :key 'gptel-api-key
+    :models '(big-pickle
+              mimo-v2.5-free
+              mimo-v2.6-flash-free
+              space-bunny-free
+              ling-3.0-flash-fin-free
+              nemotron-3-ultra-free
+              nemotron-3.5-lightning-free))
 
   ;; DeepSeek
   (gptel-make-deepseek "DeepSeek"
