@@ -88,7 +88,7 @@
     :endpoint "/api/paas/v4/chat/completions"
     :stream t
     :key 'gptel-api-key
-    :models '(glm-5.2 glm-5.2-flash glm-4.7 glm-4.7-flash))
+    :models '(glm-5.3 glm-5.3-flash glm-4.7 glm-4.7-flash))
 
   ;; Qwen (Alibaba Cloud)
   (gptel-make-openai "Qwen"
@@ -103,7 +103,7 @@
     :host "api.moonshot.cn" ;; or "api.moonshot.ai" for the global site
     :key 'gptel-api-key
     :stream t
-    :models '(kimi-k3 kimi-k2.7-code kimi-k2.7-code-highspeed kimi-k2.6 kimi-k2.5))
+    :models '(kimi-k3 kimi-k2.7-code kimi-k2.7-code-highspeed kimi-k2.6))
 
   ;; Gemini (Google)
   (gptel-make-gemini "Gemini"
@@ -115,13 +115,13 @@
     :stream t
     :key 'gptel-api-key))
 
-;; Generate commit messages for magit
-(use-package gptel-magit
-  :vc (:url "https://github.com/roife/gptel-magit" :rev :newest)
-  :hook (magit-mode . gptel-magit-install))
-
-;; A native shell experience to interact with ACP agents
 (when emacs/>=29p
+  ;; Generate commit messages for magit
+  (use-package gptel-magit
+    :vc (:url "https://github.com/roife/gptel-magit" :rev :newest)
+    :hook (magit-mode . gptel-magit-install))
+
+  ;; A native shell experience to interact with ACP agents
   (use-package agent-shell
     :commands agent-shell-insert
     :defines magit-mode-map

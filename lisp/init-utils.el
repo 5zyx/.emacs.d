@@ -99,15 +99,15 @@
                        ("C-c C-t" . "python-skeleton"))
                       (rust-mode
                        ("C-c C-c" . "rust-build"))
-                      (markdown-ts-mode
-                       ("C-c C-x" . "markdown-toggle")
-                       ("C-c C-v" . "markdown-code-block"))
                       (markdown-mode
                        ("C-c C-a" . "markdown-link")
                        ("C-c C-c" . "markdown-command")
                        ("C-c C-s" . "markdown-style")
                        ("C-c C-t" . "markdown-header")
                        ("C-c C-x" . "markdown-toggle"))
+                      (markdown-ts-mode
+                       ("C-c C-x" . "markdown-toggle")
+                       ("C-c C-v" . "markdown-code-block"))
                       (gfm-mode
                        ("C-c C-a" . "markdown-link")
                        ("C-c C-c" . "markdown-command")
@@ -122,22 +122,21 @@
 
 ;; Show 'which-key' in the child frame
 (use-package which-key-posframe
-  :defines posframe-border-width
   :functions childframe-completion-workable-p
   :commands which-key-posframe-mode
+  :custom
+  (which-key-posframe-border-width posframe-border-width)
+  (which-key-posframe-poshandler 'posframe-poshandler-frame-center-near-bottom)
+  (which-key-posframe-parameters '((left-fringe . 8)
+                                   (right-fringe . 8)))
   :custom-face
   (which-key-posframe-border ((t (:inherit posframe-border :background unspecified))))
-  :hook (which-key-mode
+  :hook ((emacs-startup server-after-make-frame)
          .
          (lambda ()
            (if (and which-key-mode (childframe-completion-workable-p))
                (which-key-posframe-mode 1)
-             (which-key-posframe-mode -1))))
-  :init
-  (setq which-key-posframe-border-width posframe-border-width
-        which-key-posframe-poshandler 'posframe-poshandler-frame-center-near-bottom
-        which-key-posframe-parameters '((left-fringe . 8)
-                                        (right-fringe . 8))))
+             (which-key-posframe-mode -1)))))
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
