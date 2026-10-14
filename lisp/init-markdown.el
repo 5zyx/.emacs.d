@@ -137,7 +137,6 @@ mermaid.initialize({
     :config (require 'markdown-ts-mode-x))
 
   (use-package markdown-ts-appear
-    :vc (:url "https://github.com/Thysrael/markdown-ts-appear" :rev :newest)
     :hook (markdown-ts-mode . markdown-ts-appear-mode)))
 
 ;; Preview markdown files
