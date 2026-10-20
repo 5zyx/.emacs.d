@@ -45,6 +45,7 @@
 (use-package gptel
   :functions (gptel-make-openai gptel-make-deepseek
                gptel-make-anthropic gptel-make-gemini)
+  :autoload gptel-get-backend
   :bind (("C-<f12>"   . gptel)
          ("C-M-<f12>" . gptel-menu)
          ("C-c a g"   . gptel)
@@ -52,6 +53,7 @@
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
+<<<<<<< HEAD
   ;; Set default model and backend (Verystar internal gateway)
   (setq gptel-model 'glm-5.3
         gptel-backend (gptel-make-openai "Verystar Token Plan"
@@ -77,6 +79,8 @@
               nemotron-3-ultra-free
               nemotron-3.5-lightning-free))
 
+=======
+>>>>>>> update_stream/master
   ;; DeepSeek
   (gptel-make-deepseek "DeepSeek"
     :stream t
@@ -113,7 +117,11 @@
   ;; Claude (Anthropic)
   (gptel-make-anthropic "Claude"
     :stream t
-    :key 'gptel-api-key))
+    :key 'gptel-api-key)
+
+  ;; Set default model and backend
+  (setq gptel-model 'deepseek-flash
+        gptel-backend (gptel-get-backend "DeepSeek")))
 
 (when emacs/>=29p
   ;; Generate commit messages for magit
