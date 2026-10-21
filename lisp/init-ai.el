@@ -53,7 +53,6 @@
   :hook (gptel-mode . gptel-highlight-mode)
   :custom (gptel-use-curl nil)
   :config
-<<<<<<< HEAD
   ;; Set default model and backend (Verystar internal gateway)
   (setq gptel-model 'glm-5.3
         gptel-backend (gptel-make-openai "Verystar Token Plan"
@@ -79,8 +78,6 @@
               nemotron-3-ultra-free
               nemotron-3.5-lightning-free))
 
-=======
->>>>>>> update_stream/master
   ;; DeepSeek
   (gptel-make-deepseek "DeepSeek"
     :stream t
