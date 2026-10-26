@@ -45,6 +45,8 @@
 (declare-function chart-bar-quickie "chart")
 (declare-function consult-theme "ext:consult")
 (declare-function nerd-icons-install-fonts "ext:nerd-icons")
+(declare-function vc-find-backend-function "vc" (backend function))
+(declare-function vc-responsible-backend "vc" (file &optional no-error))
 (declare-function winner-undo "winner")
 (declare-function xwidget-buffer "xwidget")
 (declare-function xwidget-webkit-current-session "xwidget")
@@ -382,12 +384,24 @@ Return the fastest package archive."
 
 
 ;; Update
+(defun centaur--vc-pull-directory (dir)
+  "Pull the repository containing DIR with its VC backend.
+Unlike `vc-dir' followed by `vc-pull', this doesn't need a VC buffer
+whose file list has finished loading, which is still empty right after
+`vc-dir' returns (that makes `vc-pull' fail with \"No file available\")."
+  (let ((default-directory (file-name-as-directory (expand-file-name dir))))
+    (unless (file-directory-p default-directory)
+      (user-error "\"%s\" doesn't exist" default-directory))
+    (let* ((backend (vc-responsible-backend default-directory))
+           (pull (or (vc-find-backend-function backend 'pull)
+                     (user-error "VC pull is unsupported for `%s'" backend))))
+      (funcall pull nil))))
+
 (defun update-config ()
   "Update Centaur Emacs configurations to the latest version."
   (interactive)
   (message "Updating configurations...")
-  (vc-dir user-emacs-directory)
-  (vc-pull))
+  (centaur--vc-pull-directory user-emacs-directory))
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -409,16 +423,14 @@ Return the fastest package archive."
   "Update the dotfiles to the latest version."
   (interactive)
   (message "Updating dotfiles...")
-  (vc-dir "~/.dotfiles/")
-  (vc-pull))
+  (centaur--vc-pull-directory "~/.dotfiles/"))
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
-  (message "Updating org files %s..." default-directory)
-  (vc-dir "~/org/")
-  (vc-pull))
+  (message "Updating org files...")
+  (centaur--vc-pull-directory "~/org/"))
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
