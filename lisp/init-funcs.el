@@ -434,11 +434,21 @@ whose file list has finished loading, which is still empty right after
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
-  "Update dotfiles, org files, configurations and packages to the latest."
+  "Update dotfiles, org files, configurations and packages to the latest.
+Each step runs independently, so a failing repository or package
+upgrade doesn't prevent the remaining steps from running."
   (interactive)
-  (update-org)
-  (update-dotfiles)
-  (update-config-and-packages))
+  (let (failures)
+    (dolist (update '(update-org update-dotfiles update-config-and-packages))
+      (condition-case err
+          (funcall update)
+        (error (push (format "%s: %s" update (error-message-string err)) failures))))
+    (if failures
+        (display-warning 'centaur
+                         (format "Update finished with errors: %s"
+                                 (mapconcat #'identity (nreverse failures) "; "))
+                         :warning)
+      (message "Update all...done"))))
 (defalias 'centaur-update-all #'update-all)
 
 
