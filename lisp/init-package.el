@@ -83,6 +83,33 @@
 ;; Set ELPA packages
 (set-package-archives centaur-package-archives nil nil t)
 
+;; Guard against a stale quickstart byte-code file.
+;; `package-quickstart-refresh' rewrites `package-quickstart-file' and then
+;; byte-compiles it.  If Emacs is killed in between (e.g. during a package
+;; upgrade), the previous `.elc' keeps precedence because `load-prefer-newer'
+;; is nil, and the `load-path' it sets up may still contain package
+;; directories that were just deleted -- surfacing as
+;; "Cannot open load file: <package>" during startup.
+(defun centaur--refresh-stale-quickstart ()
+  "Recompile `package-quickstart-file' when it is newer than its byte-code."
+  (require 'package)
+  (let ((source package-quickstart-file)
+        (compiled (concat package-quickstart-file "c")))
+    (when (and package-quickstart
+               (file-exists-p source)
+               (file-exists-p compiled)
+               (file-newer-than-file-p source compiled))
+      (message "Recompiling stale %s..." (file-name-nondirectory compiled))
+      (condition-case err
+          (byte-compile-file source)
+        (error
+         ;; Fall back to the up-to-date source file.
+         (message "Cannot recompile %s: %s"
+                  compiled (error-message-string err))
+         (ignore-errors (delete-file compiled)))))))
+
+(centaur--refresh-stale-quickstart)
+
 ;; Initialize packages
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
   (setq package-enable-at-startup nil)          ; To prevent initializing twice
