@@ -401,7 +401,13 @@ whose file list has finished loading, which is still empty right after
   "Update Centaur Emacs configurations to the latest version."
   (interactive)
   (message "Updating configurations...")
+<<<<<<< HEAD
   (centaur--vc-pull-directory user-emacs-directory))
+=======
+  (vc-dir user-emacs-directory)
+  (sleep-for 0.5)
+  (vc-pull))
+>>>>>>> update_stream/master
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -423,14 +429,27 @@ whose file list has finished loading, which is still empty right after
   "Update the dotfiles to the latest version."
   (interactive)
   (message "Updating dotfiles...")
+<<<<<<< HEAD
   (centaur--vc-pull-directory "~/.dotfiles/"))
+=======
+  (vc-dir "~/.dotfiles/")
+  (sleep-for 0.5)
+  (vc-pull))
+>>>>>>> update_stream/master
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
+<<<<<<< HEAD
   (message "Updating org files...")
   (centaur--vc-pull-directory "~/org/"))
+=======
+  (message "Updating org files %s..." default-directory)
+  (vc-dir "~/org/")
+  (sleep-for 0.5)
+  (vc-pull))
+>>>>>>> update_stream/master
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
