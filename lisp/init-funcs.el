@@ -405,7 +405,11 @@ whose file list has finished loading, which is still empty right after
   (centaur--vc-pull-directory user-emacs-directory))
 =======
   (vc-dir user-emacs-directory)
+<<<<<<< HEAD
   (sleep-for 0.5)
+=======
+  (sleep-for 0.2)
+>>>>>>> update_stream/master
   (vc-pull))
 >>>>>>> update_stream/master
 (defalias 'centaur-update-config #'update-config)
@@ -433,7 +437,11 @@ whose file list has finished loading, which is still empty right after
   (centaur--vc-pull-directory "~/.dotfiles/"))
 =======
   (vc-dir "~/.dotfiles/")
+<<<<<<< HEAD
   (sleep-for 0.5)
+=======
+  (sleep-for 0.2)
+>>>>>>> update_stream/master
   (vc-pull))
 >>>>>>> update_stream/master
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
@@ -447,7 +455,11 @@ whose file list has finished loading, which is still empty right after
 =======
   (message "Updating org files %s..." default-directory)
   (vc-dir "~/org/")
+<<<<<<< HEAD
   (sleep-for 0.5)
+=======
+  (sleep-for 0.2)
+>>>>>>> update_stream/master
   (vc-pull))
 >>>>>>> update_stream/master
 (defalias 'centaur-update-org #'update-org)
