@@ -419,6 +419,7 @@ whose file list has finished loading, which is still empty right after
   (interactive)
   (message "Updating packages...")
   (package-upgrade-all)
+  (delete-file (locate-user-emacs-file "package-quickstart.elc"))
   (message "Updating packages...done"))
 (defalias 'centaur-update-packages #'update-packages)
 
