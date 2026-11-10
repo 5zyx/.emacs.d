@@ -225,10 +225,10 @@ Also opens the custom-post file in another window if it exists."
 (defun byte-compile-site-lisp ()
   "Compile packages in site-lisp directory."
   (interactive)
-  (let ((default-directory (locate-user-emacs-file "site-lisp")))
+  (let ((dir (locate-user-emacs-file "site-lisp")))
     (if (fboundp 'async-byte-recompile-directory)
-        (async-byte-recompile-directory default-directory)
-      (byte-recompile-directory default-directory 0 t))))
+        (async-byte-recompile-directory dir)
+      (byte-recompile-directory dir 0 t))))
 
 (defun native-compile-elpa ()
   "Native-compile packages in elpa directory."
@@ -239,9 +239,9 @@ Also opens the custom-post file in another window if it exists."
 (defun native-compile-site-lisp ()
   "Native compile packages in site-lisp directory."
   (interactive)
-  (let ((default-directory (locate-user-emacs-file "site-lisp")))
+  (let ((dir (locate-user-emacs-file "site-lisp")))
     (if (fboundp 'native-compile-async)
-        (native-compile-async default-directory t))))
+        (native-compile-async dir t))))
 
 (defun icons-displayable-p ()
   "Return non-nil if icons are displayable."
@@ -401,17 +401,7 @@ whose file list has finished loading, which is still empty right after
   "Update Centaur Emacs configurations to the latest version."
   (interactive)
   (message "Updating configurations...")
-<<<<<<< HEAD
   (centaur--vc-pull-directory user-emacs-directory))
-=======
-  (vc-dir user-emacs-directory)
-<<<<<<< HEAD
-  (sleep-for 0.5)
-=======
-  (sleep-for 0.2)
->>>>>>> update_stream/master
-  (vc-pull))
->>>>>>> update_stream/master
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -434,36 +424,22 @@ whose file list has finished loading, which is still empty right after
   "Update the dotfiles to the latest version."
   (interactive)
   (message "Updating dotfiles...")
-<<<<<<< HEAD
   (centaur--vc-pull-directory "~/.dotfiles/"))
-=======
-  (vc-dir "~/.dotfiles/")
-<<<<<<< HEAD
-  (sleep-for 0.5)
-=======
-  (sleep-for 0.2)
->>>>>>> update_stream/master
-  (vc-pull))
->>>>>>> update_stream/master
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
-<<<<<<< HEAD
   (message "Updating org files...")
   (centaur--vc-pull-directory "~/org/"))
-=======
-  (message "Updating org files %s..." default-directory)
-  (vc-dir "~/org/")
-<<<<<<< HEAD
-  (sleep-for 0.5)
-=======
-  (sleep-for 0.2)
->>>>>>> update_stream/master
-  (vc-pull))
->>>>>>> update_stream/master
 (defalias 'centaur-update-org #'update-org)
+
+(defun update-rime ()
+  "Update Rime settings to the latest version."
+  (interactive)
+  (message "Updating Rime settings...")
+  (centaur--vc-pull-directory "~/.rime/"))
+(defalias 'centaur-update-rime #'update-rime)
 
 (defun update-all ()
   "Update dotfiles, org files, configurations and packages to the latest.
@@ -471,7 +447,7 @@ Each step runs independently, so a failing repository or package
 upgrade doesn't prevent the remaining steps from running."
   (interactive)
   (let (failures)
-    (dolist (update '(update-org update-dotfiles update-config-and-packages))
+    (dolist (update '(update-org update-rime update-dotfiles update-config-and-packages))
       (condition-case err
           (funcall update)
         (error (push (format "%s: %s" update (error-message-string err)) failures))))
