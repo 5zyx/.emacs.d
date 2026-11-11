@@ -424,21 +424,24 @@ whose file list has finished loading, which is still empty right after
   "Update the dotfiles to the latest version."
   (interactive)
   (message "Updating dotfiles...")
-  (centaur--vc-pull-directory "~/.dotfiles/"))
+  (centaur--vc-pull-directory "~/.dotfiles/")
+  (message "Updating dotfiles...done"))
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
   (message "Updating org files...")
-  (centaur--vc-pull-directory "~/org/"))
+  (centaur--vc-pull-directory "~/org/")
+  (message "Updating org files...done"))
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-rime ()
   "Update Rime settings to the latest version."
   (interactive)
   (message "Updating Rime settings...")
-  (centaur--vc-pull-directory "~/.rime/"))
+  (centaur--vc-pull-directory "~/.rime/")
+  (message "Updating Rime settings...done"))
 (defalias 'centaur-update-rime #'update-rime)
 
 (defun update-all ()
