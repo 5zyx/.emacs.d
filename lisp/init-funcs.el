@@ -408,7 +408,11 @@ whose file list has finished loading, which is still empty right after
   "Refresh package contents and update all packages."
   (interactive)
   (message "Updating packages...")
-  (package-upgrade-all)
+  (when (fboundp 'package-upgrade-all)
+    (package-upgrade-all))
+  (when (and current-prefix-arg
+             (fboundp 'package-vc-upgrade-all))
+    (package-vc-upgrade-all))
   (delete-file (locate-user-emacs-file "package-quickstart.elc"))
   (message "Updating packages...done"))
 (defalias 'centaur-update-packages #'update-packages)
